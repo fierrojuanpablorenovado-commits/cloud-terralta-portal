@@ -372,6 +372,25 @@
     }
     .popup-btn.dev { background: #7c3aed; }
 
+    /* ─── LAYER CONTROL ─────────────────────────────────── */
+    .leaflet-control-layers {
+      border: none !important;
+      border-radius: 10px !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,.13) !important;
+      padding: 0 !important;
+      overflow: hidden;
+    }
+    .leaflet-control-layers-list {
+      padding: 6px 10px !important;
+    }
+    .leaflet-control-layers label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 600; color: #1a2e2b;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer; padding: 3px 0;
+    }
+    .leaflet-control-layers-separator { display: none; }
+
     /* Zona button */
     .zona-btn {
       display: flex; align-items: center; gap: 5px;
@@ -1001,21 +1020,17 @@ const ZONAS = {
     totalProps: null, // se calcula al cargar
     cp: "45594",
     municipio: "San Pedro Tlaquepaque",
-    // Polígono aproximado basado en propiedades verificadas + vialidades OSM
+    // Polígono basado en coordenadas geocodificadas reales de cada calle del fracc.
     polygon: [
-      [20.6145, -103.3608],
-      [20.6143, -103.3562],
-      [20.6140, -103.3528],
-      [20.6128, -103.3487],
-      [20.6105, -103.3470],
-      [20.6082, -103.3478],
-      [20.6068, -103.3502],
-      [20.6062, -103.3538],
-      [20.6065, -103.3578],
-      [20.6075, -103.3615],
-      [20.6098, -103.3638],
-      [20.6125, -103.3632],
-      [20.6145, -103.3608]
+      [20.6135, -103.3543],
+      [20.6132, -103.3595],
+      [20.6128, -103.3638],
+      [20.6105, -103.3648],
+      [20.6070, -103.3618],
+      [20.6065, -103.3558],
+      [20.6075, -103.3535],
+      [20.6095, -103.3532],
+      [20.6135, -103.3543]
     ]
   },
   altosur: {
@@ -1029,11 +1044,11 @@ const ZONAS = {
     cp: "44977",
     municipio: "El Rocío, Tlaquepaque",
     polygon: [
-      [20.6095, -103.3510],
-      [20.6095, -103.3460],
-      [20.6060, -103.3460],
-      [20.6055, -103.3510],
-      [20.6095, -103.3510]
+      [20.6158, -103.3645],
+      [20.6158, -103.3600],
+      [20.6130, -103.3600],
+      [20.6130, -103.3645],
+      [20.6158, -103.3645]
     ]
   }
 };
@@ -1053,15 +1068,31 @@ let activePopup = null;
 // MAP — centrado en Av. Terralta (coords Nominatim verificadas)
 // ================================================================
 const map = L.map('map', {
-  center: [20.6108, -103.3555],
-  zoom: 16,
+  center: [20.6100, -103.3590],
+  zoom: 15,
   zoomControl: true,
 });
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// Capa base: calles (OpenStreetMap)
+const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
-  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+});
+
+// Capa satélite: Esri World Imagery (gratis, sin API key)
+const satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom: 19,
+  attribution: 'Tiles © Esri — Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP'
+});
+
+osmLayer.addTo(map);
+
+// Control de capas: Calles / Satélite
+const layerControl = L.control.layers(
+  { '🗺 Calles': osmLayer, '🛰 Satélite': satLayer },
+  {},
+  { position: 'topright', collapsed: false }
+).addTo(map);
 
 map.zoomControl.setPosition('bottomleft');
 
@@ -1268,12 +1299,10 @@ function openPopupFor(prop) {
         ${m2txt ? `<div class="popup-m2">${m2txt}</div>` : ''}
         <div style="font-size:10.5px;color:#9ca3af;margin-top:6px;">${prop.extras || ''}</div>
         <div class="popup-footer">
-          ${popupListingUrl
-            ? `<a class="popup-btn secondary" href="${popupListingUrl}" target="_blank" style="font-size:11px;">📞 Ver teléfono</a>`
-            : ''
-          }
+          <a class="popup-btn secondary" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${prop.lat},${prop.lng}" target="_blank" style="font-size:11px;">🧍 Street View</a>
           <a class="popup-btn primary" href="https://wa.me/523314007580?text=${encodeURIComponent('Hola, me interesa la propiedad en ' + prop.calle + '. ¿Me pueden dar información?')}" target="_blank">📱 WhatsApp</a>
         </div>
+        ${popupListingUrl ? `<div style="text-align:center;padding:0 14px 10px;"><a href="${popupListingUrl}" target="_blank" style="font-size:11px;color:#6b7280;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">📋 Ver anuncio completo ↗</a></div>` : ''}
       </div>
     `)
     .openOn(map);
