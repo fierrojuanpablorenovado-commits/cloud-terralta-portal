@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Inmobiliaria · Acceso Exclusivo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1e3d6e 0%, #2f6bb5 50%, #1a5ea8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Partículas de fondo */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.04) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.97);
+      border-radius: 24px;
+      padding: 52px 48px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 8px 20px rgba(0,0,0,0.15);
+      text-align: center;
+      position: relative;
+    }
+
+    /* Logo container */
+    .logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .logo-img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 8px 24px rgba(30,61,110,0.25);
+    }
+
+    /* Fallback SVG logo si no hay imagen */
+    .logo-svg-fallback {
+      width: 100px;
+      height: 100px;
+    }
+
+    .tagline {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #2f6bb5;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e3d6e;
+      margin-bottom: 6px;
+      letter-spacing: -0.4px;
+    }
+
+    .subtitle {
+      font-size: 13.5px;
+      color: #64748b;
+      margin-bottom: 36px;
+      line-height: 1.5;
+    }
+
+    .input-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .input-wrap svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      width: 18px;
+      height: 18px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 16px;
+      font-family: inherit;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #1e3d6e;
+      font-weight: 600;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+      background: #f8fafc;
+    }
+    input[type="text"]:focus {
+      border-color: #2f6bb5;
+      box-shadow: 0 0 0 4px rgba(47,107,181,0.12);
+      background: #fff;
+    }
+    input[type="text"].error {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239,68,68,0.1);
+      animation: shake .3s ease;
+    }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+    }
+    input::placeholder { letter-spacing: 2px; font-size: 13px; font-weight: 400; color: #94a3b8; }
+
+    .error-msg {
+      font-size: 12.5px;
+      color: #ef4444;
+      text-align: left;
+      margin-bottom: 12px;
+      padding-left: 4px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #1e3d6e 0%, #2f6bb5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      letter-spacing: .5px;
+    }
+    .btn:hover { opacity: .9; }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    .divider {
+      margin: 28px 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #e2e8f0;
+    }
+
+    .footer-note {
+      font-size: 11.5px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      color: #0369a1;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Éxito */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(30,61,110,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 999;
+    }
+    .success-overlay.show { display: flex; }
+    .success-overlay .check { font-size: 56px; }
+    .success-overlay p { color: #fff; font-size: 18px; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="success-overlay" id="successOverlay">
+    <div class="check">✅</div>
+    <p>Acceso autorizado · Cargando portal...</p>
+  </div>
+
+  <div class="card">
+
+    <!-- LOGO -->
+    <div class="logo-wrap">
+      <!-- Imagen real del logo si existe -->
+      <svg class="logo-svg-fallback" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="100" fill="#4177B8"/>
+        <!-- Cloud shape -->
+        <ellipse cx="100" cy="78" rx="32" ry="20" fill="white"/>
+        <ellipse cx="78" cy="84" rx="22" ry="16" fill="white"/>
+        <ellipse cx="122" cy="84" rx="22" ry="16" fill="white"/>
+        <rect x="56" y="84" width="88" height="18" fill="white" rx="2"/>
+        <!-- House on cloud -->
+        <polygon points="100,52 80,72 120,72" fill="#4177B8"/>
+        <rect x="88" y="72" width="24" height="14" fill="#4177B8" rx="1"/>
+        <rect x="96" y="76" width="8" height="10" fill="white" rx="1"/>
+        <!-- CL☁UD text -->
+        <text x="100" y="132" text-anchor="middle"
+          font-family="Arial, sans-serif" font-weight="800"
+          font-size="22" fill="white" letter-spacing="2">CL☁UD</text>
+        <!-- INMOBILIARIA text -->
+        <text x="100" y="152" text-anchor="middle"
+          font-family="Arial, sans-serif" font-weight="400"
+          font-size="11" fill="rgba(255,255,255,0.85)" letter-spacing="3.5">INMOBILIARIA</text>
+      </svg>
+    </div>
+
+    <div class="badge">🔒 Portal Exclusivo · Solo Asesores</div>
+
+    <p class="tagline">Cloud Inmobiliaria</p>
+    <h1>Acceso al Portal</h1>
+    <p class="subtitle">Ingresa tu código de acceso para ver<br>el Mapa Inteligente de Propiedades Terralta</p>
+
+    <div class="input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <input
+        type="text"
+        id="codeInput"
+        placeholder="Código de acceso"
+        maxlength="10"
+        autocomplete="off"
+        autofocus
+        onkeydown="if(event.key==='Enter') tryAccess()"
+      >
+    </div>
+
+    <div class="error-msg" id="errorMsg">❌ Código incorrecto. Contacta a tu coordinador.</div>
+
+    <button class="btn" id="accessBtn" onclick="tryAccess()">
+      Acceder al Portal →
+    </button>
+
+    <div class="divider">portal privado</div>
+
+    <p class="footer-note">
+      🏠 Mapa en tiempo real de propiedades · Terralta, Tlaquepaque<br>
+      Datos actualizados automáticamente cada 24 horas
+    </p>
+
+  </div>
+
+  <script>
+    const ACCESS_CODE = 'LMA2026';
+    const SESSION_KEY = 'cloud_inmo_access';
+
+    // Si ya tiene acceso válido en esta sesión → ir directo al mapa
+    if (sessionStorage.getItem(SESSION_KEY) === ACCESS_CODE) {
+      window.location.replace('./mapa.html');
+    }
+
+    function tryAccess() {
+      const input = document.getElementById('codeInput');
+      const btn = document.getElementById('accessBtn');
+      const errMsg = document.getElementById('errorMsg');
+      const code = input.value.trim().toUpperCase();
+
+      if (!code) {
+        input.classList.add('error');
+        setTimeout(() => input.classList.remove('error'), 600);
+        return;
+      }
+
+      // Loading state
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Verificando...';
+      errMsg.classList.remove('show');
+
+      setTimeout(() => {
+        if (code === ACCESS_CODE) {
+          // Guardar en sessionStorage
+          sessionStorage.setItem(SESSION_KEY, ACCESS_CODE);
+
+          // Mostrar overlay de éxito y redirigir
+          document.getElementById('successOverlay').classList.add('show');
+          setTimeout(() => {
+            window.location.replace('./mapa.html');
+          }, 1200);
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = 'Acceder al Portal →';
+          input.classList.add('error');
+          errMsg.classList.add('show');
+          input.value = '';
+          setTimeout(() => input.classList.remove('error'), 600);
+          input.focus();
+        }
+      }, 600);
+    }
+  </script>
+</body>
+</html>

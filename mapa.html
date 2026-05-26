@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Inmobiliaria · Portal Exclusivo · Terralta</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ─── HEADER ──────────────────────────────────────────── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 1000;
+      box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    }
+
+    .logo { display: flex; align-items: center; gap: 10px; }
+
+    .logo-mark {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #1a2e2b 0%, #2a5248 100%);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-mark svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 1.8; }
+
+    .logo-text { line-height: 1.1; }
+    .logo-name { font-size: 15px; font-weight: 800; letter-spacing: -.4px; color: #1a2e2b; }
+    .logo-tagline { font-size: 10.5px; color: #9ca3af; font-weight: 400; }
+
+    .header-right { display: flex; align-items: center; gap: 10px; }
+
+    .zona-pill {
+      display: flex; align-items: center; gap: 5px;
+      background: #fef3e8; border: 1px solid #fcd9aa;
+      color: #c05621; padding: 5px 12px;
+      border-radius: 100px; font-size: 12px; font-weight: 600;
+    }
+
+    .data-badge {
+      background: #f0fdf4; border: 1px solid #bbf7d0;
+      color: #15803d; padding: 5px 10px;
+      border-radius: 100px; font-size: 11px; font-weight: 600;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    .btn-fuente {
+      background: #1a2e2b; color: #fff; border: none;
+      padding: 8px 18px; border-radius: 100px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: opacity .15s; font-family: inherit;
+    }
+    .btn-fuente:hover { opacity: .85; }
+
+    /* ─── LAYOUT ──────────────────────────────────────────── */
+    main { display: flex; height: calc(100vh - 60px); margin-top: 60px; }
+
+    /* ─── SIDEBAR ─────────────────────────────────────────── */
+    .sidebar {
+      width: 370px; min-width: 370px;
+      background: #fff; border-right: 1px solid #e5e7eb;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    .sidebar-top { padding: 16px 18px 12px; border-bottom: 1px solid #f1f3f5; }
+    .sidebar-heading { font-size: 17px; font-weight: 700; color: #111827; }
+    .sidebar-sub { font-size: 11.5px; color: #9ca3af; margin-top: 1px; }
+
+    .stats-row { display: flex; gap: 8px; margin-top: 10px; }
+    .stat-chip {
+      background: #f3f4f6; border-radius: 8px;
+      padding: 6px 10px; font-size: 11px; color: #4b5563;
+      flex: 1; text-align: center;
+    }
+    .stat-chip strong { display: block; font-size: 14px; font-weight: 700; color: #1a2e2b; }
+
+    /* Filters */
+    .filters-section { padding: 12px 18px; border-bottom: 1px solid #f1f3f5; }
+    .filter-label {
+      font-size: 11px; font-weight: 600; color: #6b7280;
+      text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px;
+    }
+    .tipo-chips { display: flex; gap: 6px; }
+
+    .chip {
+      padding: 6px 12px; border-radius: 100px;
+      border: 1.5px solid #e5e7eb; background: #fff;
+      font-size: 12px; font-weight: 500; color: #6b7280;
+      cursor: pointer; transition: all .15s; font-family: inherit;
+    }
+    .chip.active { border-color: #1a2e2b; background: #1a2e2b; color: #fff; }
+    .chip:hover:not(.active) { border-color: #1a2e2b; color: #1a2e2b; }
+
+    /* Price slider */
+    .precio-section { padding: 12px 18px; border-bottom: 1px solid #f1f3f5; }
+    .precio-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 8px;
+    }
+    .precio-val { font-size: 13px; font-weight: 700; color: #1a2e2b; }
+
+    input[type="range"] {
+      width: 100%; -webkit-appearance: none;
+      height: 4px; border-radius: 4px;
+      background: linear-gradient(to right, #1a2e2b 100%, #e5e7eb 100%);
+      outline: none; cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; background: #fff;
+      border: 2.5px solid #1a2e2b; cursor: pointer;
+      box-shadow: 0 1px 6px rgba(0,0,0,.15);
+    }
+
+    /* Results bar */
+    .results-bar {
+      padding: 8px 18px; background: #fafafa;
+      border-bottom: 1px solid #f1f3f5;
+      font-size: 12px; color: #9ca3af;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .results-bar strong { color: #1a2e2b; }
+    .fuente-tag {
+      font-size: 10px; font-weight: 600; color: #6b7280;
+      background: #f3f4f6; padding: 2px 7px; border-radius: 4px;
+    }
+
+    /* Property list */
+    .prop-list {
+      overflow-y: auto; flex: 1; padding: 12px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .prop-list::-webkit-scrollbar { width: 3px; }
+    .prop-list::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 3px; }
+
+    /* Property card */
+    .prop-card {
+      border: 1.5px solid #e5e7eb; border-radius: 12px;
+      overflow: hidden; cursor: pointer; background: #fff;
+      transition: all .18s;
+    }
+    .prop-card:hover { border-color: #1a2e2b; box-shadow: 0 4px 14px rgba(26,46,43,.1); }
+    .prop-card.active { border-color: #1a2e2b; box-shadow: 0 0 0 2px #1a2e2b22, 0 4px 14px rgba(26,46,43,.12); }
+
+    .card-img-wrap { position: relative; height: 150px; overflow: hidden; background: #e5e7eb; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* Property type tag */
+    .tipo-tag {
+      position: absolute; top: 8px; right: 8px;
+      background: #1a2e2b; color: #fff;
+      font-size: 9.5px; font-weight: 600;
+      padding: 3px 7px; border-radius: 5px; letter-spacing: .3px;
+    }
+
+    /* Remate badge */
+    .remate-badge {
+      position: absolute; top: 8px; left: 8px;
+      background: rgba(220,38,38,.9); color: #fff;
+      border-radius: 100px; padding: 3px 9px;
+      font-size: 10px; font-weight: 700;
+    }
+
+    .renta-badge {
+      position: absolute; top: 8px; left: 8px;
+      background: rgba(37,99,235,.92); color: #fff;
+      border-radius: 100px; padding: 3px 9px;
+      font-size: 10px; font-weight: 700;
+    }
+
+    /* Precio market badge */
+    .mercado-badge {
+      position: absolute; top: 8px; left: 8px;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      border-radius: 100px; padding: 3px 9px;
+      font-size: 10.5px; font-weight: 700; color: #1a2e2b;
+    }
+
+    .card-body { padding: 11px 13px 12px; }
+    .card-precio { font-size: 16px; font-weight: 700; color: #1a2e2b; }
+    .card-calle {
+      font-size: 11.5px; color: #6b7280; margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .card-specs { display: flex; gap: 12px; margin-top: 7px; }
+    .spec-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #6b7280; }
+    .spec-ico { font-size: 13px; }
+
+    .card-footer {
+      margin-top: 8px; padding-top: 8px;
+      border-top: 1px solid #f1f3f5;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .fuente-link {
+      font-size: 10px; color: #9ca3af; text-decoration: none;
+      display: flex; align-items: center; gap: 3px;
+    }
+    .fuente-link:hover { color: #1a2e2b; }
+    .m2-tag { font-size: 11px; color: #9ca3af; }
+
+    /* No results */
+    .no-results {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #d1d5db; padding: 30px; text-align: center;
+    }
+    .no-results .nr-icon { font-size: 40px; margin-bottom: 12px; }
+    .no-results p { font-size: 13px; color: #9ca3af; }
+
+    /* ─── MAP ─────────────────────────────────────────────── */
+    #map { flex: 1; height: 100%; z-index: 0; }
+
+    /* ─── LEAFLET OVERRIDES ───────────────────────────────── */
+    .leaflet-control-zoom {
+      border: none !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,.12) !important;
+      border-radius: 10px !important; overflow: hidden;
+    }
+    .leaflet-control-zoom a {
+      width: 34px !important; height: 34px !important;
+      line-height: 34px !important; font-size: 17px !important;
+      color: #1a2e2b !important; border-bottom: 1px solid #f1f3f5 !important;
+    }
+    .leaflet-control-zoom a:last-child { border-bottom: none !important; }
+    .leaflet-control-attribution {
+      font-size: 9px !important;
+      background: rgba(255,255,255,.7) !important;
+    }
+
+    /* Price marker on map */
+    .map-pin {
+      background: #1a2e2b; color: #fff;
+      padding: 5px 11px; border-radius: 100px;
+      font-size: 11.5px; font-weight: 700;
+      white-space: nowrap; border: 2px solid #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,.2);
+      cursor: pointer; transition: background .12s, transform .12s;
+      user-select: none;
+    }
+    .map-pin:hover { background: #c05621; transform: scale(1.06); }
+    .map-pin.sel { background: #c05621; transform: scale(1.06); }
+    .map-pin.remate { background: #dc2626; }
+    .map-pin.remate:hover, .map-pin.remate.sel { background: #991b1b; }
+
+    /* Popup */
+    .leaflet-popup-content-wrapper {
+      border-radius: 14px !important;
+      box-shadow: 0 10px 30px rgba(0,0,0,.14) !important;
+      border: 1px solid #e5e7eb !important;
+      padding: 0 !important; overflow: hidden;
+    }
+    .leaflet-popup-content { margin: 0 !important; width: 278px !important; }
+    .leaflet-popup-close-button {
+      top: 6px !important; right: 8px !important;
+      font-size: 18px !important; color: #fff !important;
+      text-shadow: 0 1px 3px rgba(0,0,0,.3); z-index: 10;
+    }
+    .leaflet-popup-tip-container { display: none; }
+
+    .popup-img { display: block; width: 100%; height: 140px; object-fit: cover; }
+    .popup-body { padding: 12px 14px 14px; }
+    .popup-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .popup-precio { font-size: 18px; font-weight: 800; color: #1a2e2b; }
+    .popup-remate-tag {
+      background: #fef2f2; color: #dc2626;
+      border: 1px solid #fecaca; border-radius: 4px;
+      font-size: 9px; font-weight: 700; padding: 2px 6px;
+      white-space: nowrap; margin-top: 4px;
+    }
+    .popup-calle { font-size: 11.5px; color: #9ca3af; margin-top: 2px; }
+    .popup-specs { display: flex; gap: 10px; margin-top: 8px; font-size: 12px; color: #6b7280; }
+    .popup-m2 { margin-top: 6px; font-size: 11px; color: #9ca3af; }
+    .popup-footer {
+      margin-top: 10px; padding-top: 8px;
+      border-top: 1px solid #f1f3f5;
+      display: flex; gap: 8px;
+    }
+    .popup-btn {
+      flex: 1; padding: 7px; border-radius: 8px;
+      text-align: center; font-size: 11.5px; font-weight: 600;
+      text-decoration: none; cursor: pointer;
+      transition: opacity .15s;
+    }
+    .popup-btn.primary { background: #1a2e2b; color: #fff; }
+    .popup-btn.secondary {
+      background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb;
+    }
+    .popup-btn:hover { opacity: .85; }
+
+    /* ─── DESARROLLOS ────────────────────────────────────── */
+    .map-pin.dev { background: #7c3aed; }
+    .map-pin.dev:hover, .map-pin.dev.sel { background: #5b21b6; }
+    .map-pin.renta { background: #2563eb; }
+    .map-pin.renta:hover, .map-pin.renta.sel { background: #1d4ed8; }
+    .map-pin.depto { background: #d97706; }
+    .map-pin.depto:hover, .map-pin.depto.sel { background: #b45309; }
+
+    .dev-section-header {
+      padding: 10px 12px 4px;
+      font-size: 10.5px; font-weight: 700;
+      color: #7c3aed; text-transform: uppercase; letter-spacing: .6px;
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    .dev-card {
+      border: 1.5px solid #ede9fe; border-radius: 12px;
+      overflow: hidden; cursor: pointer; background: #fff;
+      transition: all .18s;
+    }
+    .dev-card:hover { border-color: #7c3aed; box-shadow: 0 4px 14px rgba(124,58,237,.1); }
+    .dev-card.active { border-color: #7c3aed; box-shadow: 0 0 0 2px rgba(124,58,237,.15), 0 4px 14px rgba(124,58,237,.12); }
+
+    .dev-badge {
+      position: absolute; top: 8px; left: 8px;
+      background: rgba(124,58,237,.92); color: #fff;
+      border-radius: 100px; padding: 3px 9px;
+      font-size: 10px; font-weight: 700;
+    }
+
+    .dev-card .card-precio { color: #7c3aed; }
+    .dev-card .card-footer { border-top-color: #f5f3ff; }
+
+    .modelo-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+    .modelo-chip {
+      background: #f5f3ff; color: #7c3aed; border: 1px solid #ede9fe;
+      border-radius: 6px; padding: 2px 8px;
+      font-size: 10.5px; font-weight: 600;
+    }
+
+    /* Placeholder sin foto */
+    .card-img-ph {
+      width: 100%; height: 100%;
+      background: #f3f4f6;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px;
+    }
+    .card-img-ph span { font-size: 34px; }
+    .card-img-ph small { font-size: 10.5px; color: #9ca3af; }
+    .popup-img-ph {
+      width: 100%; height: 70px;
+      background: #f3f4f6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+
+    .popup-dev-tag {
+      background: #f5f3ff; color: #7c3aed;
+      border: 1px solid #ede9fe; border-radius: 4px;
+      font-size: 9px; font-weight: 700; padding: 2px 6px;
+      white-space: nowrap; margin-top: 4px;
+    }
+    .popup-btn.dev { background: #7c3aed; }
+
+    /* Zona button */
+    .zona-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: #f0fdf4; border: 1.5px solid #86efac;
+      color: #16a34a; padding: 5px 12px;
+      border-radius: 100px; font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: all .15s;
+    }
+    .zona-btn:hover, .zona-btn.active { background: #16a34a; color: #fff; border-color: #16a34a; }
+
+    /* Zona selector macro */
+    .zona-selector {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      z-index: 900; display: flex; gap: 8px;
+      background: #fff; border: 1px solid #e5e7eb;
+      padding: 6px 10px; border-radius: 100px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.1);
+    }
+    .zona-chip {
+      padding: 5px 14px; border-radius: 100px;
+      border: 1.5px solid #e5e7eb; background: #fff;
+      font-size: 12px; font-weight: 600; color: #4b5563;
+      cursor: pointer; transition: all .15s; font-family: inherit;
+    }
+    .zona-chip.active { border-color: #16a34a; background: #16a34a; color: #fff; }
+    .zona-chip:hover:not(.active) { border-color: #16a34a; color: #16a34a; }
+
+    /* Map overlay */
+    .map-overlay {
+      position: absolute; bottom: 18px; right: 16px; z-index: 800;
+      background: #fff; border-radius: 10px; padding: 10px 14px;
+      font-size: 11.5px; color: #6b7280;
+      box-shadow: 0 2px 10px rgba(0,0,0,.1); border: 1px solid #e5e7eb;
+      pointer-events: none;
+    }
+    .map-overlay strong { color: #1a2e2b; font-size: 13px; }
+    .map-overlay .src { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────────────────────── -->
+<header>
+  <div class="logo">
+    <!-- Cloud Inmobiliaria brand -->
+    <svg width="38" height="38" viewBox="0 0 200 200" style="border-radius:50%;flex-shrink:0;">
+      <circle cx="100" cy="100" r="100" fill="#4177B8"/>
+      <ellipse cx="100" cy="78" rx="32" ry="20" fill="white"/>
+      <ellipse cx="78" cy="84" rx="22" ry="16" fill="white"/>
+      <ellipse cx="122" cy="84" rx="22" ry="16" fill="white"/>
+      <rect x="56" y="84" width="88" height="18" fill="white" rx="2"/>
+      <polygon points="100,52 80,72 120,72" fill="#4177B8"/>
+      <rect x="88" y="72" width="24" height="14" fill="#4177B8" rx="1"/>
+      <rect x="96" y="76" width="8" height="10" fill="white" rx="1"/>
+      <text x="100" y="127" text-anchor="middle" font-family="Arial" font-weight="800" font-size="18" fill="white">CL&#9729;UD</text>
+    </svg>
+    <div class="logo-text">
+      <div class="logo-name" style="color:#1e3d6e;">CLOUD INMOBILIARIA</div>
+      <div class="logo-tagline">Portal Exclusivo · Terralta, San Pedro Tlaquepaque</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="data-badge" id="update-badge">🔄 Cargando...</div>
+    <div class="zona-pill">📍 Fracc. Terralta · CP 45594</div>
+    <button class="zona-btn active" id="btn-zona-terralta" onclick="toggleZona('terralta')">🗺 Ver zona</button>
+  </div>
+</header>
+
+<!-- Selector de zonas macro (expandible) -->
+<div class="zona-selector" id="zona-selector" style="display:none;">
+  <button class="zona-chip active" data-zona="terralta" onclick="focusZona('terralta')">📍 Terralta</button>
+  <button class="zona-chip" data-zona="altosur" onclick="focusZona('altosur')" style="opacity:.5;cursor:default" title="Próximamente">Altosur</button>
+  <button class="zona-chip" data-zona="jardines" onclick="focusZona('jardines')" style="opacity:.5;cursor:default" title="Próximamente">Jardines del Nilo</button>
+  <button class="zona-chip" style="opacity:.5;cursor:default">+ agregar zona</button>
+</div>
+
+<!-- ─── MAIN ──────────────────────────────────────────────── -->
+<main>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="sidebar-top">
+      <div class="sidebar-heading">Propiedades en Terralta</div>
+      <div class="sidebar-sub">San Pedro Tlaquepaque, Jalisco · CP 45594 · Datos: Inmuebles24, MercadoLibre, propiedades.com</div>
+      <div class="stats-row">
+        <div class="stat-chip">
+          <strong id="stat-total">36</strong>
+          activas
+        </div>
+        <div class="stat-chip">
+          <strong>$450K</strong>
+          precio mín.
+        </div>
+        <div class="stat-chip">
+          <strong>$3.0M</strong>
+          precio máx.
+        </div>
+      </div>
+    </div>
+
+    <!-- Tipo filter -->
+    <div class="filters-section">
+      <div class="filter-label">Filtrar por tipo</div>
+      <div class="tipo-chips">
+        <button class="chip active" data-tipo="Todos">Todos</button>
+        <button class="chip" data-tipo="Venta">💰 Venta</button>
+        <button class="chip" data-tipo="Renta">🏠 Renta</button>
+        <button class="chip" data-tipo="Remate">🔴 Remate</button>
+        <button class="chip" data-tipo="Nuevo">🏗 Nuevo</button>
+      </div>
+    </div>
+
+    <!-- Price slider -->
+    <div class="precio-section">
+      <div class="precio-row">
+        <span class="filter-label" style="margin:0">Precio máximo</span>
+        <span class="precio-val" id="precio-display">$3,000,000</span>
+      </div>
+      <input type="range" id="precio-slider" min="500000" max="3000000" step="50000" value="3000000">
+    </div>
+
+    <!-- Results bar -->
+    <div class="results-bar">
+      <span>Mostrando <strong id="result-count">10</strong> propiedades</span>
+      <span class="fuente-tag">Mayo 2026</span>
+    </div>
+
+    <!-- Property list -->
+    <div class="prop-list" id="prop-list"></div>
+
+  </div>
+
+  <!-- MAP -->
+  <div style="flex:1; position:relative;">
+    <div id="map"></div>
+    <div class="map-overlay">
+      <strong>Fraccionamiento Terralta</strong><br>
+      San Pedro Tlaquepaque, Jalisco<br>
+      <span class="src">Fuente: MercadoLibre · propiedades.com</span>
+    </div>
+  </div>
+
+</main>
+
+<!-- ─── SCRIPTS ───────────────────────────────────────────── -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ================================================================
+// DATOS REALES — Fraccionamiento Terralta, Tlaquepaque, Jal.
+// CP 45594 · Fuente: MercadoLibre, propiedades.com, nestoria.mx
+// Relevados: Mayo 2026
+// ================================================================
+// COORDENADAS: ancladas en Av. Terralta (Nominatim 20.609,-103.356)
+// y distribuidas por calle según mapa Google Maps del listing MLM-2899509175
+// ================================================================
+const PROPS = [
+  {
+    id: 1,
+    tipo: "Mercado",
+    titulo: "Casa en Tierra de Esperanza",
+    calle: "Tierra De Esperanza, Terralta",
+    precio: 2980000,
+    m2c: 96, m2t: null, rec: 3, ban: 3, estac: 2,
+    extras: "Jardín · Condominio cerrado · 15 años antigüedad",
+    remate: false,
+    lat: 20.6098, lng: -103.3554,
+    url: "https://casa.mercadolibre.com.mx/MLM-2899509175",
+    fuente: "MercadoLibre",
+    img: "https://http2.mlstatic.com/D_NQ_NP_646891-MLM110131552494_042026-F-hermosaen-esquina-y-dentro-de-coto-casa-dentro-de-periferico-cerca-de-todo.webp"
+  },
+  {
+    id: 2,
+    tipo: "Remate",
+    titulo: "Casa Remate — Tierra de Unicornios 188",
+    calle: "Tierra de Unicornios #188, Terralta",
+    precio: 998000,
+    m2c: 86, m2t: 102, rec: 3, ban: 1.5, estac: null,
+    extras: "Remate bancario · Solo contado · Sin poder visitar",
+    remate: true,
+    lat: 20.6128, lng: -103.3572,
+    url: "https://propiedades.com/inmuebles/casa-en-venta-calle-tierra-de-unicornios-188-terralta-jalisco-21789035",
+    fuente: "propiedades.com",
+    img: null
+  },
+  {
+    id: 3,
+    tipo: "Remate",
+    titulo: "Casa Remate — Tierra de Unicornios",
+    calle: "Tierra de Unicornios, Terralta",
+    precio: 530000,
+    m2c: 110, m2t: null, rec: 3, ban: 2, estac: null,
+    extras: "Remate bancario · Entrega 6-14 meses · Solo contado",
+    remate: true,
+    lat: 20.6132, lng: -103.3578,
+    url: "https://propiedades.com/inmuebles/casa-en-venta-tierra-de-unicornios-terralta-jalisco-27651145",
+    fuente: "propiedades.com",
+    img: null
+  },
+  {
+    id: 4,
+    tipo: "Mercado",
+    titulo: "Casa en Tierra Contenta 170",
+    calle: "Tierra Contenta #170, Terralta",
+    precio: 747000,
+    m2c: 94, m2t: null, rec: 3, ban: 2, estac: null,
+    extras: "En fraccionamiento privado",
+    remate: false,
+    lat: 20.6120, lng: -103.3525,
+    url: "https://listado.mercadolibre.com.mx/casa-en-venta-en-terralta-en-tlaquepaque-jalisco",
+    fuente: "MercadoLibre",
+    img: null
+  },
+  {
+    id: 5,
+    tipo: "Mercado",
+    titulo: "Casa en Tierra de Danza 168",
+    calle: "Tierra De Danza #168, Terralta",
+    precio: 706000,
+    m2c: 80, m2t: null, rec: 3, ban: 1, estac: null,
+    extras: "Dentro de fracc. cerrado",
+    remate: false,
+    lat: 20.6112, lng: -103.3562,
+    url: "https://listado.mercadolibre.com.mx/casa-en-venta-en-terralta-en-tlaquepaque-jalisco",
+    fuente: "MercadoLibre",
+    img: null
+  },
+  {
+    id: 6,
+    tipo: "Mercado",
+    titulo: "Casa en Tierra de Danza",
+    calle: "Tierra De Danza, Terralta",
+    precio: 755960,
+    m2c: 102, m2t: null, rec: 3, ban: 2, estac: null,
+    extras: "Fracc. privado · Vigilancia",
+    remate: false,
+    lat: 20.6109, lng: -103.3568,
+    url: "https://listado.mercadolibre.com.mx/casa-en-venta-en-terralta-en-tlaquepaque-jalisco",
+    fuente: "MercadoLibre",
+    img: null
+  },
+  {
+    id: 7,
+    tipo: "Mercado",
+    titulo: "Casa en Tierra de Danza 1-300",
+    calle: "Tierra De Danza 1-300, Terralta",
+    precio: 706000,
+    m2c: 86, m2t: null, rec: 2, ban: 1, estac: null,
+    extras: "Fracc. privado",
+    remate: false,
+    lat: 20.6106, lng: -103.3565,
+    url: "https://listado.mercadolibre.com.mx/casa-en-venta-en-terralta-en-tlaquepaque-jalisco",
+    fuente: "MercadoLibre",
+    img: null
+  },
+  {
+    id: 8,
+    tipo: "Remate",
+    titulo: "Casa Remate — Tierra Hermosa",
+    calle: "Tierra Hermosa, Terralta",
+    precio: 720000,
+    m2c: 145, m2t: 100, rec: 3, ban: 1.5, estac: 2,
+    extras: "Remate bancario · Cuarto servicio · 2 estac.",
+    remate: true,
+    lat: 20.6115, lng: -103.3542,
+    url: "https://www.lamudi.com.mx/jalisco/tlaquepaque/terralta-1/foreclosures/for-sale/",
+    fuente: "Lamudi",
+    img: null
+  },
+  {
+    id: 9,
+    tipo: "Remate",
+    titulo: "Casa Remate — Terra Contenta",
+    calle: "Terra Contenta, Terralta",
+    precio: 871000,
+    m2c: 145, m2t: 100, rec: 3, ban: 1.5, estac: null,
+    extras: "Remate bancario · Entrega estimada 6-14 meses",
+    remate: true,
+    lat: 20.6118, lng: -103.3532,
+    url: "https://www.lamudi.com.mx/jalisco/tlaquepaque/terralta-1/foreclosures/for-sale/",
+    fuente: "Lamudi",
+    img: null
+  },
+  {
+    id: 10,
+    tipo: "Mercado",
+    titulo: "Casa en Terralta",
+    calle: "Terralta, Tlaquepaque",
+    precio: 672000,
+    m2c: 60, m2t: null, rec: 2, ban: 1, estac: null,
+    extras: "Fracc. cerrado",
+    remate: false,
+    lat: 20.6095, lng: -103.3559,
+    url: "https://listado.mercadolibre.com.mx/casa-en-venta-en-terralta-en-tlaquepaque-jalisco",
+    fuente: "MercadoLibre",
+    img: null
+  },
+  // ── CASAS EN RENTA ──────────────────────────────────────────
+  {
+    id: 11, modalidad: "Renta", tipoProp: "Casa",
+    titulo: "Casa en Renta — Tierra Tranquila",
+    calle: "Tierra Tranquila 289, Terralta",
+    precio: 11500, m2c: 83, rec: 3, ban: 2, estac: 2,
+    extras: "Fracc. cerrado · 2 estacionamientos · Cerca Av. 8 de Julio",
+    remate: false, lat: 20.6100, lng: -103.3545,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/76/62/95/720x532/1604329606.jpg"
+  },
+  {
+    id: 12, modalidad: "Renta", tipoProp: "Casa",
+    titulo: "Casa en Renta — Fracc. AltoSur",
+    calle: "Fracc. AltoSur, San Pedro Tlaquepaque",
+    precio: 13000, m2c: 105, rec: 2, ban: 3, estac: 1,
+    extras: "Condominio cerrado · Vigilancia",
+    remate: false, lat: 20.6078, lng: -103.3492,
+    fuente: "Pincali", img: null
+  },
+  {
+    id: 13, modalidad: "Renta", tipoProp: "Casa",
+    titulo: "Casa en Renta — Condominio AltoSur",
+    calle: "Fracc. AltoSur, San Pedro Tlaquepaque",
+    precio: 11200, m2c: 71, rec: 2, ban: 2, estac: 1,
+    extras: "Condominio cerrado · 1 estacionamiento",
+    remate: false, lat: 20.6075, lng: -103.3496,
+    fuente: "Pincali", img: null
+  },
+  // ── DEPARTAMENTOS EN VENTA ───────────────────────────────────
+  {
+    id: 14, modalidad: "Venta", tipoProp: "Depto",
+    titulo: "Depto en Venta — Tierra Encantada 209",
+    calle: "Av. Tierra Encantada 209, Terralta",
+    precio: 1986000, m2c: 70, rec: 3, ban: 2, estac: 2,
+    extras: "Nuevo · Entrega inmediata · 2 estac.",
+    remate: false, lat: 20.6108, lng: -103.3538,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/33/48/97/720x532/1595330277.jpg"
+  },
+  {
+    id: 15, modalidad: "Venta", tipoProp: "Depto",
+    titulo: "Depto en Venta — Las Nubes Residencial",
+    calle: "Las Nubes Residencial, Terralta",
+    precio: 1960455, m2c: 60, rec: 2, ban: 2, estac: 1,
+    extras: "Nuevo · Desarrollo vertical · 1 estac.",
+    remate: false, lat: 20.6105, lng: -103.3540,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/47/73/28/96/720x532/1563052455.jpg"
+  },
+  {
+    id: 16, modalidad: "Venta", tipoProp: "Depto",
+    titulo: "Depto en Venta — Tierra Encantada",
+    calle: "Tierra Encantada, Terralta",
+    precio: 2300000, m2c: 73, rec: 2, ban: 2, estac: 2,
+    extras: "Pool · Gym · Rooftop · 2 estac.",
+    remate: false, lat: 20.6112, lng: -103.3535,
+    fuente: "casasyterrenos.com", img: null
+  },
+  {
+    id: 17, modalidad: "Venta", tipoProp: "Depto",
+    titulo: "Depto en Venta — Tierra de Gloria",
+    calle: "Tierra de Gloria, Terralta",
+    precio: 1650000, m2c: 65, rec: 2, ban: 2, estac: 1,
+    extras: "Nuevo · Desarrollo vertical",
+    remate: false, lat: 20.6103, lng: -103.3548,
+    fuente: "casasyterrenos.com", img: null
+  },
+  // ── DEPARTAMENTOS EN RENTA ───────────────────────────────────
+  {
+    id: 18, modalidad: "Renta", tipoProp: "Depto",
+    titulo: "Depto en Renta — Las Nubes Residencial",
+    calle: "Las Nubes Residencial, Terralta",
+    precio: 13000, m2c: 71, rec: 3, ban: 2, estac: 1,
+    extras: "Torre vertical · Amenidades · Elevador",
+    remate: false, lat: 20.6107, lng: -103.3541,
+    fuente: "Pincali", img: null
+  },
+  {
+    id: 19, modalidad: "Renta", tipoProp: "Depto",
+    titulo: "Depto en Renta — Tierra del Honor",
+    calle: "Tierra del Honor 845, Terralta",
+    precio: 10500, m2c: 51, rec: 2, ban: 1, estac: 1,
+    extras: "Condominio vertical · 1 estac.",
+    remate: false, lat: 20.6102, lng: -103.3550,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/97/42/83/720x532/1608719453.jpg"
+  },
+  {
+    id: 20, modalidad: "Renta", tipoProp: "Depto",
+    titulo: "Depto en Renta — Tierra del Honor",
+    calle: "Tierra del Honor, Terralta",
+    precio: 8000, m2c: 65, rec: 2, ban: 2, estac: 1,
+    extras: "Condominio vertical · Elevador",
+    remate: false, lat: 20.6100, lng: -103.3552,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/45/66/69/53/720x532/1510241052.jpg"
+  },
+  {
+    id: 21, modalidad: "Renta", tipoProp: "Depto",
+    titulo: "Depto en Renta — Tierra de Honor Oriente",
+    calle: "Tierra de Honor Oriente, Terralta",
+    precio: 9250, m2c: 54, rec: 2, ban: 1, estac: 1,
+    extras: "Condominio vertical · 1 estac.",
+    remate: false, lat: 20.6097, lng: -103.3548,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/40/46/08/720x532/1596735832.jpg"
+  },
+  // ── NUEVAS: INMUEBLES24 TERRALTA · Mayo 2026 ────────────────
+  {
+    id: 22, modalidad: "Venta", tipoProp: "Depto",
+    titulo: "Depto en Venta — Las Nubes Residencial",
+    calle: "Las Nubes Residencial, Terralta",
+    precio: 1950000, m2c: 70, rec: 3, ban: 2, estac: 2,
+    extras: "Planta baja · Jardín · 2 estac.",
+    remate: false, lat: 20.6106, lng: -103.3541,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/47/09/02/12/720x532/1547878932.jpg"
+  },
+  {
+    id: 23, modalidad: "Venta", tipoProp: "Casa",
+    titulo: "Casa en Venta — Coto San Gabriel",
+    calle: "Tierra de Unicornios 238, Coto San Gabriel",
+    precio: 3000000, m2c: 105, rec: 3, ban: 2, estac: 2,
+    extras: "Coto privado · Jardín · 2 estac.",
+    remate: false, lat: 20.6130, lng: -103.3570,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/93/87/10/720x532/1607985144.jpg"
+  },
+  {
+    id: 24, modalidad: "Renta", tipoProp: "Depto",
+    titulo: "Depto Amueblado en Renta — Tierra Encantada",
+    calle: "Tierra Encantada 209, Terralta",
+    precio: 15000, m2c: 71, rec: 3, ban: 2, estac: 1,
+    extras: "Amueblado · Amenidades · Elevador",
+    remate: false, lat: 20.6109, lng: -103.3536,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/28/38/85/720x532/1594262154.jpg"
+  },
+  {
+    id: 25, modalidad: "Renta", tipoProp: "Depto",
+    titulo: "Depto Amueblado Premium en Renta — Tierra Encantada",
+    calle: "Tierra Encantada 209, Terralta",
+    precio: 16500, m2c: 71, rec: 3, ban: 2, estac: 2,
+    extras: "Amueblado · Rooftop · 2 estac.",
+    remate: false, lat: 20.6110, lng: -103.3537,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/86/31/90/720x532/1606388451.jpg"
+  },
+  {
+    id: 26, modalidad: "Venta", tipoProp: "Casa",
+    titulo: "Casa Remate — Tierra Contenta 198",
+    calle: "Tierra Contenta 198, Terralta",
+    precio: 902000, m2c: 96, rec: 2, ban: 2, estac: 2,
+    extras: "Remate bancario · 2 estacionamientos",
+    remate: true, lat: 20.6122, lng: -103.3524,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/67/56/22/720x532/1602491579.jpg"
+  },
+  {
+    id: 27, modalidad: "Venta", tipoProp: "Casa",
+    titulo: "Casa Remate — Tierra de Ilusiones",
+    calle: "Tierra de Ilusiones, Terralta",
+    precio: 650000, m2c: 98, rec: 3, ban: 2, estac: 2,
+    extras: "Remate bancario · 2 estacionamientos",
+    remate: true, lat: 20.6118, lng: -103.3565,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/47/59/70/720x532/1598190427.jpg"
+  },
+  {
+    id: 28, modalidad: "Venta", tipoProp: "Depto",
+    titulo: "Depto PB en Venta — Av. Terralta Central",
+    calle: "Av. Terralta Central, Terralta",
+    precio: 1990000, m2c: 134, rec: 2, ban: 2, estac: null,
+    extras: "Planta baja · Terraza amplia · Jardín privado",
+    remate: false, lat: 20.6096, lng: -103.3556,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/36/98/53/720x532/1596052242.jpg"
+  },
+  {
+    id: 29, modalidad: "Renta", tipoProp: "Depto",
+    titulo: "Depto en Renta — Tierra Encantada",
+    calle: "Av. Tierra Encantada 209, Terralta",
+    precio: 10000, m2c: 87, rec: 2, ban: 2, estac: 1,
+    extras: "Desarrollo vertical · Amenidades · 1 estac.",
+    remate: false, lat: 20.6107, lng: -103.3539,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/40/51/33/720x532/1596744997.jpg"
+  },
+  {
+    id: 30, modalidad: "Venta", tipoProp: "Casa",
+    titulo: "Casa Remate — Tierra Hermosa",
+    calle: "Tierra Hermosa, Terralta",
+    precio: 450000, m2c: 103, rec: 3, ban: 2, estac: 2,
+    extras: "Remate bancario · 2 estacionamientos",
+    remate: true, lat: 20.6116, lng: -103.3543,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/47/59/57/720x532/1598189572.jpg"
+  },
+  {
+    id: 31, modalidad: "Venta", tipoProp: "Depto",
+    titulo: "Depto en Venta — Tierra Encantada 209",
+    calle: "Av. Tierra Encantada 209, Terralta",
+    precio: 1950000, m2c: 71, rec: 3, ban: 2, estac: 2,
+    extras: "Nuevo · Desarrollo Las Nubes · 2 estac.",
+    remate: false, lat: 20.6108, lng: -103.3540,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/49/47/52/720x532/1598619174.jpg"
+  },
+  {
+    id: 32, modalidad: "Venta", tipoProp: "Casa",
+    titulo: "Casa en Venta — Tierra Contenta",
+    calle: "Tierra Contenta, Terralta",
+    precio: 1050000, m2c: 96, rec: 3, ban: 2, estac: 2,
+    extras: "Fracc. privado · Jardín · 2 estac.",
+    remate: false, lat: 20.6121, lng: -103.3526,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/22/13/34/720x532/1592897995.jpg"
+  },
+  {
+    id: 33, modalidad: "Venta", tipoProp: "Casa",
+    titulo: "Casa en Venta — Av. Terralta Central",
+    calle: "Av. Terralta Central, Terralta",
+    precio: 610000, m2c: 96, rec: 3, ban: 1, estac: 2,
+    extras: "Fracc. cerrado · 2 estacionamientos",
+    remate: false, lat: 20.6094, lng: -103.3558,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/48/86/99/72/720x532/1586030585.jpg"
+  },
+  {
+    id: 34, modalidad: "Venta", tipoProp: "Depto",
+    titulo: "Depto en Venta — Las Nubes Residencial",
+    calle: "Las Nubes Residencial, Terralta",
+    precio: 2128000, m2c: 71, rec: 3, ban: 2, estac: 1,
+    extras: "Desarrollo vertical · Amenidades · Elevador",
+    remate: false, lat: 20.6104, lng: -103.3542,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/47/73/31/25/720x532/1563055772.jpg"
+  },
+  {
+    id: 35, modalidad: "Venta", tipoProp: "Depto",
+    titulo: "Depto Plus en Venta — Las Nubes Residencial",
+    calle: "Las Nubes Residencial, Terralta",
+    precio: 2725000, m2c: 104, rec: 3, ban: 2, estac: 1,
+    extras: "Gran formato · Amenidades · Elevador",
+    remate: false, lat: 20.6103, lng: -103.3543,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/40/64/54/720x532/1596770561.jpg"
+  },
+  {
+    id: 36, modalidad: "Renta", tipoProp: "Depto",
+    titulo: "Depto en Renta — Tierra Encantada 3060",
+    calle: "Av. Tierra Encantada 3060 Int. 511, Terralta",
+    precio: 12250, m2c: 125, rec: 2, ban: 2, estac: 1,
+    extras: "125 m² · Piso alto · Vista panorámica",
+    remate: false, lat: 20.6113, lng: -103.3534,
+    fuente: "Inmuebles24",
+    img: "https://img10.naventcdn.com/avisos/18/01/49/73/93/42/720x532/1603819930.jpg"
+  }
+];
+
+// ================================================================
+// DESARROLLOS NUEVOS EN ZONA TERRALTA
+// Datos: sitios oficiales + Century21 · Mayo 2026
+// ================================================================
+const DESARROLLOS = [
+  {
+    id: "d1",
+    nombre: "Las Nubes Residencial",
+    desarrollador: "Celsius",
+    direccion: "Tierra Encantada #209, Terralta",
+    desde: 1500000,
+    modelos: [
+      { nombre: "Cielo", m2c: 60, rec: 2, ban: 2, precio: 1500000 },
+      { nombre: "Sol", m2c: 71, rec: 3, ban: 2, precio: 1750000 }
+    ],
+    tipo: "Vertical · 14 torres · 1,334 viviendas",
+    credito: "INFONAVIT · Crédito hipotecario",
+    lat: 20.6105, lng: -103.3540,
+    url: "https://lasnubesresidencial.com",
+    img: "https://lasnubesresidencial.com/wp-content/uploads/2024/05/Portada.png"
+  },
+  {
+    id: "d2",
+    nombre: "Altosur",
+    desarrollador: "Domus Desarrolladora",
+    direccion: "Av. Jesús Reyes Heroles #1325, El Rocío",
+    desde: 1728684,
+    modelos: [
+      { nombre: "Himalaya", precio: 1728684 },
+      { nombre: "Balcanes", precio: 1783426 },
+      { nombre: "Alpes", precio: 2025500 },
+      { nombre: "Pirineos", precio: 2148414 }
+    ],
+    tipo: "Horizontal · Aceptan Infonavit / FOVISSSTE",
+    credito: "INFONAVIT · FOVISSSTE · Crédito hipotecario",
+    lat: 20.6070, lng: -103.3488,
+    url: "https://altosur.com.mx",
+    img: "http://altosur.com.mx/wp-content/uploads/2025/05/fraccionamiento-altosur-departamentos-en-venta.png.webp"
+  },
+  {
+    id: "d3",
+    nombre: "Valentika",
+    desarrollador: "Preventa",
+    direccion: "Fraccionamiento Terralta, Tlaquepaque",
+    desde: 1500000,
+    modelos: [],
+    tipo: "Preventa · Zona Terralta",
+    credito: "INFONAVIT · Crédito hipotecario",
+    lat: 20.6118, lng: -103.3548,
+    url: "https://inmuebles.mercadolibre.com.mx/casas/venta/jalisco/tlaquepaque/terralta/",
+    img: null
+  }
+];
+
+// ================================================================
+// ZONAS — Polígonos GeoJSON por fraccionamiento/colonia
+// Coordenadas ancladas en datos reales de propiedades + Av.Terralta (Nominatim)
+// Arquitectura escalable: agregar más zonas aquí
+// ================================================================
+const ZONAS = {
+  terralta: {
+    id: "terralta",
+    nombre: "Fracc. Terralta",
+    color: "#16a34a",
+    fillColor: "#16a34a",
+    fillOpacity: 0.10,
+    weight: 2.5,
+    avgPrecioM2: 8400,
+    totalProps: null, // se calcula al cargar
+    cp: "45594",
+    municipio: "San Pedro Tlaquepaque",
+    // Polígono aproximado basado en propiedades verificadas + vialidades OSM
+    polygon: [
+      [20.6145, -103.3608],
+      [20.6143, -103.3562],
+      [20.6140, -103.3528],
+      [20.6128, -103.3487],
+      [20.6105, -103.3470],
+      [20.6082, -103.3478],
+      [20.6068, -103.3502],
+      [20.6062, -103.3538],
+      [20.6065, -103.3578],
+      [20.6075, -103.3615],
+      [20.6098, -103.3638],
+      [20.6125, -103.3632],
+      [20.6145, -103.3608]
+    ]
+  },
+  altosur: {
+    id: "altosur",
+    nombre: "Fracc. AltoSur",
+    color: "#7c3aed",
+    fillColor: "#7c3aed",
+    fillOpacity: 0.10,
+    weight: 2,
+    avgPrecioM2: 18000,
+    cp: "44977",
+    municipio: "El Rocío, Tlaquepaque",
+    polygon: [
+      [20.6095, -103.3510],
+      [20.6095, -103.3460],
+      [20.6060, -103.3460],
+      [20.6055, -103.3510],
+      [20.6095, -103.3510]
+    ]
+  }
+};
+
+// ================================================================
+// STATE
+// ================================================================
+let selectedId = null;
+let selectedDevId = null;
+let tipoFiltro = "Todos";
+let maxPrecio = 3000000;
+let markers = {};
+let devMarkers = {};
+let activePopup = null;
+
+// ================================================================
+// MAP — centrado en Av. Terralta (coords Nominatim verificadas)
+// ================================================================
+const map = L.map('map', {
+  center: [20.6108, -103.3555],
+  zoom: 16,
+  zoomControl: true,
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+map.zoomControl.setPosition('bottomleft');
+
+// ================================================================
+// HELPERS
+// ================================================================
+function fmtPrecio(n) {
+  if (n >= 1000000) return '$' + (n / 1000000).toFixed(n % 1000000 === 0 ? 0 : 2).replace(/\.?0+$/, '') + 'M';
+  return '$' + (n / 1000).toFixed(0) + 'K';
+}
+
+function fmtPrecioFull(n) {
+  return '$' + n.toLocaleString('es-MX');
+}
+
+function filtered() {
+  if (tipoFiltro === "Nuevo") return [];
+  return PROPS.filter(p => {
+    const modalidad = p.modalidad || "Venta";
+    if (tipoFiltro === "Venta" && (p.remate || modalidad === "Renta")) return false;
+    if (tipoFiltro === "Renta" && modalidad !== "Renta") return false;
+    if (tipoFiltro === "Remate" && !p.remate) return false;
+    // No aplicar slider de precio a rentas (escala diferente)
+    if (tipoFiltro !== "Renta" && tipoFiltro !== "Todos" && p.precio > maxPrecio) return false;
+    if (tipoFiltro === "Todos" && modalidad !== "Renta" && p.precio > maxPrecio) return false;
+    return true;
+  });
+}
+
+// ================================================================
+// MARKERS — propiedades usadas
+// ================================================================
+function rebuildMarkers() {
+  Object.values(markers).forEach(m => map.removeLayer(m));
+  markers = {};
+
+  filtered().forEach(prop => {
+    const isSelected = prop.id === selectedId;
+    const modalidad = prop.modalidad || "Venta";
+    const tipoProp = prop.tipoProp || "Casa";
+    let pinExtra = '';
+    if (prop.remate) pinExtra = ' remate';
+    else if (modalidad === 'Renta') pinExtra = ' renta';
+    else if (tipoProp === 'Depto') pinExtra = ' depto';
+    const pinClass = `map-pin${pinExtra}${isSelected ? ' sel' : ''}`;
+
+    const pinLabel = modalidad === 'Renta'
+      ? `$${(prop.precio/1000).toFixed(prop.precio%1000===0?0:1)}K/mes`
+      : fmtPrecio(prop.precio);
+    const icon = L.divIcon({
+      html: `<div class="${pinClass}" data-id="${prop.id}">${pinLabel}</div>`,
+      className: '',
+      iconSize: [90, 28],
+      iconAnchor: [45, 14],
+    });
+
+    const m = L.marker([prop.lat, prop.lng], { icon }).addTo(map);
+    m.on('click', () => selectProp(prop.id, false));
+    markers[prop.id] = m;
+  });
+}
+
+// MARKERS — desarrollos nuevos
+function filteredDesarrollos() {
+  if (tipoFiltro === "Remate" || tipoFiltro === "Mercado") return [];
+  return DESARROLLOS.filter(d => d.desde <= maxPrecio);
+}
+
+function rebuildDevMarkers() {
+  Object.values(devMarkers).forEach(m => map.removeLayer(m));
+  devMarkers = {};
+
+  filteredDesarrollos().forEach(dev => {
+    const isSel = dev.id === selectedDevId;
+    const icon = L.divIcon({
+      html: `<div class="map-pin dev${isSel ? ' sel' : ''}" data-dev-id="${dev.id}">🏗 ${fmtPrecio(dev.desde)}+</div>`,
+      className: '',
+      iconSize: [100, 28],
+      iconAnchor: [50, 14],
+    });
+    const m = L.marker([dev.lat, dev.lng], { icon }).addTo(map);
+    m.on('click', () => selectDesarrollo(dev.id, false));
+    devMarkers[dev.id] = m;
+  });
+}
+
+// ================================================================
+// DESARROLLO POPUP & SELECT
+// ================================================================
+function openDevPopup(dev) {
+  if (activePopup) { map.closePopup(activePopup); activePopup = null; }
+
+  const modelosHtml = dev.modelos.length > 0
+    ? dev.modelos.map(m => `<span class="modelo-chip">${m.nombre}${m.precio ? ' · ' + fmtPrecio(m.precio) : ''}</span>`).join('')
+    : '';
+
+  const popup = L.popup({ offset: [0, -14], closeButton: true, autoClose: false, maxWidth: 290 })
+    .setLatLng([dev.lat, dev.lng])
+    .setContent(`
+      ${dev.img ? `<img class="popup-img" src="${dev.img}" alt="${dev.nombre}" />` : `<div class="popup-img-ph">🏗</div>`}
+      <div class="popup-body">
+        <div class="popup-header">
+          <div>
+            <div class="popup-precio">Desde ${fmtPrecioFull(dev.desde)}</div>
+            <div class="popup-dev-tag">🏗 DESARROLLO NUEVO</div>
+          </div>
+        </div>
+        <div class="popup-calle">${dev.direccion}</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:5px;">${dev.tipo}</div>
+        ${modelosHtml ? `<div class="modelo-chips" style="margin-top:7px;">${modelosHtml}</div>` : ''}
+        <div style="font-size:10.5px;color:#9ca3af;margin-top:6px;">💳 ${dev.credito}</div>
+        <div class="popup-footer">
+          <a class="popup-btn primary dev" href="https://wa.me/523314007580?text=Hola, me interesa el desarrollo ${encodeURIComponent(dev.nombre)} en Terralta, ¿pueden darme información?" target="_blank">📱 Solicitar información</a>
+        </div>
+      </div>
+    `)
+    .openOn(map);
+
+  activePopup = popup;
+}
+
+function selectDesarrollo(id, panToMap = true) {
+  selectedDevId = id;
+  selectedId = null;
+  const dev = DESARROLLOS.find(d => d.id === id);
+  if (!dev) return;
+
+  document.querySelectorAll('.prop-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.dev-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.devId === id);
+  });
+  document.querySelectorAll('.map-pin').forEach(el => el.classList.remove('sel'));
+
+  if (panToMap) map.panTo([dev.lat, dev.lng], { animate: true, duration: 0.5 });
+  openDevPopup(dev);
+
+  const card = document.querySelector(`.dev-card[data-dev-id="${id}"]`);
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ================================================================
+// POPUP — propiedades usadas
+// ================================================================
+function openPopupFor(prop) {
+  if (activePopup) { map.closePopup(activePopup); activePopup = null; }
+
+  const m2txt = [
+    prop.m2c ? `🏠 ${prop.m2c}m² const.` : null,
+    prop.m2t ? `📐 ${prop.m2t}m² terreno` : null,
+  ].filter(Boolean).join(' · ');
+
+  const pModalidad = prop.modalidad || "Venta";
+  const pTipoProp = prop.tipoProp || "Casa";
+  const pEsRenta = pModalidad === "Renta";
+  const popupPrecio = pEsRenta
+    ? `$${prop.precio.toLocaleString('es-MX')}<span style="font-size:13px;font-weight:500;color:#6b7280">/mes</span>`
+    : fmtPrecioFull(prop.precio);
+  const popupPlaceholderIcon = pTipoProp === "Depto" ? "🏢" : "🏠";
+
+  const popup = L.popup({ offset: [0, -14], closeButton: true, autoClose: false, maxWidth: 290 })
+    .setLatLng([prop.lat, prop.lng])
+    .setContent(`
+      ${prop.img ? `<img class="popup-img" src="${prop.img}" alt="${prop.titulo}" />` : `<div class="popup-img-ph">${popupPlaceholderIcon}</div>`}
+      <div class="popup-body">
+        <div class="popup-header">
+          <div>
+            <div class="popup-precio">${popupPrecio}</div>
+            ${prop.remate ? '<div class="popup-remate-tag">REMATE BANCARIO</div>' : ''}
+            ${pEsRenta ? '<div class="popup-remate-tag" style="background:#eff6ff;color:#2563eb;border-color:#bfdbfe;">EN RENTA · ' + pTipoProp + '</div>' : ''}
+          </div>
+        </div>
+        <div class="popup-calle">${prop.calle}</div>
+        <div class="popup-specs">
+          <span>🛏 ${prop.rec} rec</span>
+          <span>🚿 ${prop.ban} baños</span>
+          ${prop.estac ? `<span>🚗 ${prop.estac}</span>` : ''}
+        </div>
+        ${m2txt ? `<div class="popup-m2">${m2txt}</div>` : ''}
+        <div style="font-size:10.5px;color:#9ca3af;margin-top:6px;">${prop.extras}</div>
+        <div class="popup-footer">
+          <a class="popup-btn primary" href="https://wa.me/523314007580?text=Hola, vi la propiedad en ${prop.calle}, ¿me pueden dar información?" target="_blank">📱 Solicitar información</a>
+        </div>
+      </div>
+    `)
+    .openOn(map);
+
+  activePopup = popup;
+}
+
+// ================================================================
+// SELECT
+// ================================================================
+function selectProp(id, panToMap = true) {
+  selectedId = id;
+  selectedDevId = null;
+  const prop = PROPS.find(p => p.id === id);
+  if (!prop) return;
+
+  document.querySelectorAll('.prop-card').forEach(c => {
+    c.classList.toggle('active', parseInt(c.dataset.id) === id);
+  });
+  document.querySelectorAll('.dev-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.map-pin').forEach(el => {
+    el.classList.toggle('sel', parseInt(el.dataset.id) === id);
+  });
+
+  if (panToMap) map.panTo([prop.lat, prop.lng], { animate: true, duration: 0.5 });
+  openPopupFor(prop);
+
+  const card = document.querySelector(`.prop-card[data-id="${id}"]`);
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ================================================================
+// RENDER CARDS
+// ================================================================
+function renderCards() {
+  const list = filtered();
+  const container = document.getElementById('prop-list');
+  document.getElementById('result-count').textContent = list.length;
+  document.getElementById('stat-total').textContent = PROPS.length;
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="no-results">
+        <div class="nr-icon">🔍</div>
+        <p>Sin propiedades con estos filtros.</p>
+      </div>`;
+    return;
+  }
+
+  const devs = filteredDesarrollos();
+
+  container.innerHTML = list.map(p => {
+    const m2txt = [
+      p.m2c ? `${p.m2c}m²` : null,
+      p.m2t ? `${p.m2t}m² t.` : null,
+    ].filter(Boolean).join(' / ');
+    const modalidad = p.modalidad || "Venta";
+    const tipoProp = p.tipoProp || "Casa";
+    const esRenta = modalidad === "Renta";
+    const precioStr = esRenta
+      ? `$${p.precio.toLocaleString('es-MX')}<span style="font-size:11px;font-weight:500;color:#6b7280">/mes</span>`
+      : fmtPrecioFull(p.precio);
+    const placeholderIcon = tipoProp === "Depto" ? "🏢" : "🏠";
+
+    return `
+      <div class="prop-card${selectedId === p.id ? ' active' : ''}" data-id="${p.id}">
+        <div class="card-img-wrap">
+          ${p.img
+            ? `<img class="card-img" src="${p.img}" alt="${p.titulo}" loading="lazy">`
+            : `<div class="card-img-ph"><span>${placeholderIcon}</span><small>Sin fotografía</small></div>`
+          }
+          ${p.remate
+            ? '<div class="remate-badge">REMATE BANCARIO</div>'
+            : esRenta
+              ? '<div class="renta-badge">EN RENTA</div>'
+              : '<div class="mercado-badge">💰 Venta</div>'
+          }
+          <div class="tipo-tag">${tipoProp.toUpperCase()}</div>
+        </div>
+        <div class="card-body">
+          <div class="card-precio">${precioStr}</div>
+          <div class="card-calle">${p.calle}</div>
+          <div class="card-specs">
+            <div class="spec-item"><span class="spec-ico">🛏</span>${p.rec} rec</div>
+            <div class="spec-item"><span class="spec-ico">🚿</span>${p.ban} baños</div>
+            ${p.m2c ? `<div class="spec-item"><span class="spec-ico">📐</span>${p.m2c}m²</div>` : ''}
+          </div>
+          <div class="card-footer">
+            <span class="m2-tag">${m2txt}</span>
+            <span class="fuente-link">${p.fuente}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Append developments section
+  if (devs.length > 0) {
+    const devSection = document.createElement('div');
+    devSection.innerHTML = `
+      <div class="dev-section-header">🏗 Desarrollos nuevos en zona</div>
+      ${devs.map(dev => {
+        const modelosHtml = dev.modelos.map(m =>
+          `<span class="modelo-chip">${m.nombre}${m.precio ? ' · ' + fmtPrecio(m.precio) : ''}</span>`
+        ).join('');
+        return `
+          <div class="dev-card${selectedDevId === dev.id ? ' active' : ''}" data-dev-id="${dev.id}">
+            <div class="card-img-wrap">
+              ${dev.img
+                ? `<img class="card-img" src="${dev.img}" alt="${dev.nombre}" loading="lazy">`
+                : `<div class="card-img-ph"><span>🏗</span><small>Sin fotografía</small></div>`
+              }
+              <div class="dev-badge">🏗 NUEVO</div>
+              <div class="tipo-tag">${dev.desarrollador.toUpperCase()}</div>
+            </div>
+            <div class="card-body">
+              <div class="card-precio">Desde ${fmtPrecioFull(dev.desde)}</div>
+              <div class="card-calle">${dev.direccion}</div>
+              <div class="modelo-chips">${modelosHtml || '<span class="modelo-chip">Preventa</span>'}</div>
+              <div class="card-footer">
+                <span class="m2-tag">${dev.tipo}</span>
+                <span class="fuente-link" style="color:#7c3aed;">${dev.desarrollador}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    `;
+    container.appendChild(devSection);
+  }
+
+  document.querySelectorAll('.prop-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') return;
+      selectProp(parseInt(card.dataset.id), true);
+    });
+  });
+
+  document.querySelectorAll('.dev-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') return;
+      selectDesarrollo(card.dataset.devId, true);
+    });
+  });
+}
+
+// ================================================================
+// MAIN RENDER
+// ================================================================
+function render() {
+  renderCards();
+  rebuildMarkers();
+  rebuildDevMarkers();
+  // Ocultar slider de precio cuando filtro = Renta (escala distinta)
+  document.querySelector('.precio-section').style.display =
+    tipoFiltro === 'Renta' ? 'none' : '';
+}
+
+// ================================================================
+// FILTER HANDLERS
+// ================================================================
+document.querySelectorAll('.chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    tipoFiltro = btn.dataset.tipo;
+    selectedId = null;
+    if (activePopup) { map.closePopup(activePopup); activePopup = null; }
+    render();
+  });
+});
+
+const slider = document.getElementById('precio-slider');
+const display = document.getElementById('precio-display');
+
+slider.addEventListener('input', () => {
+  maxPrecio = parseInt(slider.value);
+  display.textContent = fmtPrecioFull(maxPrecio);
+  const pct = ((maxPrecio - 500000) / (3000000 - 500000)) * 100;
+  slider.style.background = `linear-gradient(to right, #1a2e2b ${pct}%, #e5e7eb ${pct}%)`;
+  selectedId = null;
+  if (activePopup) { map.closePopup(activePopup); activePopup = null; }
+  render();
+});
+
+map.on('click', () => {
+  if (activePopup) { map.closePopup(activePopup); activePopup = null; }
+  selectedId = null;
+  selectedDevId = null;
+  document.querySelectorAll('.prop-card, .dev-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.map-pin').forEach(el => el.classList.remove('sel'));
+});
+
+// ================================================================
+// ZONAS — Polígonos en el mapa
+// ================================================================
+let zonaLayers = {};
+let zonasVisible = true;
+
+function drawAllZones() {
+  Object.values(zonaLayers).forEach(l => map.removeLayer(l));
+  zonaLayers = {};
+  if (!zonasVisible) return;
+
+  Object.values(ZONAS).forEach(zona => {
+    const totalEnZona = PROPS.length; // se puede filtrar por zona en el futuro
+    const layer = L.polygon(zona.polygon, {
+      color: zona.color,
+      fillColor: zona.fillColor,
+      weight: zona.weight,
+      opacity: 0.75,
+      fillOpacity: zona.fillOpacity,
+      dashArray: zona.id === 'terralta' ? null : '6,4',
+    }).addTo(map);
+
+    layer.bindTooltip(`
+      <div style="font-family:Inter,sans-serif;padding:4px 2px;">
+        <div style="font-weight:700;font-size:13px;color:#111">${zona.nombre}</div>
+        <div style="font-size:11px;color:#6b7280;">${zona.municipio} · CP ${zona.cp}</div>
+        <div style="font-size:11.5px;color:${zona.color};font-weight:600;margin-top:4px;">
+          ~$${zona.avgPrecioM2.toLocaleString('es-MX')}/m² prom.
+        </div>
+      </div>
+    `, { sticky: true, className: 'leaflet-tooltip-clean' });
+
+    zonaLayers[zona.id] = layer;
+  });
+}
+
+function toggleZona(zonaId) {
+  zonasVisible = !zonasVisible;
+  const btn = document.getElementById('btn-zona-terralta');
+  btn.classList.toggle('active', zonasVisible);
+  btn.textContent = zonasVisible ? '🗺 Ver zona' : '🗺 Zona oculta';
+
+  const selector = document.getElementById('zona-selector');
+  selector.style.display = zonasVisible ? 'flex' : 'none';
+
+  drawAllZones();
+}
+
+function focusZona(zonaId) {
+  const zona = ZONAS[zonaId];
+  if (!zona || !zonaLayers[zonaId]) return;
+  document.querySelectorAll('.zona-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.zona === zonaId);
+  });
+  map.fitBounds(zonaLayers[zonaId].getBounds(), { padding: [40, 40] });
+}
+
+// ================================================================
+// AUTH CHECK — redirige si no tiene acceso
+// ================================================================
+(function checkAuth() {
+  const SESSION_KEY = 'cloud_inmo_access';
+  const ACCESS_CODE = 'LMA2026';
+  if (sessionStorage.getItem(SESSION_KEY) !== ACCESS_CODE) {
+    window.location.replace('./index.html');
+  }
+})();
+
+// ================================================================
+// INIT — carga datos dinámicos del JSON y arranca el mapa
+// ================================================================
+async function initFromData() {
+  try {
+    const res = await fetch('./data/listings.json?v=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    // Inyectar datos al scope global
+    PROPS.length = 0;
+    data.propiedades.forEach(p => PROPS.push(p));
+
+    DESARROLLOS.length = 0;
+    if (data.desarrollos) data.desarrollos.forEach(d => DESARROLLOS.push(d));
+
+    // Actualizar badge con timestamp
+    const badge = document.getElementById('update-badge');
+    if (data._meta && data._meta.actualizado) {
+      const fecha = new Date(data._meta.actualizado);
+      const ahora = new Date();
+      const diffH = Math.floor((ahora - fecha) / 3600000);
+      const diffLabel = diffH === 0 ? 'hace menos de 1h'
+        : diffH < 24 ? `hace ${diffH}h`
+        : `hace ${Math.floor(diffH/24)}d`;
+      badge.textContent = `✓ Datos reales · ${diffLabel}`;
+    } else {
+      badge.textContent = '✓ Datos reales';
+    }
+
+    // Actualizar contador en sidebar
+    document.getElementById('stat-total').textContent = PROPS.length;
+
+  } catch (err) {
+    console.warn('No se pudo cargar data/listings.json, usando datos embebidos:', err);
+    document.getElementById('update-badge').textContent = '⚠ Datos locales';
+  }
+
+  // Arrancar mapa siempre (con datos del JSON o los hardcodeados como fallback)
+  render();
+  drawAllZones();
+}
+
+// PROPS y DESARROLLOS son los arrays declarados arriba (fallback si falla fetch)
+initFromData();
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+name: 🏠 Daily Listings Scraper
+
+on:
+  schedule:
+    # 9:00 AM UTC = 4:00 AM CDT (lunes a viernes)
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
+    # Permite correrlo manualmente desde GitHub Actions UI
+    inputs:
+      debug:
+        description: 'Modo debug (verbose)'
+        required: false
+        default: 'false'
+
+jobs:
+  scrape:
+    name: Scrape & Update Listings
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 📦 Instalar dependencias
+        run: |
+          pip install playwright requests python-dateutil
+          playwright install chromium --with-deps
+
+      - name: 🕷️ Correr scraper
+        run: python scraper/scrape.py
+
+      - name: 📊 Verificar resultados
+        run: |
+          echo "=== listings.json ==="
+          cat data/listings.json | python3 -c "
+          import json,sys
+          data = json.load(sys.stdin)
+          meta = data['_meta']
+          print(f'Total: {meta[\"total\"]} propiedades')
+          print(f'Actualizado: {meta[\"actualizado\"]}')
+          print(f'Fuentes: {\", \".join(meta[\"fuentes\"])}')
+          "
+
+      - name: 💾 Commit y push si hay cambios
+        run: |
+          git config --global user.email "bot@cloudinmobiliaria.mx"
+          git config --global user.name "Cloud Inmo Bot"
+          git add data/listings.json
+          if git diff --staged --quiet; then
+            echo "Sin cambios en los listings. Nada que commitear."
+          else
+            TOTAL=$(cat data/listings.json | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['_meta']['total'])")
+            git commit -m "🏠 Listings actualizados: ${TOTAL} propiedades · $(TZ='America/Mexico_City' date +'%Y-%m-%d %H:%M CDT')"
+            git push
+            echo "✅ Datos actualizados y publicados"
+          fi
+
+      - name: 📢 Notificación si falla
+        if: failure()
+        run: |
+          echo "❌ El scraper falló. Revisar logs de GitHub Actions."
+          # Aquí se puede agregar webhook a Slack/WhatsApp si se desea
