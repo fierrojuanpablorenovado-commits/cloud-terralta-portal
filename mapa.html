@@ -1075,6 +1075,28 @@ function fmtPrecioFull(n) {
   return '$' + n.toLocaleString('es-MX');
 }
 
+// Construye URL del anuncio original (extrae ID de Inmuebles24 desde naventcdn si aplica)
+function getListingUrl(p) {
+  if (p.url && !p.url.includes('listado.mercadolibre') && !p.url.includes('/jalisco/tlaquepaque/terralta') && !p.url.includes('foreclosures/for-sale')) return p.url;
+  if (p.img && p.img.includes('naventcdn.com')) {
+    const m = p.img.match(/\/18\/01\/(\d{2})\/(\d{2})\/(\d{2})\/(\d{2})\//);
+    if (m) return 'https://www.inmuebles24.com/propiedades-1' + m[1] + m[2] + m[3] + m[4] + '.html';
+  }
+  if (p.url) return p.url;
+  return null;
+}
+
+// Fallback imagen rota en tarjeta lateral
+function cardImgError(el) {
+  const wrap = el.parentNode;
+  const icon = wrap.dataset.icon || '🏠';
+  el.style.display = 'none';
+  const ph = document.createElement('div');
+  ph.className = 'card-img-ph';
+  ph.innerHTML = `<span>${icon}</span><small>Sin foto disponible</small>`;
+  wrap.appendChild(ph);
+}
+
 function filtered() {
   if (tipoFiltro === "Nuevo") return [];
   return PROPS.filter(p => {
@@ -1218,11 +1240,15 @@ function openPopupFor(prop) {
     ? `$${prop.precio.toLocaleString('es-MX')}<span style="font-size:13px;font-weight:500;color:#6b7280">/mes</span>`
     : fmtPrecioFull(prop.precio);
   const popupPlaceholderIcon = pTipoProp === "Depto" ? "🏢" : "🏠";
+  const popupListingUrl = getListingUrl(prop);
 
   const popup = L.popup({ offset: [0, -14], closeButton: true, autoClose: false, maxWidth: 290 })
     .setLatLng([prop.lat, prop.lng])
     .setContent(`
-      ${prop.img ? `<img class="popup-img" src="${prop.img}" alt="${prop.titulo}" />` : `<div class="popup-img-ph">${popupPlaceholderIcon}</div>`}
+      ${prop.img
+        ? `<img class="popup-img" src="${prop.img}" referrerpolicy="no-referrer" alt="${prop.titulo}" onerror="this.outerHTML='<div class=&quot;popup-img-ph&quot;>${popupPlaceholderIcon}</div>'" />`
+        : `<div class="popup-img-ph">${popupPlaceholderIcon}</div>`
+      }
       <div class="popup-body">
         <div class="popup-header">
           <div>
@@ -1238,9 +1264,13 @@ function openPopupFor(prop) {
           ${prop.estac ? `<span>🚗 ${prop.estac}</span>` : ''}
         </div>
         ${m2txt ? `<div class="popup-m2">${m2txt}</div>` : ''}
-        <div style="font-size:10.5px;color:#9ca3af;margin-top:6px;">${prop.extras}</div>
+        <div style="font-size:10.5px;color:#9ca3af;margin-top:6px;">${prop.extras || ''}</div>
         <div class="popup-footer">
-          <a class="popup-btn primary" href="https://wa.me/523314007580?text=Hola, vi la propiedad en ${prop.calle}, ¿me pueden dar información?" target="_blank">📱 Solicitar información</a>
+          ${popupListingUrl
+            ? `<a class="popup-btn secondary" href="${popupListingUrl}" target="_blank" style="font-size:11px;">📞 Ver teléfono</a>`
+            : ''
+          }
+          <a class="popup-btn primary" href="https://wa.me/523314007580?text=${encodeURIComponent('Hola, me interesa la propiedad en ' + prop.calle + '. ¿Me pueden dar información?')}" target="_blank">📱 WhatsApp</a>
         </div>
       </div>
     `)
@@ -1305,13 +1335,14 @@ function renderCards() {
       ? `$${p.precio.toLocaleString('es-MX')}<span style="font-size:11px;font-weight:500;color:#6b7280">/mes</span>`
       : fmtPrecioFull(p.precio);
     const placeholderIcon = tipoProp === "Depto" ? "🏢" : "🏠";
+    const listingUrl = getListingUrl(p);
 
     return `
       <div class="prop-card${selectedId === p.id ? ' active' : ''}" data-id="${p.id}">
-        <div class="card-img-wrap">
+        <div class="card-img-wrap" data-icon="${placeholderIcon}">
           ${p.img
-            ? `<img class="card-img" src="${p.img}" alt="${p.titulo}" loading="lazy">`
-            : `<div class="card-img-ph"><span>${placeholderIcon}</span><small>Sin fotografía</small></div>`
+            ? `<img class="card-img" src="${p.img}" alt="${p.titulo}" loading="lazy" referrerpolicy="no-referrer" onerror="cardImgError(this)">`
+            : `<div class="card-img-ph"><span>${placeholderIcon}</span><small>Sin foto disponible</small></div>`
           }
           ${p.remate
             ? '<div class="remate-badge">REMATE BANCARIO</div>'
@@ -1330,8 +1361,11 @@ function renderCards() {
             ${p.m2c ? `<div class="spec-item"><span class="spec-ico">📐</span>${p.m2c}m²</div>` : ''}
           </div>
           <div class="card-footer">
-            <span class="m2-tag">${m2txt}</span>
-            <span class="fuente-link">${p.fuente}</span>
+            <span class="m2-tag">${m2txt || p.fuente}</span>
+            ${listingUrl
+              ? `<a class="fuente-link" href="${listingUrl}" target="_blank" onclick="event.stopPropagation()" style="color:#1a2e2b;font-weight:600;text-decoration:none;">📋 Ver anuncio ↗</a>`
+              : `<span class="fuente-link">${p.fuente}</span>`
+            }
           </div>
         </div>
       </div>
@@ -1525,9 +1559,10 @@ async function initFromData() {
       const fecha = new Date(data._meta.actualizado);
       const ahora = new Date();
       const diffH = Math.floor((ahora - fecha) / 3600000);
-      const diffLabel = diffH === 0 ? 'hace menos de 1h'
-        : diffH < 24 ? `hace ${diffH}h`
-        : `hace ${Math.floor(diffH/24)}d`;
+      const absDiff = Math.abs(diffH);
+      const diffLabel = absDiff === 0 ? 'recién actualizado'
+        : absDiff < 24 ? `hace ${absDiff}h`
+        : `hace ${Math.floor(absDiff/24)}d`;
       badge.textContent = `✓ Datos reales · ${diffLabel}`;
     } else {
       badge.textContent = '✓ Datos reales';
