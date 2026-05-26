@@ -156,6 +156,7 @@
       border: 1.5px solid #e5e7eb; border-radius: 12px;
       overflow: hidden; cursor: pointer; background: #fff;
       transition: all .18s;
+      flex-shrink: 0; /* evita que el flex container aplaste las tarjetas */
     }
     .prop-card:hover { border-color: #1a2e2b; box-shadow: 0 4px 14px rgba(26,46,43,.1); }
     .prop-card.active { border-color: #1a2e2b; box-shadow: 0 0 0 2px #1a2e2b22, 0 4px 14px rgba(26,46,43,.12); }
@@ -325,6 +326,7 @@
       border: 1.5px solid #ede9fe; border-radius: 12px;
       overflow: hidden; cursor: pointer; background: #fff;
       transition: all .18s;
+      flex-shrink: 0;
     }
     .dev-card:hover { border-color: #7c3aed; box-shadow: 0 4px 14px rgba(124,58,237,.1); }
     .dev-card.active { border-color: #7c3aed; box-shadow: 0 0 0 2px rgba(124,58,237,.15), 0 4px 14px rgba(124,58,237,.12); }
