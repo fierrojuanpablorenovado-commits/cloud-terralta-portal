@@ -1247,6 +1247,15 @@ function fmtPrecioFull(n) {
   return '$' + n.toLocaleString('es-MX');
 }
 
+// Proxy local para imágenes que requieren Referer (naventcdn hotlink protection)
+function imgProxy(url) {
+  if (!url) return null;
+  if (url.includes('naventcdn.com') || url.includes('mlstatic.com')) {
+    return '/api/img?url=' + encodeURIComponent(url);
+  }
+  return url;
+}
+
 // Construye URL del anuncio original (extrae ID de Inmuebles24 desde naventcdn si aplica)
 function getListingUrl(p) {
   if (p.url && !p.url.includes('listado.mercadolibre') && !p.url.includes('/jalisco/tlaquepaque/terralta') && !p.url.includes('foreclosures/for-sale')) return p.url;
@@ -1353,7 +1362,7 @@ function openDevPopup(dev) {
   const popup = L.popup({ offset: [0, -14], closeButton: true, autoClose: false, maxWidth: 290 })
     .setLatLng([dev.lat, dev.lng])
     .setContent(`
-      ${dev.img ? `<img class="popup-img" src="${dev.img}" alt="${dev.nombre}" />` : `<div class="popup-img-ph">🏗</div>`}
+      ${dev.img ? `<img class="popup-img" src="${imgProxy(dev.img)}" alt="${dev.nombre}" onerror="this.style.display='none'" />` : `<div class="popup-img-ph">🏗</div>`}
       <div class="popup-body">
         <div class="popup-header">
           <div>
@@ -1418,7 +1427,7 @@ function openPopupFor(prop) {
     .setLatLng([prop.lat, prop.lng])
     .setContent(`
       ${prop.img
-        ? `<img class="popup-img" src="${prop.img}" referrerpolicy="no-referrer" alt="${prop.titulo}" onerror="this.outerHTML='<div class=&quot;popup-img-ph&quot;>${popupPlaceholderIcon}</div>'" />`
+        ? `<img class="popup-img" src="${imgProxy(prop.img)}" alt="${prop.titulo}" onerror="this.outerHTML='<div class=&quot;popup-img-ph&quot;>${popupPlaceholderIcon}</div>'" />`
         : `<div class="popup-img-ph">${popupPlaceholderIcon}</div>`
       }
       <div class="popup-body">
@@ -1511,7 +1520,7 @@ function renderCards() {
       <div class="prop-card${selectedId === p.id ? ' active' : ''}" data-id="${p.id}">
         <div class="card-img-wrap" data-icon="${placeholderIcon}">
           ${p.img
-            ? `<img class="card-img" src="${p.img}" alt="${p.titulo}" loading="lazy" referrerpolicy="no-referrer" onerror="cardImgError(this)">`
+            ? `<img class="card-img" src="${imgProxy(p.img)}" alt="${p.titulo}" loading="lazy" onerror="cardImgError(this)">`
             : `<div class="card-img-ph"><span>${placeholderIcon}</span><small>Sin foto disponible</small></div>`
           }
           ${p.remate
@@ -1555,7 +1564,7 @@ function renderCards() {
           <div class="dev-card${selectedDevId === dev.id ? ' active' : ''}" data-dev-id="${dev.id}">
             <div class="card-img-wrap">
               ${dev.img
-                ? `<img class="card-img" src="${dev.img}" alt="${dev.nombre}" loading="lazy">`
+                ? `<img class="card-img" src="${imgProxy(dev.img)}" alt="${dev.nombre}" loading="lazy" onerror="cardImgError(this)">`
                 : `<div class="card-img-ph"><span>🏗</span><small>Sin fotografía</small></div>`
               }
               <div class="dev-badge">🏗 NUEVO</div>
