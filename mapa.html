@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Cloud Inmobiliaria · Portal Exclusivo · Terralta</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -680,7 +683,7 @@
 <header>
   <div class="logo">
     <!-- Cloud Inmobiliaria logo — cuadrado redondeado azul -->
-    <svg width="38" height="38" viewBox="0 0 200 200" style="border-radius:20%;flex-shrink:0;">
+    <svg width="50" height="50" viewBox="0 0 200 200" style="border-radius:22%;flex-shrink:0;box-shadow:0 2px 8px rgba(91,144,184,.35);">
       <rect width="200" height="200" rx="32" fill="#5B90B8"/>
       <!-- CL -->
       <text x="12" y="122" font-family="'Arial Black','Arial',sans-serif" font-weight="900" font-size="56" fill="white">CL</text>
@@ -1813,7 +1816,17 @@ function openPopupFor(prop) {
             <a class="popup-btn secondary" href="https://wa.me/523314007580?text=${encodeURIComponent('Hola, me interesa la propiedad en ' + prop.calle + '. ¿Me pueden dar información?')}" target="_blank" style="flex:1;text-align:center;font-size:10px;">📱 WhatsApp</a>
           </div>
         </div>
-        ${popupListingUrl ? `<div style="text-align:center;padding:0 14px 10px;"><a href="${popupListingUrl}" target="_blank" style="font-size:11px;color:#6b7280;text-decoration:none;">📋 Ver anuncio ↗</a></div>` : ''}
+        ${popupListingUrl ? `
+          <div style="padding:0 12px 12px;">
+            <a href="${popupListingUrl}" target="_blank"
+               style="display:flex;align-items:center;justify-content:center;gap:6px;
+                      background:#0ea5e9;color:#fff;text-decoration:none;
+                      border-radius:8px;padding:9px;font-size:12px;font-weight:700;
+                      transition:opacity .15s;"
+               onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+              🔗 Ver anuncio en Inmuebles24
+            </a>
+          </div>` : ''}
       </div>
     `)
     .openOn(map);
@@ -1905,7 +1918,7 @@ function renderCards() {
           <div class="card-footer">
             <span class="m2-tag">${m2txt || (p.m2c ? p.m2c + ' m²' : '—')}</span>
             ${listingUrl
-              ? `<a class="fuente-link" href="${listingUrl}" target="_blank" onclick="event.stopPropagation()" style="color:#1a2e2b;font-weight:600;text-decoration:none;">📋 Ver anuncio ↗</a>`
+              ? `<a class="fuente-link" href="${listingUrl}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;background:#f0f9ff;border:1px solid #bae6fd;color:#0369a1;border-radius:6px;padding:3px 8px;font-size:10.5px;font-weight:700;text-decoration:none;">🔗 Ver en Inmuebles24</a>`
               : ''
             }
           </div>
