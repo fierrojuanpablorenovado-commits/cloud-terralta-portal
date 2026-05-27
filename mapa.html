@@ -351,12 +351,12 @@
     /* Placeholder sin foto */
     .card-img-ph {
       width: 100%; height: 100%;
-      background: #f3f4f6;
+      background: linear-gradient(135deg, #1a2e2b 0%, #2a5248 60%, #3d7568 100%);
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 4px;
+      align-items: center; justify-content: center; gap: 6px;
     }
-    .card-img-ph span { font-size: 34px; }
-    .card-img-ph small { font-size: 10.5px; color: #9ca3af; }
+    .card-img-ph span { font-size: 30px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.3)); }
+    .card-img-ph small { font-size: 10px; color: rgba(255,255,255,.65); font-weight: 500; letter-spacing: .3px; }
     .popup-img-ph {
       width: 100%; height: 70px;
       background: #f3f4f6;
@@ -371,6 +371,82 @@
       white-space: nowrap; margin-top: 4px;
     }
     .popup-btn.dev { background: #7c3aed; }
+
+    /* ─── MARKETPLACE ───────────────────────────────────── */
+    .publish-bar {
+      padding: 10px 12px 12px;
+      border-top: 1px solid #e5e7eb;
+      background: #fff;
+      flex-shrink: 0;
+    }
+    .publish-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #7c3aed 0%, #9f67f7 100%);
+      color: #fff; border: none;
+      padding: 11px 16px; border-radius: 10px;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: opacity .15s; letter-spacing: -.2px;
+    }
+    .publish-btn:hover { opacity: .88; }
+
+    /* Modal marketplace */
+    .mkt-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); backdrop-filter: blur(3px);
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .mkt-overlay.open { opacity: 1; pointer-events: all; }
+    .mkt-modal {
+      background: #fff; border-radius: 16px;
+      width: 420px; max-width: calc(100vw - 32px); max-height: 92vh;
+      overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.28);
+      transform: translateY(24px); transition: transform .22s;
+    }
+    .mkt-overlay.open .mkt-modal { transform: translateY(0); }
+    .mkt-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .mkt-header h3 { font-size: 15px; font-weight: 800; color: #1a2e2b; }
+    .mkt-header button {
+      background: #f3f4f6; border: none; width: 28px; height: 28px;
+      border-radius: 50%; cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #6b7280; transition: background .15s;
+    }
+    .mkt-header button:hover { background: #e5e7eb; }
+    .mkt-body { padding: 18px 20px 22px; }
+    .mkt-intro {
+      font-size: 12.5px; color: #6b7280; line-height: 1.55;
+      background: #f0fdf4; border: 1px solid #bbf7d0;
+      border-radius: 8px; padding: 10px 12px; margin-bottom: 18px;
+    }
+    .mkt-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 13px; }
+    .mkt-field label { font-size: 11.5px; font-weight: 600; color: #374151; }
+    .mkt-field input, .mkt-field select, .mkt-field textarea {
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      padding: 9px 12px; font-size: 13px; font-family: inherit;
+      color: #111827; outline: none; transition: border-color .15s;
+    }
+    .mkt-field input:focus, .mkt-field select:focus, .mkt-field textarea:focus {
+      border-color: #7c3aed;
+    }
+    .mkt-field textarea { resize: vertical; min-height: 58px; }
+    .mkt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mkt-submit {
+      width: 100%; background: #25D366; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 13px; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      margin-top: 6px; transition: opacity .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .mkt-submit:hover { opacity: .9; }
 
     /* ─── LAYER CONTROL ─────────────────────────────────── */
     .leaflet-control-layers {
@@ -522,6 +598,69 @@
     <!-- Property list -->
     <div class="prop-list" id="prop-list"></div>
 
+    <!-- Publicar propiedad -->
+    <div class="publish-bar">
+      <button class="publish-btn" onclick="openMarketplace()">
+        📢 Publicar propiedad en Terralta
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ─── MARKETPLACE MODAL ─────────────────────────────── -->
+  <div class="mkt-overlay" id="mktOverlay" onclick="closeMarketplace()">
+    <div class="mkt-modal" onclick="event.stopPropagation()">
+      <div class="mkt-header">
+        <h3>📢 Publicar propiedad</h3>
+        <button onclick="closeMarketplace()">✕</button>
+      </div>
+      <div class="mkt-body">
+        <p class="mkt-intro">¿Tienes un cuarto, depto o casa disponible en Terralta? Publica gratis — la socia te contactará.</p>
+        <form id="mktForm" onsubmit="submitMarketplace(event)">
+          <div class="mkt-field">
+            <label>Tipo de propiedad</label>
+            <select id="mktTipo">
+              <option value="Cuarto en renta">🛏 Cuarto en renta</option>
+              <option value="Departamento en renta">🏢 Departamento en renta</option>
+              <option value="Casa en renta">🏠 Casa en renta</option>
+              <option value="Departamento en venta">💰 Departamento en venta</option>
+              <option value="Casa en venta">💰 Casa en venta</option>
+            </select>
+          </div>
+          <div class="mkt-field">
+            <label>Calle / Dirección</label>
+            <input type="text" id="mktCalle" placeholder="Ej: Tierra Contenta 170, Terralta" required>
+          </div>
+          <div class="mkt-row">
+            <div class="mkt-field">
+              <label>Precio mensual (MXN)</label>
+              <input type="number" id="mktPrecio" placeholder="Ej: 8500" required>
+            </div>
+            <div class="mkt-field">
+              <label>Recámaras</label>
+              <select id="mktRec">
+                <option value="Cuarto">Cuarto</option>
+                <option value="1 rec">1</option>
+                <option value="2 rec" selected>2</option>
+                <option value="3 rec">3</option>
+                <option value="4+ rec">4+</option>
+              </select>
+            </div>
+          </div>
+          <div class="mkt-field">
+            <label>Descripción breve</label>
+            <textarea id="mktDesc" placeholder="Amueblado, mascotas, estacionamiento, fecha disponible…"></textarea>
+          </div>
+          <div class="mkt-field">
+            <label>Tu WhatsApp (10 dígitos)</label>
+            <input type="tel" id="mktTel" placeholder="33XXXXXXXX" required>
+          </div>
+          <button type="submit" class="mkt-submit">
+            📱 Enviar por WhatsApp
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <!-- MAP -->
@@ -1392,10 +1531,10 @@ function renderCards() {
             ${p.m2c ? `<div class="spec-item"><span class="spec-ico">📐</span>${p.m2c}m²</div>` : ''}
           </div>
           <div class="card-footer">
-            <span class="m2-tag">${m2txt || p.fuente}</span>
+            <span class="m2-tag">${m2txt || (p.m2c ? p.m2c + ' m²' : '—')}</span>
             ${listingUrl
               ? `<a class="fuente-link" href="${listingUrl}" target="_blank" onclick="event.stopPropagation()" style="color:#1a2e2b;font-weight:600;text-decoration:none;">📋 Ver anuncio ↗</a>`
-              : `<span class="fuente-link">${p.fuente}</span>`
+              : ''
             }
           </div>
         </div>
@@ -1614,6 +1753,46 @@ async function initFromData() {
 
 // PROPS y DESARROLLOS son los arrays declarados arriba (fallback si falla fetch)
 initFromData();
+
+// ================================================================
+// MARKETPLACE — publicar propiedad vía WhatsApp
+// ================================================================
+function openMarketplace() {
+  document.getElementById('mktOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMarketplace() {
+  document.getElementById('mktOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function submitMarketplace(e) {
+  e.preventDefault();
+  const tipo   = document.getElementById('mktTipo').value;
+  const calle  = document.getElementById('mktCalle').value.trim();
+  const precio = document.getElementById('mktPrecio').value;
+  const rec    = document.getElementById('mktRec').value;
+  const desc   = document.getElementById('mktDesc').value.trim();
+  const tel    = document.getElementById('mktTel').value.trim();
+
+  const lines = [
+    '📢 *Nueva propiedad disponible en Terralta*',
+    '',
+    `🏠 Tipo: ${tipo}`,
+    `📍 Dirección: ${calle}`,
+    `💰 Precio: $${Number(precio).toLocaleString('es-MX')}`,
+    `🛏 ${rec}`,
+    desc ? `📝 ${desc}` : null,
+    '',
+    `📞 Contacto (propietario): ${tel}`,
+  ].filter(l => l !== null);
+
+  const waUrl = 'https://wa.me/523314007580?text=' + encodeURIComponent(lines.join('\n'));
+  window.open(waUrl, '_blank');
+  closeMarketplace();
+  document.getElementById('mktForm').reset();
+}
 </script>
 </body>
 </html>
