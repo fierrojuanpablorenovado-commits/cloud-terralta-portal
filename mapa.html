@@ -372,6 +372,142 @@
     }
     .popup-btn.dev { background: #7c3aed; }
 
+    /* ─── MARKET INTELLIGENCE ──────────────────────────── */
+    .market-intel {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;
+    }
+    .intel-chip {
+      padding: 9px 4px; text-align: center;
+      border-right: 1px solid #e5e7eb;
+    }
+    .intel-chip:last-child { border-right: none; }
+    .intel-val { font-size: 11.5px; font-weight: 800; color: #1a2e2b; display: block; }
+    .intel-label { font-size: 9px; color: #9ca3af; display: block; margin-top: 1px; text-transform: uppercase; letter-spacing: .3px; }
+
+    /* ─── CTA VENDER ────────────────────────────────────── */
+    .cta-vender { padding: 8px 12px 0; }
+    .cta-vender-btn {
+      width: 100%; background: #fff8f0;
+      border: 1.5px solid #fcd9aa; color: #c05621;
+      padding: 9px 12px; border-radius: 8px;
+      font-size: 12.5px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all .15s;
+    }
+    .cta-vender-btn:hover { background: #c05621; color: #fff; border-color: #c05621; }
+
+    /* ─── LEAD MODAL ─────────────────────────────────────── */
+    .lead-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); backdrop-filter: blur(3px);
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .lead-overlay.open { opacity: 1; pointer-events: all; }
+    .lead-modal {
+      background: #fff; border-radius: 16px;
+      width: 400px; max-width: calc(100vw - 32px); max-height: 88vh;
+      overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.28);
+      transform: translateY(24px); transition: transform .22s;
+    }
+    .lead-overlay.open .lead-modal { transform: translateY(0); }
+    .lead-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 18px 12px; border-bottom: 1px solid #e5e7eb;
+    }
+    .lead-header h3 { font-size: 14px; font-weight: 800; color: #1a2e2b; }
+    .lead-header button { background: #f3f4f6; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 13px; }
+    .lead-prop-preview {
+      margin: 14px 18px; background: #f9fafb; border: 1px solid #e5e7eb;
+      border-radius: 8px; padding: 10px 12px;
+      font-size: 12px; color: #374151; line-height: 1.5;
+    }
+    .lead-prop-preview strong { color: #16a34a; font-size: 15px; display: block; }
+    .lead-body { padding: 0 18px 18px; }
+    .lead-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+    .lead-field label { font-size: 11.5px; font-weight: 600; color: #374151; }
+    .lead-field input {
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      padding: 9px 12px; font-size: 13px; font-family: inherit;
+      color: #111827; outline: none; transition: border-color .15s;
+    }
+    .lead-field input:focus { border-color: #16a34a; }
+    .lead-submit {
+      width: 100%; background: #16a34a; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 13px; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: inherit; margin-top: 4px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: opacity .15s;
+    }
+    .lead-submit:hover { opacity: .9; }
+
+    /* ─── CALCULATOR MODAL ──────────────────────────────── */
+    .calc-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); backdrop-filter: blur(3px);
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .calc-overlay.open { opacity: 1; pointer-events: all; }
+    .calc-modal {
+      background: #fff; border-radius: 16px;
+      width: 420px; max-width: calc(100vw - 32px); max-height: 90vh;
+      overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.28);
+      transform: translateY(24px); transition: transform .22s;
+    }
+    .calc-overlay.open .calc-modal { transform: translateY(0); }
+    .calc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 18px 12px; border-bottom: 1px solid #e5e7eb;
+    }
+    .calc-header h3 { font-size: 14px; font-weight: 800; color: #1a2e2b; }
+    .calc-header button { background: #f3f4f6; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 13px; }
+    .calc-tabs { display: flex; border-bottom: 1px solid #e5e7eb; }
+    .calc-tab {
+      flex: 1; padding: 10px 8px; text-align: center;
+      font-size: 12px; font-weight: 600; color: #9ca3af;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      transition: all .15s; font-family: inherit; background: none; border-left: none; border-right: none; border-top: none;
+    }
+    .calc-tab.active { color: #1a2e2b; border-bottom-color: #1a2e2b; }
+    .calc-body { padding: 16px 18px 20px; }
+    .calc-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+    .calc-field label { font-size: 11.5px; font-weight: 600; color: #374151; }
+    .calc-field input, .calc-field select {
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      padding: 9px 12px; font-size: 13px; font-family: inherit;
+      color: #111827; outline: none; transition: border-color .15s;
+    }
+    .calc-field input:focus, .calc-field select:focus { border-color: #1a2e2b; }
+    .calc-result {
+      background: #f0fdf4; border: 1.5px solid #86efac;
+      border-radius: 10px; padding: 14px; margin-top: 12px; text-align: center;
+    }
+    .calc-result strong { font-size: 22px; color: #16a34a; display: block; margin-bottom: 3px; }
+    .calc-result small { font-size: 11px; color: #6b7280; }
+    .calc-go {
+      width: 100%; background: #1a2e2b; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 12px; font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: inherit; margin-top: 10px;
+      transition: opacity .15s;
+    }
+    .calc-go:hover { opacity: .87; }
+    .calc-wa {
+      width: 100%; background: #25D366; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 12px; font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: inherit; margin-top: 8px;
+      display: none; transition: opacity .15s;
+    }
+    .calc-wa.show { display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .calc-wa:hover { opacity: .9; }
+
     /* ─── MARKETPLACE ───────────────────────────────────── */
     .publish-bar {
       padding: 10px 12px 12px;
@@ -568,6 +704,21 @@
       </div>
     </div>
 
+    <!-- Market Intelligence Strip -->
+    <div class="market-intel" id="market-intel">
+      <div class="intel-chip"><span class="intel-val" id="mi-ventas">—</span><span class="intel-label">en venta</span></div>
+      <div class="intel-chip"><span class="intel-val" id="mi-rentas">—</span><span class="intel-label">en renta</span></div>
+      <div class="intel-chip"><span class="intel-val" id="mi-avgm2">—</span><span class="intel-label">prom/m²</span></div>
+      <div class="intel-chip"><span class="intel-val" id="mi-remates">—</span><span class="intel-label">remates</span></div>
+    </div>
+
+    <!-- CTA Vender/Rentar propiedad -->
+    <div class="cta-vender">
+      <button class="cta-vender-btn" onclick="openValuacion()">
+        🏠 ¿Quieres vender o rentar tu propiedad en Terralta?
+      </button>
+    </div>
+
     <!-- Tipo filter -->
     <div class="filters-section">
       <div class="filter-label">Filtrar por tipo</div>
@@ -598,13 +749,172 @@
     <!-- Property list -->
     <div class="prop-list" id="prop-list"></div>
 
-    <!-- Publicar propiedad -->
-    <div class="publish-bar">
+    <!-- Publish + Calculator bar -->
+    <div class="publish-bar" style="display:flex;flex-direction:column;gap:7px;">
       <button class="publish-btn" onclick="openMarketplace()">
         📢 Publicar propiedad en Terralta
       </button>
+      <button class="publish-btn" onclick="openCalc()" style="background:linear-gradient(135deg,#1a2e2b,#2a5248);font-size:12px;padding:9px 16px;">
+        🧮 Calculadora Hipotecaria · INFONAVIT
+      </button>
     </div>
 
+  </div>
+
+  <!-- ─── LEAD CAPTURE MODAL ──────────────────────────────── -->
+  <div class="lead-overlay" id="leadOverlay" onclick="closeLead()">
+    <div class="lead-modal" onclick="event.stopPropagation()">
+      <div class="lead-header">
+        <h3>🎯 Me interesa esta propiedad</h3>
+        <button onclick="closeLead()">✕</button>
+      </div>
+      <div class="lead-prop-preview" id="leadPropPreview"></div>
+      <div class="lead-body">
+        <form id="leadForm" onsubmit="submitLead(event)">
+          <div class="lead-field">
+            <label>Tu nombre</label>
+            <input type="text" id="leadNombre" placeholder="Nombre completo" required autocomplete="name">
+          </div>
+          <div class="lead-field">
+            <label>Tu WhatsApp</label>
+            <input type="tel" id="leadTel" placeholder="33XXXXXXXX" required autocomplete="tel">
+          </div>
+          <div class="lead-field">
+            <label>¿Cuándo quieres visitar?</label>
+            <input type="text" id="leadCuando" placeholder="Lo antes posible / Esta semana / Otro">
+          </div>
+          <button type="submit" class="lead-submit">
+            📱 Enviar mi solicitud por WhatsApp
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CALCULADORA MODAL ─────────────────────────────────── -->
+  <div class="calc-overlay" id="calcOverlay" onclick="closeCalc()">
+    <div class="calc-modal" onclick="event.stopPropagation()">
+      <div class="calc-header">
+        <h3>🧮 Calculadora Inmobiliaria</h3>
+        <button onclick="closeCalc()">✕</button>
+      </div>
+      <div class="calc-tabs">
+        <button class="calc-tab active" onclick="switchCalcTab('hip',this)">🏦 Hipotecario</button>
+        <button class="calc-tab" onclick="switchCalcTab('info',this)">🏗 INFONAVIT</button>
+        <button class="calc-tab" onclick="switchCalcTab('rent',this)">🏠 Rendimiento Renta</button>
+      </div>
+
+      <!-- Tab Hipotecario -->
+      <div class="calc-body" id="calc-hip">
+        <div class="calc-field">
+          <label>Precio de la propiedad (MXN)</label>
+          <input type="number" id="hipPrecio" placeholder="1,500,000" value="1500000">
+        </div>
+        <div class="calc-field">
+          <label>Enganche (%)</label>
+          <input type="number" id="hipEnganche" placeholder="20" value="20" min="10" max="50">
+        </div>
+        <div class="calc-field">
+          <label>Plazo (años)</label>
+          <select id="hipPlazo">
+            <option value="10">10 años</option>
+            <option value="15" selected>15 años</option>
+            <option value="20">20 años</option>
+            <option value="25">25 años</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label>Tasa anual (%)</label>
+          <input type="number" id="hipTasa" value="11.5" step="0.1">
+        </div>
+        <button class="calc-go" onclick="calcHipotecario()">Calcular mensualidad</button>
+        <div class="calc-result" id="hipResult" style="display:none"></div>
+        <button class="calc-wa" id="hipWA">📱 Enviar resultado a WhatsApp</button>
+      </div>
+
+      <!-- Tab INFONAVIT -->
+      <div class="calc-body" id="calc-info" style="display:none">
+        <div class="calc-field">
+          <label>Salario mensual bruto (MXN)</label>
+          <input type="number" id="infoSalario" placeholder="15,000" value="15000">
+        </div>
+        <div class="calc-field">
+          <label>Años cotizados en IMSS</label>
+          <input type="number" id="infoAnios" placeholder="5" value="5" min="1" max="40">
+        </div>
+        <div class="calc-field">
+          <label>Saldo en subcuenta de vivienda (MXN)</label>
+          <input type="number" id="infoSaldo" placeholder="50,000" value="50000">
+        </div>
+        <button class="calc-go" onclick="calcInfonavit()">Calcular crédito estimado</button>
+        <div class="calc-result" id="infoResult" style="display:none"></div>
+        <button class="calc-wa" id="infoWA">📱 Compartir con asesor por WhatsApp</button>
+      </div>
+
+      <!-- Tab Rendimiento Renta -->
+      <div class="calc-body" id="calc-rent" style="display:none">
+        <div class="calc-field">
+          <label>Precio de compra (MXN)</label>
+          <input type="number" id="rentPrecio" placeholder="1,500,000" value="1500000">
+        </div>
+        <div class="calc-field">
+          <label>Renta mensual estimada (MXN)</label>
+          <input type="number" id="rentMensual" placeholder="12,000" value="12000">
+        </div>
+        <div class="calc-field">
+          <label>Gastos mensuales (mantenimiento, impuestos…)</label>
+          <input type="number" id="rentGastos" placeholder="1,500" value="1500">
+        </div>
+        <button class="calc-go" onclick="calcRendimiento()">Calcular rendimiento</button>
+        <div class="calc-result" id="rentResult" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── VALUACION / VENDER MODAL ─────────────────────────── -->
+  <div class="lead-overlay" id="valuacionOverlay" onclick="closeValuacion()">
+    <div class="lead-modal" onclick="event.stopPropagation()">
+      <div class="lead-header">
+        <h3>🏠 Quiero vender o rentar mi propiedad</h3>
+        <button onclick="closeValuacion()">✕</button>
+      </div>
+      <div class="lead-prop-preview" style="background:#fff8f0;border-color:#fcd9aa;">
+        <strong style="color:#c05621;">Recibe asesoría gratuita</strong>
+        La socia de LP Inmobiliaria te contacta, hace la valuación y pone tu propiedad en el mercado.
+      </div>
+      <div class="lead-body">
+        <form id="valuacionForm" onsubmit="submitValuacion(event)">
+          <div class="lead-field">
+            <label>Tipo de operación</label>
+            <select id="valTipo" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;">
+              <option>Quiero vender mi propiedad</option>
+              <option>Quiero rentar mi propiedad</option>
+              <option>Quiero saber cuánto vale</option>
+            </select>
+          </div>
+          <div class="lead-field">
+            <label>Tipo de propiedad</label>
+            <select id="valPropTipo" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;">
+              <option>Casa</option>
+              <option>Departamento</option>
+              <option>Cuarto</option>
+              <option>Local comercial</option>
+            </select>
+          </div>
+          <div class="lead-field">
+            <label>Dirección aproximada en Terralta</label>
+            <input type="text" id="valCalle" placeholder="Ej: Tierra Contenta 150" required>
+          </div>
+          <div class="lead-field">
+            <label>Tu nombre y WhatsApp</label>
+            <input type="text" id="valContacto" placeholder="Nombre · 33XXXXXXXX" required>
+          </div>
+          <button type="submit" class="lead-submit" style="background:#c05621;">
+            📱 Quiero que me contacten
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <!-- ─── MARKETPLACE MODAL ─────────────────────────────── -->
@@ -1449,11 +1759,17 @@ function openPopupFor(prop) {
         </div>
         ${m2txt ? `<div class="popup-m2">${m2txt}</div>` : ''}
         <div style="font-size:10.5px;color:#9ca3af;margin-top:6px;">${prop.extras || ''}</div>
-        <div class="popup-footer">
-          <a class="popup-btn secondary" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${prop.lat},${prop.lng}" target="_blank" style="font-size:11px;">🧍 Street View</a>
-          <a class="popup-btn primary" href="https://wa.me/523314007580?text=${encodeURIComponent('Hola, me interesa la propiedad en ' + prop.calle + '. ¿Me pueden dar información?')}" target="_blank">📱 WhatsApp</a>
+        <div class="popup-footer" style="flex-direction:column;gap:6px;">
+          <div style="display:flex;gap:6px;width:100%;">
+            <button class="popup-btn primary" onclick="openLeadCapture(${prop.id})" style="flex:1;border:none;cursor:pointer;font-family:inherit;">🎯 Me interesa</button>
+            <button class="popup-btn secondary" onclick="shareProperty(${prop.id})" style="flex:1;border:none;cursor:pointer;font-family:inherit;font-size:11px;">📤 Compartir</button>
+          </div>
+          <div style="display:flex;gap:6px;width:100%;">
+            <a class="popup-btn secondary" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${prop.lat},${prop.lng}" target="_blank" style="flex:1;text-align:center;font-size:10px;">🧍 Street View</a>
+            <a class="popup-btn secondary" href="https://wa.me/523314007580?text=${encodeURIComponent('Hola, me interesa la propiedad en ' + prop.calle + '. ¿Me pueden dar información?')}" target="_blank" style="flex:1;text-align:center;font-size:10px;">📱 WhatsApp</a>
+          </div>
         </div>
-        ${popupListingUrl ? `<div style="text-align:center;padding:0 14px 10px;"><a href="${popupListingUrl}" target="_blank" style="font-size:11px;color:#6b7280;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">📋 Ver anuncio completo ↗</a></div>` : ''}
+        ${popupListingUrl ? `<div style="text-align:center;padding:0 14px 10px;"><a href="${popupListingUrl}" target="_blank" style="font-size:11px;color:#6b7280;text-decoration:none;">📋 Ver anuncio ↗</a></div>` : ''}
       </div>
     `)
     .openOn(map);
@@ -1714,7 +2030,9 @@ function focusZona(zonaId) {
 (function checkAuth() {
   const SESSION_KEY = 'cloud_inmo_access';
   const ACCESS_CODE = 'LMA2026';
-  if (sessionStorage.getItem(SESSION_KEY) !== ACCESS_CODE) {
+  // localStorage → persiste entre pestañas y sesiones (no pide código cada vez)
+  if (localStorage.getItem(SESSION_KEY) !== ACCESS_CODE &&
+      sessionStorage.getItem(SESSION_KEY) !== ACCESS_CODE) {
     window.location.replace('./index.html');
   }
 })();
@@ -1761,10 +2079,198 @@ async function initFromData() {
   // Arrancar mapa siempre (con datos del JSON o los hardcodeados como fallback)
   render();
   drawAllZones();
+  updateMarketIntel();
 }
 
 // PROPS y DESARROLLOS son los arrays declarados arriba (fallback si falla fetch)
 initFromData();
+
+// ================================================================
+// MARKET INTELLIGENCE — stats dinámicas calculadas de PROPS
+// ================================================================
+function updateMarketIntel() {
+  if (!PROPS.length) return;
+  const ventas = PROPS.filter(p => p.modalidad === 'Venta');
+  const rentas = PROPS.filter(p => p.modalidad === 'Renta');
+  const remates = PROPS.filter(p => p.remate);
+  const ventasConM2 = ventas.filter(p => p.m2c && p.m2c > 0);
+  const avgM2 = ventasConM2.length
+    ? Math.round(ventasConM2.reduce((s,p) => s + p.precio / p.m2c, 0) / ventasConM2.length)
+    : 0;
+  document.getElementById('mi-ventas').textContent = ventas.length;
+  document.getElementById('mi-rentas').textContent = rentas.length;
+  document.getElementById('mi-avgm2').textContent = avgM2 ? '$' + Math.round(avgM2/1000) + 'K' : '—';
+  document.getElementById('mi-remates').textContent = remates.length;
+}
+
+// ================================================================
+// LEAD CAPTURE
+// ================================================================
+let _leadPropId = null;
+
+function openLeadCapture(propId) {
+  _leadPropId = propId;
+  const prop = PROPS.find(p => p.id === propId);
+  if (!prop) return;
+  const preview = document.getElementById('leadPropPreview');
+  preview.innerHTML = `<strong>${fmtPrecioFull(prop.precio)}</strong>${prop.titulo}<br><span style="color:#6b7280;">${prop.calle}</span>`;
+  document.getElementById('leadOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLead() {
+  document.getElementById('leadOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function submitLead(e) {
+  e.preventDefault();
+  const prop = PROPS.find(p => p.id === _leadPropId);
+  const nombre = document.getElementById('leadNombre').value.trim();
+  const tel    = document.getElementById('leadTel').value.trim();
+  const cuando = document.getElementById('leadCuando').value.trim();
+  const msg = [
+    '🎯 *Nuevo lead — Portal Terralta*',
+    '',
+    `👤 Nombre: ${nombre}`,
+    `📞 WhatsApp: ${tel}`,
+    cuando ? `📅 Cuándo: ${cuando}` : null,
+    '',
+    '🏠 Propiedad de interés:',
+    prop ? `   ${prop.titulo}` : '(sin especificar)',
+    prop ? `   ${prop.calle}` : '',
+    prop ? `   ${fmtPrecioFull(prop.precio)}` : '',
+  ].filter(l => l !== null).join('\n');
+  window.open('https://wa.me/523314007580?text=' + encodeURIComponent(msg), '_blank');
+  closeLead();
+  document.getElementById('leadForm').reset();
+}
+
+// ================================================================
+// SHARE PROPERTY
+// ================================================================
+function shareProperty(propId) {
+  const prop = PROPS.find(p => p.id === propId);
+  if (!prop) return;
+  const precio = fmtPrecioFull(prop.precio);
+  const especsArr = [];
+  if (prop.rec) especsArr.push(`🛏 ${prop.rec} rec`);
+  if (prop.ban) especsArr.push(`🚿 ${prop.ban} baños`);
+  if (prop.m2c) especsArr.push(`📐 ${prop.m2c} m²`);
+  const msg = [
+    `🏠 *${prop.titulo}*`,
+    '',
+    `💰 ${precio}`,
+    `📍 ${prop.calle}`,
+    especsArr.join('  '),
+    prop.extras ? `✨ ${prop.extras}` : null,
+    '',
+    '📲 Contáctame para más info:',
+    'https://wa.me/523314007580',
+    '',
+    '🔗 Ver en portal:',
+    `https://cloud-terralta-portal.vercel.app/mapa.html`,
+  ].filter(l => l !== null).join('\n');
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+// ================================================================
+// CALCULATOR
+// ================================================================
+function openCalc() {
+  document.getElementById('calcOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCalc() {
+  document.getElementById('calcOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function switchCalcTab(tab, el) {
+  ['hip','info','rent'].forEach(t => {
+    document.getElementById('calc-'+t).style.display = t === tab ? '' : 'none';
+  });
+  document.querySelectorAll('.calc-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+function calcHipotecario() {
+  const precio   = parseFloat(document.getElementById('hipPrecio').value) || 0;
+  const enganche = parseFloat(document.getElementById('hipEnganche').value) / 100 || 0.2;
+  const plazo    = parseInt(document.getElementById('hipPlazo').value) || 15;
+  const tasa     = parseFloat(document.getElementById('hipTasa').value) / 100 || 0.115;
+  const credito  = precio * (1 - enganche);
+  const r        = tasa / 12;
+  const n        = plazo * 12;
+  const mensual  = credito * r / (1 - Math.pow(1 + r, -n));
+  const res = document.getElementById('hipResult');
+  res.style.display = '';
+  res.innerHTML = `<strong>$${Math.round(mensual).toLocaleString('es-MX')}/mes</strong><small>Crédito: $${Math.round(credito).toLocaleString('es-MX')} · ${plazo} años · ${(tasa*100).toFixed(1)}% anual</small>`;
+  const wa = document.getElementById('hipWA');
+  wa.classList.add('show');
+  wa.onclick = () => {
+    const msg = `🏦 Simulación hipotecaria:\nPropiedad: $${precio.toLocaleString('es-MX')}\nEnganche ${(enganche*100).toFixed(0)}%: $${(precio*enganche).toLocaleString('es-MX')}\nCrédito: $${Math.round(credito).toLocaleString('es-MX')}\nPlazo: ${plazo} años · ${(tasa*100).toFixed(1)}% anual\nMensualidad estimada: $${Math.round(mensual).toLocaleString('es-MX')}/mes\n\n📲 ¿Me ayudan a tramitar? https://wa.me/523314007580`;
+    window.open('https://wa.me/523314007580?text=' + encodeURIComponent(msg), '_blank');
+  };
+}
+function calcInfonavit() {
+  const salario = parseFloat(document.getElementById('infoSalario').value) || 0;
+  const anios   = parseFloat(document.getElementById('infoAnios').value) || 0;
+  const saldo   = parseFloat(document.getElementById('infoSaldo').value) || 0;
+  // Estimación simplificada: crédito ≈ 115 VSM × UMA diario × 365 (cap ~$2.1M)
+  const uma = 108.57; // UMA diaria 2025
+  const vsmAnual = uma * 365;
+  const creditoBase = Math.min(salario * anios * 8, vsmAnual * 115);
+  const creditoTotal = Math.min(creditoBase + saldo, 2100000);
+  const res = document.getElementById('infoResult');
+  res.style.display = '';
+  res.innerHTML = `<strong>~$${Math.round(creditoTotal).toLocaleString('es-MX')}</strong><small>Crédito INFONAVIT estimado · Incluye subcuenta $${saldo.toLocaleString('es-MX')}<br>Consulta tu saldo real en <strong>infonatel.gob.mx</strong></small>`;
+  const wa = document.getElementById('infoWA');
+  wa.classList.add('show');
+  wa.onclick = () => {
+    const msg = `🏗 Consulta INFONAVIT:\nSalario: $${salario.toLocaleString('es-MX')}/mes · ${anios} años cotizados\nSaldo subcuenta: $${saldo.toLocaleString('es-MX')}\nCrédito estimado: ~$${Math.round(creditoTotal).toLocaleString('es-MX')}\n\n📲 Quiero asesoría para comprarlo en Terralta: https://wa.me/523314007580`;
+    window.open('https://wa.me/523314007580?text=' + encodeURIComponent(msg), '_blank');
+  };
+}
+function calcRendimiento() {
+  const precio  = parseFloat(document.getElementById('rentPrecio').value) || 0;
+  const renta   = parseFloat(document.getElementById('rentMensual').value) || 0;
+  const gastos  = parseFloat(document.getElementById('rentGastos').value) || 0;
+  const netaAnual = (renta - gastos) * 12;
+  const rendimiento = precio > 0 ? (netaAnual / precio) * 100 : 0;
+  const recuperacion = rendimiento > 0 ? (100 / rendimiento).toFixed(1) : '∞';
+  const res = document.getElementById('rentResult');
+  res.style.display = '';
+  res.innerHTML = `<strong>${rendimiento.toFixed(2)}% anual</strong><small>Renta neta: $${Math.round(netaAnual).toLocaleString('es-MX')}/año · Recuperación en ${recuperacion} años</small>`;
+}
+
+// ================================================================
+// VALUACION / VENDER PROPIEDAD
+// ================================================================
+function openValuacion() {
+  document.getElementById('valuacionOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeValuacion() {
+  document.getElementById('valuacionOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function submitValuacion(e) {
+  e.preventDefault();
+  const tipo     = document.getElementById('valTipo').value;
+  const propTipo = document.getElementById('valPropTipo').value;
+  const calle    = document.getElementById('valCalle').value.trim();
+  const contacto = document.getElementById('valContacto').value.trim();
+  const msg = [
+    '🏠 *Lead Vendedor — Portal Terralta*',
+    '',
+    `📋 Operación: ${tipo}`,
+    `🏗 Tipo: ${propTipo}`,
+    `📍 Ubicación: ${calle}`,
+    `👤 Contacto: ${contacto}`,
+    '',
+    '→ Requiere valuación y asesoría.'
+  ].join('\n');
+  window.open('https://wa.me/523314007580?text=' + encodeURIComponent(msg), '_blank');
+  closeValuacion();
+  document.getElementById('valuacionForm').reset();
+}
 
 // ================================================================
 // MARKETPLACE — publicar propiedad vía WhatsApp

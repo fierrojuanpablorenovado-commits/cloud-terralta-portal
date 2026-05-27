@@ -319,7 +319,8 @@
 
       setTimeout(() => {
         if (code === ACCESS_CODE) {
-          // Guardar en sessionStorage
+          // Guardar en localStorage Y sessionStorage → persiste entre sesiones
+          localStorage.setItem(SESSION_KEY, ACCESS_CODE);
           sessionStorage.setItem(SESSION_KEY, ACCESS_CODE);
 
           // Mostrar overlay de éxito y redirigir
