@@ -508,6 +508,38 @@
     .calc-wa.show { display: flex; align-items: center; justify-content: center; gap: 8px; }
     .calc-wa:hover { opacity: .9; }
 
+    /* ─── AGENT CARD ────────────────────────────────────── */
+    .agent-card {
+      margin: 10px 18px 0;
+      background: linear-gradient(135deg, #1a2e2b 0%, #2a5248 100%);
+      border-radius: 14px;
+      padding: 13px 15px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      flex-shrink: 0;
+    }
+    .agent-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.22);
+    }
+    .agent-info { flex: 1; min-width: 0; }
+    .agent-name { font-size: 13px; font-weight: 700; color: #fff; }
+    .agent-title { font-size: 10px; color: rgba(255,255,255,0.65); margin-top: 2px; line-height: 1.3; }
+    .agent-wa {
+      background: #25D366; color: #fff; border: none;
+      border-radius: 8px; padding: 7px 11px;
+      font-size: 11px; font-weight: 700; cursor: pointer;
+      font-family: inherit; flex-shrink: 0;
+      transition: opacity .15s; text-decoration: none;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .agent-wa:hover { opacity: .88; }
+
     /* ─── MARKETPLACE ───────────────────────────────────── */
     .publish-bar {
       padding: 10px 12px 12px;
@@ -690,7 +722,7 @@
 
     <div class="sidebar-top">
       <div class="sidebar-heading">Propiedades en Terralta</div>
-      <div class="sidebar-sub">San Pedro Tlaquepaque, Jalisco · CP 45594 · Datos: Inmuebles24, MercadoLibre, propiedades.com</div>
+      <div class="sidebar-sub">San Pedro Tlaquepaque, Jalisco · CP 45594 · Datos: Inmuebles24 · MercadoLibre</div>
       <div class="stats-row">
         <div class="stat-chip">
           <strong id="stat-total">36</strong>
@@ -713,6 +745,18 @@
       <div class="intel-chip"><span class="intel-val" id="mi-rentas">—</span><span class="intel-label">en renta</span></div>
       <div class="intel-chip"><span class="intel-val" id="mi-avgm2">—</span><span class="intel-label">prom/m²</span></div>
       <div class="intel-chip"><span class="intel-val" id="mi-remates">—</span><span class="intel-label">remates</span></div>
+    </div>
+
+    <!-- Asesora Exclusiva -->
+    <div class="agent-card">
+      <div class="agent-avatar">👩‍💼</div>
+      <div class="agent-info">
+        <div class="agent-name">Asesora Cloud Inmobiliaria</div>
+        <div class="agent-title">🏆 Especialista exclusiva · Zona Terralta<br>Atención personalizada 24/7</div>
+      </div>
+      <a class="agent-wa" href="https://wa.me/523314007580?text=Hola, vi el portal exclusivo de Terralta y me interesa una propiedad. ¿Me puedes ayudar?" target="_blank">
+        💬 Chat
+      </a>
     </div>
 
     <!-- CTA Vender/Rentar propiedad -->
@@ -740,13 +784,13 @@
         <span class="filter-label" style="margin:0">Precio máximo</span>
         <span class="precio-val" id="precio-display">$3,000,000</span>
       </div>
-      <input type="range" id="precio-slider" min="500000" max="3000000" step="50000" value="3000000">
+      <input type="range" id="precio-slider" min="400000" max="3000000" step="50000" value="3000000">
     </div>
 
     <!-- Results bar -->
     <div class="results-bar">
       <span>Mostrando <strong id="result-count">10</strong> propiedades</span>
-      <span class="fuente-tag">Mayo 2026</span>
+      <span class="fuente-tag" id="data-fecha-tag">Mayo 2026</span>
     </div>
 
     <!-- Property list -->
@@ -1569,15 +1613,12 @@ function imgProxy(url) {
   return url;
 }
 
-// Construye URL del anuncio original (extrae ID de Inmuebles24 desde naventcdn si aplica)
+// URL del anuncio original — solo si está explícitamente definida y es válida
 function getListingUrl(p) {
-  if (p.url && !p.url.includes('listado.mercadolibre') && !p.url.includes('/jalisco/tlaquepaque/terralta') && !p.url.includes('foreclosures/for-sale')) return p.url;
-  if (p.img && p.img.includes('naventcdn.com')) {
-    const m = p.img.match(/\/18\/01\/(\d{2})\/(\d{2})\/(\d{2})\/(\d{2})\//);
-    if (m) return 'https://www.inmuebles24.com/propiedades-1' + m[1] + m[2] + m[3] + m[4] + '.html';
-  }
-  if (p.url) return p.url;
-  return null;
+  if (!p.url) return null;
+  const invalid = ['listado.mercadolibre', '/jalisco/tlaquepaque/terralta', 'foreclosures/for-sale'];
+  if (invalid.some(s => p.url.includes(s))) return null;
+  return p.url;
 }
 
 // Fallback imagen rota en tarjeta lateral
@@ -2071,8 +2112,13 @@ async function initFromData() {
       badge.textContent = '✓ Datos reales';
     }
 
-    // Actualizar contador en sidebar
+    // Actualizar contador y fecha en sidebar
     document.getElementById('stat-total').textContent = PROPS.length;
+    if (data._meta && data._meta.actualizado) {
+      const d = new Date(data._meta.actualizado);
+      const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      document.getElementById('data-fecha-tag').textContent = `${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
 
   } catch (err) {
     console.warn('No se pudo cargar data/listings.json, usando datos embebidos:', err);

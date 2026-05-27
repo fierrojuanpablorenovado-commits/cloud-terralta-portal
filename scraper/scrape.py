@@ -13,6 +13,12 @@ import json
 import re
 import sys
 import os
+
+# Forzar UTF-8 en stdout para Windows (emojis en print)
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -57,11 +63,15 @@ async def scrape_inmuebles24(page) -> list[dict]:
     print("  → Scrapeando Inmuebles24...")
     await page.goto(
         "https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html",
-        wait_until="networkidle",
-        timeout=30000,
+        wait_until="domcontentloaded",
+        timeout=60000,
     )
-    # Esperar que carguen los listings
-    await page.wait_for_selector("[data-id]", timeout=15000)
+    # Esperar que carguen los listings (varios intentos)
+    try:
+        await page.wait_for_selector("[data-id]", timeout=20000)
+    except Exception:
+        # Intentar selector alternativo de Inmuebles24
+        await page.wait_for_selector(".posting-card, .listing-card, article", timeout=10000)
 
     listings = []
     cards = await page.query_selector_all("[data-id]")
@@ -111,12 +121,19 @@ async def scrape_inmuebles24(page) -> list[dict]:
             )
             estac = int(re.search(r"(\d+)\s*estac", estac_match, re.I).group(1)) if estac_match else None
 
-            # Dirección: primera línea de texto que no sea precio/spec
-            skip_patterns = r"^(MN\s|m²|\d+\s*(rec|ba[ñn]|estac)|\+\d+\s*foto|$)"
-            calle = next(
-                (l for l in lines if not re.search(skip_patterns, l, re.I) and len(l) > 6),
-                "Terralta",
-            )
+            # URL real del anuncio — construida desde listing_id (método fiable)
+            listing_url = f"https://www.inmuebles24.com/propiedades-{listing_id}.html" if listing_id else None
+
+            # Dirección: buscar línea de texto que parezca dirección de calle
+            # Saltar líneas de specs (precio, m², rec, baños, estac, fotos, números solos)
+            skip_patterns = r"^(MN\s|m²|\d+\s*m²|^\d+\s*m|^\d+[\s,]+m²|\d+\s*(rec|ba[ñn]|estac)|\+\d+\s*foto|^\d+$|^\s*$)"
+            calle_candidates = [
+                l for l in lines
+                if not re.search(skip_patterns, l, re.I)
+                and len(l) > 6
+                and not re.match(r'^\d', l)  # no empezar con número
+            ]
+            calle = calle_candidates[0] if calle_candidates else "Terralta, San Pedro Tlaquepaque"
 
             # Determinar modalidad y tipo
             text_lower = text.lower()
@@ -145,6 +162,7 @@ async def scrape_inmuebles24(page) -> list[dict]:
                     "lng": lng,
                     "fuente": "Inmuebles24",
                     "img": img_src or None,
+                    "url": listing_url,
                     "listing_id": listing_id,
                 }
             )
@@ -325,17 +343,24 @@ async def main():
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(
             headless=True,
-            args=["--no-sandbox", "--disable-setuid-sandbox"],
+            args=[
+                "--no-sandbox", "--disable-setuid-sandbox",
+                "--disable-blink-features=AutomationControlled",
+                "--disable-web-security",
+            ],
         )
         context = await browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
             viewport={"width": 1280, "height": 900},
+            locale="es-MX",
         )
+        # Ocultar que es headless
+        await context.add_init_script("Object.defineProperty(navigator,'webdriver',{get:()=>undefined})")
         page = await context.new_page()
 
-        # Bloquear recursos innecesarios para velocidad
+        # Bloquear recursos innecesarios para velocidad (pero no imágenes — las necesitamos)
         await page.route(
-            "**/*.{png,jpg,jpeg,gif,svg,woff,woff2,ttf,mp4,webm}",
+            "**/*.{woff,woff2,ttf,mp4,webm}",
             lambda route: route.abort(),
         )
 
@@ -365,6 +390,13 @@ async def main():
     # Limpiar y deduplicar
     all_listings = [p for p in all_listings if p.get("precio")]
     all_listings = dedup(all_listings)
+
+    # ─── GUARD: nunca sobrescribir con datos vacíos ───────────────────────────
+    if len(all_listings) == 0:
+        print("\n⚠️  Scraping resultó en 0 propiedades. El archivo de datos NO fue modificado.")
+        print("   Verifica conectividad o si los portales cambiaron su estructura.\n")
+        return
+
     all_listings = assign_ids(all_listings)
 
     # Ordenar: primero venta, luego renta; dentro de cada grupo por precio
