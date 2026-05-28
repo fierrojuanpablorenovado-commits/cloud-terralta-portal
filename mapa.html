@@ -76,49 +76,117 @@
     /* ─── LAYOUT ──────────────────────────────────────────── */
     main { display: flex; height: calc(100vh - 60px); margin-top: 60px; }
 
-    /* ─── SIDEBAR ─────────────────────────────────────────── */
+    /* ─── SIDEBAR ────────────────────────────────────────── */
     .sidebar {
-      width: 370px; min-width: 370px;
+      width: 256px; min-width: 256px;
       background: #fff; border-right: 1px solid #e5e7eb;
-      display: flex; flex-direction: column; overflow: hidden;
+      display: flex; flex-direction: column; overflow-y: auto;
     }
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
 
-    .sidebar-top { padding: 16px 18px 12px; border-bottom: 1px solid #f1f3f5; }
-    .sidebar-heading { font-size: 17px; font-weight: 700; color: #111827; }
-    .sidebar-sub { font-size: 11.5px; color: #9ca3af; margin-top: 1px; }
+    /* ─── CONTENT RIGHT — scroll propio, mapa sticky arriba ─── */
+    .content-right {
+      flex: 1; min-width: 0;
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .content-right::-webkit-scrollbar { width: 4px; }
+    .content-right::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
 
-    .stats-row { display: flex; gap: 8px; margin-top: 10px; }
+    /* ─── SIDEBAR TOP ─────────────────────────────────────── */
+    .sidebar-top { padding: 16px 16px 14px; border-bottom: 1px solid #e5e7eb; }
+    .sidebar-heading {
+      font-size: 13px; font-weight: 800; color: #1a2e2b;
+      text-transform: uppercase; letter-spacing: .8px;
+    }
+    .sidebar-sub { font-size: 10.5px; color: #9ca3af; margin-top: 3px; line-height: 1.4; }
+
+    /* Stats 2×2 — número grande + label */
+    .stats-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px; margin-top: 12px;
+    }
     .stat-chip {
-      background: #f3f4f6; border-radius: 8px;
-      padding: 6px 10px; font-size: 11px; color: #4b5563;
-      flex: 1; text-align: center;
+      background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 10px;
+      padding: 8px 10px; text-align: center;
     }
-    .stat-chip strong { display: block; font-size: 14px; font-weight: 700; color: #1a2e2b; }
+    .stat-chip strong {
+      display: block; font-size: 18px; font-weight: 800;
+      color: #1a2e2b; line-height: 1; margin-bottom: 2px;
+    }
+    .stat-chip span { font-size: 10px; color: #9ca3af; font-weight: 500; }
 
-    /* Filters */
-    .filters-section { padding: 12px 18px; border-bottom: 1px solid #f1f3f5; }
-    .filter-label {
-      font-size: 11px; font-weight: 600; color: #6b7280;
-      text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px;
+    /* ─── MARKET INTEL 2×2 ─────────────────────────────────── */
+    .market-intel {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid #e5e7eb;
     }
-    .tipo-chips { display: flex; gap: 6px; }
+    .intel-chip {
+      padding: 10px 8px; text-align: center;
+      border-right: 1px solid #e5e7eb;
+    }
+    .intel-chip:nth-child(2n) { border-right: none; }
+    .intel-chip:nth-child(n+3) { border-top: 1px solid #e5e7eb; }
+    .intel-val { font-size: 15px; font-weight: 800; color: #1a2e2b; display: block; }
+    .intel-label { font-size: 9.5px; color: #9ca3af; display: block; margin-top: 2px;
+      text-transform: uppercase; letter-spacing: .4px; }
+
+    /* ─── FILTERS ──────────────────────────────────────────── */
+    .filters-section { padding: 12px 14px; border-bottom: 1px solid #e5e7eb; }
+    .filter-label {
+      font-size: 10px; font-weight: 700; color: #9ca3af;
+      text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px;
+    }
+    /* Chips de tipo: 2 por fila */
+    .tipo-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
 
     .chip {
-      padding: 6px 12px; border-radius: 100px;
-      border: 1.5px solid #e5e7eb; background: #fff;
-      font-size: 12px; font-weight: 500; color: #6b7280;
+      padding: 7px 6px; border-radius: 8px;
+      border: 1.5px solid #e5e7eb; background: #f8fafc;
+      font-size: 11.5px; font-weight: 600; color: #6b7280;
       cursor: pointer; transition: all .15s; font-family: inherit;
+      text-align: center; white-space: nowrap;
     }
+    /* Botón "Todos" ocupa todo el ancho */
+    .chip[data-tipo="Todos"] { grid-column: 1 / -1; }
     .chip.active { border-color: #1a2e2b; background: #1a2e2b; color: #fff; }
-    .chip:hover:not(.active) { border-color: #1a2e2b; color: #1a2e2b; }
+    .chip:hover:not(.active) { border-color: #1a2e2b; color: #1a2e2b; background: #f0fdf4; }
 
-    /* Price slider */
-    .precio-section { padding: 12px 18px; border-bottom: 1px solid #f1f3f5; }
+    /* ─── PRECIO ───────────────────────────────────────────── */
+    .precio-section { padding: 12px 14px; border-bottom: 1px solid #e5e7eb; }
     .precio-row {
       display: flex; justify-content: space-between;
-      align-items: center; margin-bottom: 8px;
+      align-items: center; margin-bottom: 10px;
     }
     .precio-val { font-size: 13px; font-weight: 700; color: #1a2e2b; }
+
+    /* ─── ACTIONS ──────────────────────────────────────────── */
+    .action-section {
+      padding: 12px 14px 16px; margin-top: auto;
+      border-top: 1px solid #e5e7eb;
+      display: flex; flex-direction: column; gap: 7px;
+    }
+    .action-btn {
+      width: 100%; padding: 10px 14px; border-radius: 9px;
+      font-size: 12.5px; font-weight: 600; cursor: pointer;
+      font-family: inherit; text-align: left;
+      display: flex; align-items: center; gap: 7px;
+      transition: opacity .15s; letter-spacing: -.1px;
+    }
+    .action-btn:hover { opacity: .83; }
+    .action-btn--pub {
+      background: linear-gradient(135deg,#7c3aed 0%,#9f67f7 100%);
+      color: #fff; border: none;
+    }
+    .action-btn--calc {
+      background: #f0fdf4; color: #16a34a;
+      border: 1.5px solid #bbf7d0;
+    }
+    .action-btn--val {
+      background: #fff8f0; color: #c05621;
+      border: 1.5px solid #fcd9aa;
+    }
 
     input[type="range"] {
       width: 100%; -webkit-appearance: none;
@@ -133,8 +201,10 @@
       box-shadow: 0 1px 6px rgba(0,0,0,.15);
     }
 
-    /* Results bar */
+    /* Results bar — sticky justo debajo del mapa */
     .results-bar {
+      position: sticky; top: 420px; z-index: 99;
+      flex-shrink: 0;
       padding: 8px 18px; background: #fafafa;
       border-bottom: 1px solid #f1f3f5;
       font-size: 12px; color: #9ca3af;
@@ -146,13 +216,24 @@
       background: #f3f4f6; padding: 2px 7px; border-radius: 4px;
     }
 
-    /* Property list */
+    /* Property grid — fluye natural, content-right hace el scroll */
     .prop-list {
-      overflow-y: auto; flex: 1; padding: 12px;
-      display: flex; flex-direction: column; gap: 10px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+      align-content: start;
+      background: #f3f4f6;
     }
-    .prop-list::-webkit-scrollbar { width: 3px; }
-    .prop-list::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 3px; }
+
+    /* Rendimiento anual badge (estilo Gonzara) */
+    .rend-badge {
+      position: absolute; bottom: 8px; left: 8px;
+      background: rgba(22,163,74,0.92); color: #fff;
+      border-radius: 6px; padding: 3px 8px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: .2px;
+      backdrop-filter: blur(4px);
+    }
 
     /* Property card */
     .prop-card {
@@ -162,7 +243,19 @@
       flex-shrink: 0; /* evita que el flex container aplaste las tarjetas */
     }
     .prop-card:hover { border-color: #1a2e2b; box-shadow: 0 4px 14px rgba(26,46,43,.1); }
-    .prop-card.active { border-color: #1a2e2b; box-shadow: 0 0 0 2px #1a2e2b22, 0 4px 14px rgba(26,46,43,.12); }
+    .prop-card.active {
+      border: 2.5px solid #16a34a;
+      box-shadow: 0 0 0 3px rgba(22,163,74,.25), 0 6px 20px rgba(22,163,74,.18);
+      transform: translateY(-2px);
+    }
+    /* Franja verde arriba de la tarjeta cuando está seleccionada — imagen queda visible */
+    .prop-card.active::before {
+      content: '📍 Ubicado en mapa';
+      display: block;
+      background: #16a34a; color: #fff;
+      text-align: center; font-size: 10.5px; font-weight: 700;
+      padding: 4px 8px; letter-spacing: .3px;
+    }
 
     .card-img-wrap { position: relative; height: 150px; overflow: hidden; background: #e5e7eb; }
     .card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -230,8 +323,13 @@
     .no-results .nr-icon { font-size: 40px; margin-bottom: 12px; }
     .no-results p { font-size: 13px; color: #9ca3af; }
 
-    /* ─── MAP ─────────────────────────────────────────────── */
-    #map { flex: 1; height: 100%; z-index: 0; }
+    /* ─── MAP — sticky al hacer scroll en content-right ─────── */
+    .map-wrap {
+      position: sticky; top: 0; z-index: 100;
+      height: 420px; flex-shrink: 0;
+      border-bottom: 2px solid #e5e7eb; overflow: hidden;
+    }
+    #map { width: 100%; height: 100%; z-index: 0; }
 
     /* ─── LEAFLET OVERRIDES ───────────────────────────────── */
     .leaflet-control-zoom {
@@ -261,7 +359,17 @@
       user-select: none;
     }
     .map-pin:hover { background: #c05621; transform: scale(1.06); }
-    .map-pin.sel { background: #c05621; transform: scale(1.06); }
+    .map-pin.sel {
+      background: #16a34a !important;
+      transform: scale(1.35) !important;
+      box-shadow: 0 0 0 6px rgba(22,163,74,.35), 0 4px 14px rgba(0,0,0,.3) !important;
+      z-index: 9999 !important;
+      animation: pin-pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pin-pulse {
+      0%,100% { box-shadow: 0 0 0 6px rgba(22,163,74,.35), 0 4px 14px rgba(0,0,0,.3); }
+      50%      { box-shadow: 0 0 0 12px rgba(22,163,74,.15), 0 4px 14px rgba(0,0,0,.3); }
+    }
     .map-pin.remate { background: #dc2626; }
     .map-pin.remate:hover, .map-pin.remate.sel { background: #991b1b; }
 
@@ -388,19 +496,6 @@
     .intel-val { font-size: 11.5px; font-weight: 800; color: #1a2e2b; display: block; }
     .intel-label { font-size: 9px; color: #9ca3af; display: block; margin-top: 1px; text-transform: uppercase; letter-spacing: .3px; }
 
-    /* ─── CTA VENDER ────────────────────────────────────── */
-    .cta-vender { padding: 8px 12px 0; }
-    .cta-vender-btn {
-      width: 100%; background: #fff8f0;
-      border: 1.5px solid #fcd9aa; color: #c05621;
-      padding: 9px 12px; border-radius: 8px;
-      font-size: 12.5px; font-weight: 700;
-      cursor: pointer; font-family: inherit;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      transition: all .15s;
-    }
-    .cta-vender-btn:hover { background: #c05621; color: #fff; border-color: #c05621; }
-
     /* ─── LEAD MODAL ─────────────────────────────────────── */
     .lead-overlay {
       position: fixed; inset: 0;
@@ -510,38 +605,6 @@
     }
     .calc-wa.show { display: flex; align-items: center; justify-content: center; gap: 8px; }
     .calc-wa:hover { opacity: .9; }
-
-    /* ─── AGENT CARD ────────────────────────────────────── */
-    .agent-card {
-      margin: 10px 18px 0;
-      background: linear-gradient(135deg, #1a2e2b 0%, #2a5248 100%);
-      border-radius: 14px;
-      padding: 13px 15px;
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      flex-shrink: 0;
-    }
-    .agent-avatar {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.12);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; flex-shrink: 0;
-      border: 2px solid rgba(255,255,255,0.22);
-    }
-    .agent-info { flex: 1; min-width: 0; }
-    .agent-name { font-size: 13px; font-weight: 700; color: #fff; }
-    .agent-title { font-size: 10px; color: rgba(255,255,255,0.65); margin-top: 2px; line-height: 1.3; }
-    .agent-wa {
-      background: #25D366; color: #fff; border: none;
-      border-radius: 8px; padding: 7px 11px;
-      font-size: 11px; font-weight: 700; cursor: pointer;
-      font-family: inherit; flex-shrink: 0;
-      transition: opacity .15s; text-decoration: none;
-      display: flex; align-items: center; gap: 4px;
-    }
-    .agent-wa:hover { opacity: .88; }
 
     /* ─── MARKETPLACE ───────────────────────────────────── */
     .publish-bar {
@@ -682,21 +745,7 @@
 <!-- ─── HEADER ─────────────────────────────────────────────── -->
 <header>
   <div class="logo">
-    <!-- Cloud Inmobiliaria logo — cuadrado redondeado azul -->
-    <svg width="50" height="50" viewBox="0 0 200 200" style="border-radius:22%;flex-shrink:0;box-shadow:0 2px 8px rgba(91,144,184,.35);">
-      <rect width="200" height="200" rx="32" fill="#5B90B8"/>
-      <!-- CL -->
-      <text x="12" y="122" font-family="'Arial Black','Arial',sans-serif" font-weight="900" font-size="56" fill="white">CL</text>
-      <!-- Cloud (O) -->
-      <ellipse cx="108" cy="86" rx="19" ry="14" fill="white"/>
-      <ellipse cx="91"  cy="95" rx="13" ry="10" fill="white"/>
-      <ellipse cx="125" cy="95" rx="13" ry="10" fill="white"/>
-      <rect x="78" y="95" width="60" height="13" rx="6" fill="white"/>
-      <!-- UD -->
-      <text x="130" y="122" font-family="'Arial Black','Arial',sans-serif" font-weight="900" font-size="56" fill="white">UD</text>
-      <!-- INMOBILIARIA -->
-      <text x="100" y="152" text-anchor="middle" font-family="Arial,sans-serif" font-weight="500" font-size="11.5" fill="rgba(255,255,255,0.88)" letter-spacing="4.2">INMOBILIARIA</text>
-    </svg>
+    <img src="download.png" alt="Cloud Inmobiliaria" style="width:50px;height:50px;object-fit:contain;flex-shrink:0;border-radius:50%;box-shadow:0 2px 8px rgba(91,144,184,.35);">
     <div class="logo-text">
       <div class="logo-name" style="color:#1e3d6e;">CLOUD INMOBILIARIA</div>
       <div class="logo-tagline">Portal Exclusivo · Terralta, San Pedro Tlaquepaque</div>
@@ -724,20 +773,24 @@
   <div class="sidebar">
 
     <div class="sidebar-top">
-      <div class="sidebar-heading">Propiedades en Terralta</div>
-      <div class="sidebar-sub">San Pedro Tlaquepaque, Jalisco · CP 45594 · Datos: Inmuebles24 · MercadoLibre</div>
+      <div class="sidebar-heading">Terralta</div>
+      <div class="sidebar-sub">San Pedro Tlaquepaque · Jalisco · CP 45594</div>
       <div class="stats-row">
         <div class="stat-chip">
-          <strong id="stat-total">36</strong>
-          activas
+          <strong id="stat-total">—</strong>
+          <span>propiedades</span>
+        </div>
+        <div class="stat-chip">
+          <strong>$8.4K</strong>
+          <span>prom/m²</span>
         </div>
         <div class="stat-chip">
           <strong>$450K</strong>
-          precio mín.
+          <span>desde</span>
         </div>
         <div class="stat-chip">
           <strong>$3.0M</strong>
-          precio máx.
+          <span>hasta</span>
         </div>
       </div>
     </div>
@@ -748,25 +801,6 @@
       <div class="intel-chip"><span class="intel-val" id="mi-rentas">—</span><span class="intel-label">en renta</span></div>
       <div class="intel-chip"><span class="intel-val" id="mi-avgm2">—</span><span class="intel-label">prom/m²</span></div>
       <div class="intel-chip"><span class="intel-val" id="mi-remates">—</span><span class="intel-label">remates</span></div>
-    </div>
-
-    <!-- Asesora Exclusiva -->
-    <div class="agent-card">
-      <div class="agent-avatar">👩‍💼</div>
-      <div class="agent-info">
-        <div class="agent-name">Asesora Cloud Inmobiliaria</div>
-        <div class="agent-title">🏆 Especialista exclusiva · Zona Terralta<br>Atención personalizada 24/7</div>
-      </div>
-      <a class="agent-wa" href="https://wa.me/523314007580?text=Hola, vi el portal exclusivo de Terralta y me interesa una propiedad. ¿Me puedes ayudar?" target="_blank">
-        💬 Chat
-      </a>
-    </div>
-
-    <!-- CTA Vender/Rentar propiedad -->
-    <div class="cta-vender">
-      <button class="cta-vender-btn" onclick="openValuacion()">
-        🏠 ¿Quieres vender o rentar tu propiedad en Terralta?
-      </button>
     </div>
 
     <!-- Tipo filter -->
@@ -790,26 +824,47 @@
       <input type="range" id="precio-slider" min="400000" max="3000000" step="50000" value="3000000">
     </div>
 
+    <!-- Acciones rápidas -->
+    <div class="action-section">
+      <button class="action-btn action-btn--pub" onclick="openMarketplace()">
+        📢 Publicar propiedad
+      </button>
+      <button class="action-btn action-btn--calc" onclick="openCalc()">
+        🧮 Calculadora inmobiliaria
+      </button>
+      <button class="action-btn action-btn--val" onclick="openValuacion()">
+        🏠 Vender / Rentar mi propiedad
+      </button>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- ─── CONTENT RIGHT ───────────────────────────────────── -->
+  <div class="content-right">
+
+    <!-- Mapa arriba -->
+    <div class="map-wrap">
+      <div id="map"></div>
+      <div class="map-overlay">
+        <strong>Fracc. Terralta</strong><br>
+        San Pedro Tlaquepaque, Jalisco<br>
+        <span class="src">Inmuebles24 · MercadoLibre</span>
+      </div>
+    </div>
+
     <!-- Results bar -->
     <div class="results-bar">
-      <span>Mostrando <strong id="result-count">10</strong> propiedades</span>
-      <span class="fuente-tag" id="data-fecha-tag">Mayo 2026</span>
+      <span>Mostrando <strong id="result-count">0</strong> propiedades</span>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <button onclick="map.fitBounds(_teraltaBounds,{padding:[20,20]})" style="background:#16a34a;color:#fff;border:none;border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📍 Ver Terralta</button>
+        <span class="fuente-tag" id="data-fecha-tag">Mayo 2026</span>
+      </div>
     </div>
 
-    <!-- Property list -->
+    <!-- Property grid abajo -->
     <div class="prop-list" id="prop-list"></div>
 
-    <!-- Publish + Calculator bar -->
-    <div class="publish-bar" style="display:flex;flex-direction:column;gap:7px;">
-      <button class="publish-btn" onclick="openMarketplace()">
-        📢 Publicar propiedad en Terralta
-      </button>
-      <button class="publish-btn" onclick="openCalc()" style="background:linear-gradient(135deg,#1a2e2b,#2a5248);font-size:12px;padding:9px 16px;">
-        🧮 Calculadora Hipotecaria · INFONAVIT
-      </button>
-    </div>
-
-  </div>
+  </div><!-- /content-right -->
 
   <!-- ─── LEAD CAPTURE MODAL ──────────────────────────────── -->
   <div class="lead-overlay" id="leadOverlay" onclick="closeLead()">
@@ -1023,15 +1078,6 @@
     </div>
   </div>
 
-  <!-- MAP -->
-  <div style="flex:1; position:relative;">
-    <div id="map"></div>
-    <div class="map-overlay">
-      <strong>Fraccionamiento Terralta</strong><br>
-      San Pedro Tlaquepaque, Jalisco<br>
-      <span class="src">Fuente: MercadoLibre · propiedades.com</span>
-    </div>
-  </div>
 
 </main>
 
@@ -1566,10 +1612,19 @@ let activePopup = null;
 // ================================================================
 // MAP — centrado en Av. Terralta (coords Nominatim verificadas)
 // ================================================================
+// Bounds precisos de Terralta
+const _teraltaBounds = L.latLngBounds(
+  [20.6065, -103.3648], [20.6135, -103.3530]
+);
+
 const map = L.map('map', {
-  center: [20.6100, -103.3590],
-  zoom: 15,
+  center: [20.6098, -103.3592],
+  zoom: 16,
+  minZoom: 15,
+  maxZoom: 18,
   zoomControl: true,
+  maxBounds: _teraltaBounds.pad(0.08),
+  maxBoundsViscosity: 1.0,
 });
 
 // Capa base: calles (OpenStreetMap)
@@ -1680,7 +1735,7 @@ function rebuildMarkers() {
     });
 
     const m = L.marker([prop.lat, prop.lng], { icon }).addTo(map);
-    m.on('click', () => selectProp(prop.id, false));
+    m.on('click', (e) => { L.DomEvent.stopPropagation(e); selectProp(prop.id, false); });
     markers[prop.id] = m;
   });
 }
@@ -1704,7 +1759,7 @@ function rebuildDevMarkers() {
       iconAnchor: [50, 14],
     });
     const m = L.marker([dev.lat, dev.lng], { icon }).addTo(map);
-    m.on('click', () => selectDesarrollo(dev.id, false));
+    m.on('click', (e) => { L.DomEvent.stopPropagation(e); selectDesarrollo(dev.id, false); });
     devMarkers[dev.id] = m;
   });
 }
@@ -1735,7 +1790,7 @@ function openDevPopup(dev) {
         ${modelosHtml ? `<div class="modelo-chips" style="margin-top:7px;">${modelosHtml}</div>` : ''}
         <div style="font-size:10.5px;color:#9ca3af;margin-top:6px;">💳 ${dev.credito}</div>
         <div class="popup-footer">
-          <a class="popup-btn primary dev" href="https://wa.me/523314007580?text=Hola, me interesa el desarrollo ${encodeURIComponent(dev.nombre)} en Terralta, ¿pueden darme información?" target="_blank">📱 Solicitar información</a>
+          <a class="popup-btn primary dev" href="https://wa.me/?text=Hola, me interesa el desarrollo ${encodeURIComponent(dev.nombre)} en Terralta, ¿pueden darme información?" target="_blank">📱 Solicitar información</a>
         </div>
       </div>
     `)
@@ -1813,20 +1868,9 @@ function openPopupFor(prop) {
           </div>
           <div style="display:flex;gap:6px;width:100%;">
             <a class="popup-btn secondary" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${prop.lat},${prop.lng}" target="_blank" style="flex:1;text-align:center;font-size:10px;">🧍 Street View</a>
-            <a class="popup-btn secondary" href="https://wa.me/523314007580?text=${encodeURIComponent('Hola, me interesa la propiedad en ' + prop.calle + '. ¿Me pueden dar información?')}" target="_blank" style="flex:1;text-align:center;font-size:10px;">📱 WhatsApp</a>
+            <a class="popup-btn secondary" href="https://wa.me/?text=${encodeURIComponent('Hola, me interesa la propiedad en ' + prop.calle + '. ¿Me pueden dar información?')}" target="_blank" style="flex:1;text-align:center;font-size:10px;">📱 WhatsApp</a>
           </div>
         </div>
-        ${popupListingUrl ? `
-          <div style="padding:0 12px 12px;">
-            <a href="${popupListingUrl}" target="_blank"
-               style="display:flex;align-items:center;justify-content:center;gap:6px;
-                      background:#0ea5e9;color:#fff;text-decoration:none;
-                      border-radius:8px;padding:9px;font-size:12px;font-weight:700;
-                      transition:opacity .15s;"
-               onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-              🔗 Ver anuncio en Inmuebles24
-            </a>
-          </div>` : ''}
       </div>
     `)
     .openOn(map);
@@ -1851,8 +1895,14 @@ function selectProp(id, panToMap = true) {
     el.classList.toggle('sel', parseInt(el.dataset.id) === id);
   });
 
-  if (panToMap) map.panTo([prop.lat, prop.lng], { animate: true, duration: 0.5 });
-  openPopupFor(prop);
+  if (panToMap) {
+    // Clic desde tarjeta: solo mover mapa al pin, sin popup
+    if (activePopup) { map.closePopup(activePopup); activePopup = null; }
+    map.panTo([prop.lat, prop.lng], { animate: true, duration: 0.4 });
+  } else {
+    // Clic desde marcador en mapa: abrir popup
+    openPopupFor(prop);
+  }
 
   const card = document.querySelector(`.prop-card[data-id="${id}"]`);
   if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1906,6 +1956,7 @@ function renderCards() {
               : '<div class="mercado-badge">💰 Venta</div>'
           }
           <div class="tipo-tag">${tipoProp.toUpperCase()}</div>
+          ${esRenta ? '' : `<div class="rend-badge">↑ ${p.remate ? '15–25' : '8–10'}% rend. anual</div>`}
         </div>
         <div class="card-body">
           <div class="card-precio">${precioStr}</div>
@@ -1917,49 +1968,58 @@ function renderCards() {
           </div>
           <div class="card-footer">
             <span class="m2-tag">${m2txt || (p.m2c ? p.m2c + ' m²' : '—')}</span>
-            ${listingUrl
-              ? `<a class="fuente-link" href="${listingUrl}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;background:#f0f9ff;border:1px solid #bae6fd;color:#0369a1;border-radius:6px;padding:3px 8px;font-size:10.5px;font-weight:700;text-decoration:none;">🔗 Ver en Inmuebles24</a>`
-              : ''
-            }
+            <a href="https://wa.me/?text=${encodeURIComponent('Hola, me interesa esta propiedad en Terralta:\n\n' + (esRenta ? '🏠 EN RENTA\n' : '💰 EN VENTA\n') + '📍 ' + p.calle + '\n💵 ' + (esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)) + '\n🛏 ' + p.rec + ' rec · 🚿 ' + p.ban + ' baños' + (p.m2c ? ' · 📐 ' + p.m2c + 'm²' : '') + '\n\n¿Pueden darme más información?')}"
+               target="_blank" rel="noopener" onclick="event.stopPropagation()"
+               style="display:inline-flex;align-items:center;gap:3px;background:#25D366;color:#fff;border-radius:6px;padding:3px 8px;font-size:10.5px;font-weight:700;text-decoration:none;">
+               📱 Info
+            </a>
           </div>
         </div>
       </div>
     `;
   }).join('');
 
-  // Append developments section
+  // Desarrollos — se insertan directo al grid sin wrapper
   if (devs.length > 0) {
-    const devSection = document.createElement('div');
-    devSection.innerHTML = `
-      <div class="dev-section-header">🏗 Desarrollos nuevos en zona</div>
-      ${devs.map(dev => {
-        const modelosHtml = dev.modelos.map(m =>
-          `<span class="modelo-chip">${m.nombre}${m.precio ? ' · ' + fmtPrecio(m.precio) : ''}</span>`
-        ).join('');
-        return `
-          <div class="dev-card${selectedDevId === dev.id ? ' active' : ''}" data-dev-id="${dev.id}">
-            <div class="card-img-wrap">
-              ${dev.img
-                ? `<img class="card-img" src="${imgProxy(dev.img)}" alt="${dev.nombre}" onerror="cardImgError(this)">`
-                : `<div class="card-img-ph"><span>🏗</span><small>Sin fotografía</small></div>`
-              }
-              <div class="dev-badge">🏗 NUEVO</div>
-              <div class="tipo-tag">${dev.desarrollador.toUpperCase()}</div>
-            </div>
-            <div class="card-body">
-              <div class="card-precio">Desde ${fmtPrecioFull(dev.desde)}</div>
-              <div class="card-calle">${dev.direccion}</div>
-              <div class="modelo-chips">${modelosHtml || '<span class="modelo-chip">Preventa</span>'}</div>
-              <div class="card-footer">
-                <span class="m2-tag">${dev.tipo}</span>
-                <span class="fuente-link" style="color:#7c3aed;">${dev.desarrollador}</span>
-              </div>
-            </div>
+    // Header de sección: ocupa todas las columnas
+    const devHeader = document.createElement('div');
+    devHeader.className = 'dev-section-header';
+    devHeader.style.gridColumn = '1 / -1';
+    devHeader.innerHTML = '🏗 Desarrollos nuevos en zona';
+    container.appendChild(devHeader);
+
+    // Cada dev-card va directo al grid
+    devs.forEach(dev => {
+      const modelosHtml = dev.modelos.map(m =>
+        `<span class="modelo-chip">${m.nombre}${m.precio ? ' · ' + fmtPrecio(m.precio) : ''}</span>`
+      ).join('');
+      const devCard = document.createElement('div');
+      devCard.className = `dev-card${selectedDevId === dev.id ? ' active' : ''}`;
+      devCard.dataset.devId = dev.id;
+      devCard.innerHTML = `
+        <div class="card-img-wrap">
+          ${dev.img
+            ? `<img class="card-img" src="${imgProxy(dev.img)}" alt="${dev.nombre}" onerror="cardImgError(this)">`
+            : `<div class="card-img-ph"><span>🏗</span><small>Sin fotografía</small></div>`
+          }
+          <div class="dev-badge">🏗 NUEVO</div>
+          <div class="tipo-tag">${dev.desarrollador.toUpperCase()}</div>
+        </div>
+        <div class="card-body">
+          <div class="card-precio">Desde ${fmtPrecioFull(dev.desde)}</div>
+          <div class="card-calle">${dev.direccion}</div>
+          <div class="modelo-chips">${modelosHtml || '<span class="modelo-chip">Preventa</span>'}</div>
+          <div class="card-footer">
+            <span class="m2-tag">${dev.tipo}</span>
+            <span class="fuente-link" style="color:#7c3aed;">${dev.desarrollador}</span>
           </div>
-        `;
-      }).join('')}
-    `;
-    container.appendChild(devSection);
+        </div>`;
+      devCard.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') return;
+        selectDesarrollo(dev.id, true);
+      });
+      container.appendChild(devCard);
+    });
   }
 
   document.querySelectorAll('.prop-card').forEach(card => {
@@ -1969,12 +2029,6 @@ function renderCards() {
     });
   });
 
-  document.querySelectorAll('.dev-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      if (e.target.tagName === 'A') return;
-      selectDesarrollo(card.dataset.devId, true);
-    });
-  });
 }
 
 // ================================================================
@@ -2035,8 +2089,8 @@ function drawAllZones() {
   zonaLayers = {};
   if (!zonasVisible) return;
 
-  Object.values(ZONAS).forEach(zona => {
-    const totalEnZona = PROPS.length; // se puede filtrar por zona en el futuro
+  Object.values(ZONAS).filter(z => z.id === 'terralta').forEach(zona => {
+    const totalEnZona = PROPS.length;
     const layer = L.polygon(zona.polygon, {
       color: zona.color,
       fillColor: zona.fillColor,
@@ -2078,8 +2132,15 @@ function focusZona(zonaId) {
   document.querySelectorAll('.zona-chip').forEach(c => {
     c.classList.toggle('active', c.dataset.zona === zonaId);
   });
-  map.fitBounds(zonaLayers[zonaId].getBounds(), { padding: [40, 40] });
+  map.fitBounds(zonaLayers[zonaId].getBounds(), { padding: [30, 30] });
 }
+
+// Zoom inicial al polígono Terralta
+setTimeout(() => {
+  if (zonaLayers['terralta']) {
+    map.fitBounds(zonaLayers['terralta'].getBounds(), { padding: [30, 30] });
+  }
+}, 400);
 
 // ================================================================
 // AUTH CHECK — redirige si no tiene acceso
@@ -2201,7 +2262,7 @@ function submitLead(e) {
     prop ? `   ${prop.calle}` : '',
     prop ? `   ${fmtPrecioFull(prop.precio)}` : '',
   ].filter(l => l !== null).join('\n');
-  window.open('https://wa.me/523314007580?text=' + encodeURIComponent(msg), '_blank');
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   closeLead();
   document.getElementById('leadForm').reset();
 }
@@ -2226,7 +2287,7 @@ function shareProperty(propId) {
     prop.extras ? `✨ ${prop.extras}` : null,
     '',
     '📲 Contáctame para más info:',
-    'https://wa.me/523314007580',
+    'https://wa.me/',
     '',
     '🔗 Ver en portal:',
     `https://cloud-terralta-portal.vercel.app/mapa.html`,
@@ -2267,8 +2328,8 @@ function calcHipotecario() {
   const wa = document.getElementById('hipWA');
   wa.classList.add('show');
   wa.onclick = () => {
-    const msg = `🏦 Simulación hipotecaria:\nPropiedad: $${precio.toLocaleString('es-MX')}\nEnganche ${(enganche*100).toFixed(0)}%: $${(precio*enganche).toLocaleString('es-MX')}\nCrédito: $${Math.round(credito).toLocaleString('es-MX')}\nPlazo: ${plazo} años · ${(tasa*100).toFixed(1)}% anual\nMensualidad estimada: $${Math.round(mensual).toLocaleString('es-MX')}/mes\n\n📲 ¿Me ayudan a tramitar? https://wa.me/523314007580`;
-    window.open('https://wa.me/523314007580?text=' + encodeURIComponent(msg), '_blank');
+    const msg = `🏦 Simulación hipotecaria:\nPropiedad: $${precio.toLocaleString('es-MX')}\nEnganche ${(enganche*100).toFixed(0)}%: $${(precio*enganche).toLocaleString('es-MX')}\nCrédito: $${Math.round(credito).toLocaleString('es-MX')}\nPlazo: ${plazo} años · ${(tasa*100).toFixed(1)}% anual\nMensualidad estimada: $${Math.round(mensual).toLocaleString('es-MX')}/mes\n\n📲 ¿Me ayudan a tramitar? https://wa.me/`;
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   };
 }
 function calcInfonavit() {
@@ -2286,8 +2347,8 @@ function calcInfonavit() {
   const wa = document.getElementById('infoWA');
   wa.classList.add('show');
   wa.onclick = () => {
-    const msg = `🏗 Consulta INFONAVIT:\nSalario: $${salario.toLocaleString('es-MX')}/mes · ${anios} años cotizados\nSaldo subcuenta: $${saldo.toLocaleString('es-MX')}\nCrédito estimado: ~$${Math.round(creditoTotal).toLocaleString('es-MX')}\n\n📲 Quiero asesoría para comprarlo en Terralta: https://wa.me/523314007580`;
-    window.open('https://wa.me/523314007580?text=' + encodeURIComponent(msg), '_blank');
+    const msg = `🏗 Consulta INFONAVIT:\nSalario: $${salario.toLocaleString('es-MX')}/mes · ${anios} años cotizados\nSaldo subcuenta: $${saldo.toLocaleString('es-MX')}\nCrédito estimado: ~$${Math.round(creditoTotal).toLocaleString('es-MX')}\n\n📲 Quiero asesoría para comprarlo en Terralta: https://wa.me/`;
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   };
 }
 function calcRendimiento() {
@@ -2329,7 +2390,7 @@ function submitValuacion(e) {
     '',
     '→ Requiere valuación y asesoría.'
   ].join('\n');
-  window.open('https://wa.me/523314007580?text=' + encodeURIComponent(msg), '_blank');
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   closeValuacion();
   document.getElementById('valuacionForm').reset();
 }
@@ -2368,7 +2429,7 @@ function submitMarketplace(e) {
     `📞 Contacto (propietario): ${tel}`,
   ].filter(l => l !== null);
 
-  const waUrl = 'https://wa.me/523314007580?text=' + encodeURIComponent(lines.join('\n'));
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(lines.join('\n'));
   window.open(waUrl, '_blank');
   closeMarketplace();
   document.getElementById('mktForm').reset();
