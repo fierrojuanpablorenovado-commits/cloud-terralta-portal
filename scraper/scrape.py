@@ -423,7 +423,132 @@ def scrape_inmuebles24() -> list[dict]:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FUENTE 3: Lamudi.com.mx
+# FUENTE 3: Facebook Marketplace (watchlist pública — OG meta tags, sin login)
+# ══════════════════════════════════════════════════════════════════════════════
+
+FB_WATCHLIST = Path(__file__).parent.parent / "data" / "fb_watchlist.json"
+
+def scrape_facebook() -> list[dict]:
+    """
+    Lee data/fb_watchlist.json, visita cada listing de FB y extrae
+    og:title / og:description / og:image sin necesitar login.
+    Para agregar nuevos anuncios: edita fb_watchlist.json con el ID del URL.
+    """
+    print("  → Facebook Marketplace (watchlist)...")
+    if not FB_WATCHLIST.exists():
+        print("    ✗ fb_watchlist.json no encontrado")
+        return []
+
+    try:
+        wl = json.loads(FB_WATCHLIST.read_text("utf-8"))
+        items = wl.get("items", [])
+    except Exception as e:
+        print(f"    ✗ Error leyendo watchlist: {e}")
+        return []
+
+    if not items:
+        return []
+
+    session = make_web_session()
+    listings = []
+
+    for item in items:
+        fb_id = str(item.get("id", "")).strip()
+        if not fb_id:
+            continue
+
+        url = f"https://www.facebook.com/marketplace/item/{fb_id}/"
+        jitter(1.5, 3.0)
+
+        status, html = http_get(url, session=session, headers={
+            "Accept-Language": "es-MX,es;q=0.9",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+        })
+
+        if status != 200 or not html:
+            print(f"    ✗ FB {fb_id}: HTTP {status}")
+            continue
+
+        # Extraer OG meta tags
+        def og(prop):
+            m = re.search(rf'<meta[^>]+property=["\']og:{prop}["\'][^>]+content=["\']([^"\']+)["\']', html)
+            if not m:
+                m = re.search(rf'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:{prop}["\']', html)
+            return m.group(1).strip() if m else ""
+
+        title = og("title") or item.get("nota", f"Propiedad FB {fb_id}")
+        description = og("description")
+        image = og("image")
+
+        # Limpiar título (FB añade " | Facebook Marketplace" etc.)
+        title = re.sub(r'\s*[|\-–]\s*Facebook.*$', '', title, flags=re.IGNORECASE).strip()
+        if not title:
+            title = item.get("nota", f"Propiedad Terralta — FB {fb_id}")
+
+        # Extraer precio desde description o título
+        precio = None
+        for text in (description, title):
+            m = re.search(r'MX\$\s*([\d,\.]+)|(\$\s*[\d,\.]+)', text)
+            if m:
+                raw = (m.group(1) or m.group(2)).replace('$','').replace(',','').replace(' ','')
+                try:
+                    v = float(raw)
+                    if v > 1000:
+                        precio = int(v)
+                        break
+                except Exception:
+                    pass
+
+        if not precio:
+            # Usar precio de la watchlist si tiene campo "precio"
+            precio = item.get("precio", 0)
+
+        if not precio:
+            print(f"    ✗ FB {fb_id}: sin precio detectado — skip")
+            continue
+
+        # Modalidad y remate desde watchlist o descripción
+        modalidad = item.get("modalidad", "Venta")
+        if "renta" in description.lower() or "alquiler" in description.lower():
+            modalidad = "Renta"
+        remate = item.get("remate", False)
+        if "remate" in title.lower() or "remate" in description.lower():
+            remate = True
+
+        # Tipo de propiedad
+        tipo = "Depto" if any(x in title.lower() for x in ("depto", "departamento", "apartamento")) else "Casa"
+
+        # Coordenadas
+        lat, lng = coords(title + " " + description)
+
+        listing = {
+            "titulo": title[:80],
+            "calle": "Fraccionamiento Terralta, San Pedro Tlaquepaque",
+            "precio": precio,
+            "modalidad": modalidad,
+            "tipoProp": tipo,
+            "remate": remate,
+            "fuente": "Facebook",
+            "url": url,
+            "lat": lat,
+            "lng": lng,
+            "img": image if image and "scontent" in image else None,
+            "extras": f"Facebook Marketplace · {item.get('nota', '')}".strip(" ·"),
+            "m2c": None, "rec": None, "ban": None, "estac": None,
+        }
+        listings.append(listing)
+        print(f"    ✓ FB {fb_id}: {title[:45]} — ${precio:,}")
+
+    if listings:
+        print(f"  ✓ {len(listings)} propiedades Facebook Marketplace")
+    else:
+        print("  ✗ Facebook: 0 propiedades (IPs de GH Actions bloqueadas — normal)")
+    return listings
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# FUENTE 4: Lamudi.com.mx
 # ══════════════════════════════════════════════════════════════════════════════
 
 def scrape_lamudi() -> list[dict]:
@@ -543,7 +668,7 @@ def load_desarrollos():
 # Main
 # ══════════════════════════════════════════════════════════════════════════════
 def main():
-    print("\n🏠 Cloud Inmobiliaria · Scraper v5.0")
+    print("\n🏠 Cloud Inmobiliaria · Scraper v6.0")
     print(f"   Zona: Fraccionamiento Terralta, San Pedro Tlaquepaque")
     print(f"   Hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"   ML OAuth: {'configurado ✓' if ML_APP_ID else 'no configurado (agregar ML_APP_ID y ML_APP_SECRET)'}")
@@ -551,7 +676,7 @@ def main():
 
     all_listings = []
 
-    for fn in (scrape_mercadolibre, scrape_inmuebles24, scrape_lamudi):
+    for fn in (scrape_mercadolibre, scrape_inmuebles24, scrape_lamudi, scrape_facebook):
         try:
             all_listings.extend(fn())
         except Exception as e:

@@ -1,0 +1,18 @@
+{
+  "_info": "Agrega aquí los IDs de Facebook Marketplace que quieres rastrear. El scraper diario los actualiza solo.",
+  "_como_agregar": "Abre el anuncio en FB, copia el número del URL: facebook.com/marketplace/item/NUMERO/ — ese número va aquí.",
+  "items": [
+    {
+      "id": "2058731825074295",
+      "nota": "Casa venta $610K Terralta, solo contado",
+      "modalidad": "Venta",
+      "remate": false
+    },
+    {
+      "id": "1594076988320198",
+      "nota": "Casa venta $2.7M Tierra de Ilusiones 170, Infonavit/Banco",
+      "modalidad": "Venta",
+      "remate": false
+    }
+  ]
+}
