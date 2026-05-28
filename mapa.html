@@ -314,6 +314,35 @@
     .fuente-link:hover { color: #1a2e2b; }
     .m2-tag { font-size: 11px; color: #9ca3af; }
 
+    /* Badge fuente en card footer */
+    .fuente-badge {
+      font-size: 9.5px; font-weight: 700; letter-spacing: .3px;
+      padding: 2px 6px; border-radius: 4px; white-space: nowrap;
+    }
+    .fuente-badge.i24  { background: #fff3ed; color: #c05621; }
+    .fuente-badge.ml   { background: #fef9c3; color: #92400e; }
+    .fuente-badge.lam  { background: #eff6ff; color: #1d4ed8; }
+    .fuente-badge.prop { background: #f0fdf4; color: #166534; }
+    .fuente-badge.etc  { background: #f3f4f6; color: #6b7280; }
+
+    /* Botón "Ver anuncio" */
+    .btn-ver {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10.5px; font-weight: 700; text-decoration: none;
+      padding: 3px 8px; border-radius: 6px;
+      background: #1a2e2b; color: #fff;
+      transition: opacity .15s; white-space: nowrap;
+    }
+    .btn-ver:hover { opacity: .82; }
+    .btn-wa-sm {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10.5px; font-weight: 700; text-decoration: none;
+      padding: 3px 8px; border-radius: 6px;
+      background: #25D366; color: #fff;
+      transition: opacity .15s; white-space: nowrap;
+    }
+    .btn-wa-sm:hover { opacity: .85; }
+
     /* No results */
     .no-results {
       flex: 1; display: flex; flex-direction: column;
@@ -1671,12 +1700,21 @@ function imgProxy(url) {
   return url;
 }
 
-// URL del anuncio original — solo si está explícitamente definida y es válida
+// URL del anuncio: URL directa si existe y válida, sino búsqueda en su portal
 function getListingUrl(p) {
-  if (!p.url) return null;
-  const invalid = ['listado.mercadolibre', '/jalisco/tlaquepaque/terralta', 'foreclosures/for-sale'];
-  if (invalid.some(s => p.url.includes(s))) return null;
-  return p.url;
+  const SEARCH = {
+    'Inmuebles24':      'https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html',
+    'MercadoLibre':     'https://inmuebles.mercadolibre.com.mx/casas-departamentos/' + (p.modalidad === 'Renta' ? 'alquiler' : 'venta') + '/jalisco/san-pedro-tlaquepaque/terralta/',
+    'Lamudi':           'https://www.lamudi.com.mx/jalisco/san-pedro-tlaquepaque/' + (p.modalidad === 'Renta' ? 'for-rent' : '') + '/?search=terralta',
+    'propiedades.com':  'https://propiedades.com/jalisco/san_pedro_tlaquepaque/terralta',
+    'casasyterrenos.com':'https://www.casasyterrenos.com/jalisco/san-pedro-tlaquepaque/casas/venta?q=terralta',
+    'Pincali':          'https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html',
+  };
+  // URL directa válida
+  const bad = ['listado.mercadolibre', '/jalisco/tlaquepaque/terralta', 'foreclosures/for-sale', 'handleUrlNotRecognize'];
+  if (p.url && !bad.some(s => p.url.includes(s))) return p.url;
+  // Fallback: búsqueda en el portal fuente
+  return SEARCH[p.fuente] || 'https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html';
 }
 
 // Fallback imagen rota en tarjeta lateral
@@ -1862,8 +1900,12 @@ function openPopupFor(prop) {
         ${m2txt ? `<div class="popup-m2">${m2txt}</div>` : ''}
         <div style="font-size:10.5px;color:#9ca3af;margin-top:6px;">${prop.extras || ''}</div>
         <div class="popup-footer" style="flex-direction:column;gap:6px;">
+          <a class="popup-btn primary" href="${getListingUrl(prop)}" target="_blank"
+             style="width:100%;text-align:center;font-size:12px;font-weight:700;">
+            🔗 Ver anuncio en ${prop.fuente || 'portal'}
+          </a>
           <div style="display:flex;gap:6px;width:100%;">
-            <button class="popup-btn primary" onclick="openLeadCapture(${prop.id})" style="flex:1;border:none;cursor:pointer;font-family:inherit;">🎯 Me interesa</button>
+            <button class="popup-btn secondary" onclick="openLeadCapture(${prop.id})" style="flex:1;border:none;cursor:pointer;font-family:inherit;font-size:11px;">🎯 Me interesa</button>
             <button class="popup-btn secondary" onclick="shareProperty(${prop.id})" style="flex:1;border:none;cursor:pointer;font-family:inherit;font-size:11px;">📤 Compartir</button>
           </div>
           <div style="display:flex;gap:6px;width:100%;">
@@ -1967,12 +2009,12 @@ function renderCards() {
             ${p.m2c ? `<div class="spec-item"><span class="spec-ico">📐</span>${p.m2c}m²</div>` : ''}
           </div>
           <div class="card-footer">
-            <span class="m2-tag">${m2txt || (p.m2c ? p.m2c + ' m²' : '—')}</span>
-            <a href="https://wa.me/?text=${encodeURIComponent('Hola, me interesa esta propiedad en Terralta:\n\n' + (esRenta ? '🏠 EN RENTA\n' : '💰 EN VENTA\n') + '📍 ' + p.calle + '\n💵 ' + (esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)) + '\n🛏 ' + p.rec + ' rec · 🚿 ' + p.ban + ' baños' + (p.m2c ? ' · 📐 ' + p.m2c + 'm²' : '') + '\n\n¿Pueden darme más información?')}"
-               target="_blank" rel="noopener" onclick="event.stopPropagation()"
-               style="display:inline-flex;align-items:center;gap:3px;background:#25D366;color:#fff;border-radius:6px;padding:3px 8px;font-size:10.5px;font-weight:700;text-decoration:none;">
-               📱 Info
-            </a>
+            <span class="fuente-badge ${p.fuente==='Inmuebles24'?'i24':p.fuente==='MercadoLibre'?'ml':p.fuente==='Lamudi'?'lam':p.fuente&&p.fuente.includes('propiedades')?'prop':'etc'}">${p.fuente||'Portal'}</span>
+            <div style="display:flex;gap:4px;" onclick="event.stopPropagation()">
+              <a href="${getListingUrl(p)}" target="_blank" rel="noopener" class="btn-ver">Ver anuncio →</a>
+              <a href="https://wa.me/?text=${encodeURIComponent('Hola, me interesa esta propiedad en Terralta:\n\n' + (esRenta ? '🏠 EN RENTA\n' : '💰 EN VENTA\n') + '📍 ' + p.calle + '\n💵 ' + (esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)) + '\n🛏 ' + p.rec + ' rec · 🚿 ' + p.ban + ' baños' + (p.m2c ? ' · 📐 ' + p.m2c + 'm²' : '') + '\n\n¿Pueden darme más información?')}"
+                 target="_blank" rel="noopener" class="btn-wa-sm">📱</a>
+            </div>
           </div>
         </div>
       </div>
