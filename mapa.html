@@ -1463,6 +1463,7 @@ const PROPS = [
     extras: "Remate bancario · 2 estacionamientos",
     remate: true, lat: 20.6116, lng: -103.3575,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-149675622.html",
     img: "https://img10.naventcdn.com/avisos/18/01/49/67/56/22/720x532/1602491579.jpg"
   },
   {
@@ -1473,6 +1474,7 @@ const PROPS = [
     extras: "Remate bancario · 2 estacionamientos",
     remate: true, lat: 20.6071, lng: -103.3600,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-149475970.html",
     img: "https://img10.naventcdn.com/avisos/18/01/49/47/59/70/720x532/1598190427.jpg"
   },
   {
@@ -1483,6 +1485,7 @@ const PROPS = [
     extras: "Planta baja · Terraza amplia · Jardín privado",
     remate: false, lat: 20.6092, lng: -103.3554,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-149369853.html",
     img: "https://img10.naventcdn.com/avisos/18/01/49/36/98/53/720x532/1596052242.jpg"
   },
   {
@@ -1493,6 +1496,7 @@ const PROPS = [
     extras: "Desarrollo vertical · Amenidades · 1 estac.",
     remate: false, lat: 20.6112, lng: -103.3572,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-149405133.html",
     img: "https://img10.naventcdn.com/avisos/18/01/49/40/51/33/720x532/1596744997.jpg"
   },
   {
@@ -1503,6 +1507,7 @@ const PROPS = [
     extras: "Remate bancario · 2 estacionamientos",
     remate: true, lat: 20.6101, lng: -103.3573,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-149475957.html",
     img: "https://img10.naventcdn.com/avisos/18/01/49/47/59/57/720x532/1598189572.jpg"
   },
   {
@@ -1513,6 +1518,7 @@ const PROPS = [
     extras: "Nuevo · Desarrollo Las Nubes · 2 estac.",
     remate: false, lat: 20.6113, lng: -103.3571,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-149494752.html",
     img: "https://img10.naventcdn.com/avisos/18/01/49/49/47/52/720x532/1598619174.jpg"
   },
   {
@@ -1523,6 +1529,7 @@ const PROPS = [
     extras: "Fracc. privado · Jardín · 2 estac.",
     remate: false, lat: 20.6117, lng: -103.3576,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-149221334.html",
     img: "https://img10.naventcdn.com/avisos/18/01/49/22/13/34/720x532/1592897995.jpg"
   },
   {
@@ -1533,6 +1540,7 @@ const PROPS = [
     extras: "Fracc. cerrado · 2 estacionamientos",
     remate: false, lat: 20.6093, lng: -103.3555,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-148869972.html",
     img: "https://img10.naventcdn.com/avisos/18/01/48/86/99/72/720x532/1586030585.jpg"
   },
   {
@@ -1543,6 +1551,7 @@ const PROPS = [
     extras: "Desarrollo vertical · Amenidades · Elevador",
     remate: false, lat: 20.6098, lng: -103.3563,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-147733125.html",
     img: "https://img10.naventcdn.com/avisos/18/01/47/73/31/25/720x532/1563055772.jpg"
   },
   {
@@ -1553,6 +1562,7 @@ const PROPS = [
     extras: "Gran formato · Amenidades · Elevador",
     remate: false, lat: 20.6099, lng: -103.3562,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-149406454.html",
     img: "https://img10.naventcdn.com/avisos/18/01/49/40/64/54/720x532/1596770561.jpg"
   },
   {
@@ -1563,6 +1573,7 @@ const PROPS = [
     extras: "125 m² · Piso alto · Vista panorámica",
     remate: false, lat: 20.6107, lng: -103.3576,
     fuente: "Inmuebles24",
+    url: "https://www.inmuebles24.com/propiedades-149739342.html",
     img: "https://img10.naventcdn.com/avisos/18/01/49/73/93/42/720x532/1603819930.jpg"
   },
   // ── FACEBOOK MARKETPLACE — Terralta (datos reales scraped May 2026) ──
@@ -2082,7 +2093,9 @@ function renderCards() {
         <div class="card-img-wrap" data-icon="${placeholderIcon}">
           ${p.img
             ? `<img class="card-img" src="${imgProxy(p.img)}" alt="${p.titulo}" onerror="cardImgError(this)">`
-            : `<div class="card-img-ph"><span>${placeholderIcon}</span><small>Sin foto disponible</small></div>`
+            : p.fuente === 'Facebook'
+              ? `<a href="${listingUrl}" target="_blank" rel="noopener" style="display:block;width:100%;height:100%;text-decoration:none;"><div class="card-img-ph" style="background:linear-gradient(135deg,#1877f2 0%,#0d5dbf 100%);cursor:pointer;"><span>📷</span><small style="color:#fff;font-size:11px;font-weight:600;">Ver fotos en Facebook</small></div></a>`
+              : `<div class="card-img-ph"><span>${placeholderIcon}</span><small>Sin foto disponible</small></div>`
           }
           ${p.remate
             ? '<div class="remate-badge">REMATE BANCARIO</div>'
