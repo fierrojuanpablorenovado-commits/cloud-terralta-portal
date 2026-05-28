@@ -1958,11 +1958,12 @@ function selectProp(id, panToMap = true) {
 // ================================================================
 function renderCards() {
   const list = filtered();
+  const devs = filteredDesarrollos();
   const container = document.getElementById('prop-list');
-  document.getElementById('result-count').textContent = list.length;
+  document.getElementById('result-count').textContent = list.length + devs.length;
   document.getElementById('stat-total').textContent = PROPS.length;
 
-  if (list.length === 0) {
+  if (list.length === 0 && devs.length === 0) {
     container.innerHTML = `
       <div class="no-results">
         <div class="nr-icon">🔍</div>
@@ -1970,8 +1971,9 @@ function renderCards() {
       </div>`;
     return;
   }
-
-  const devs = filteredDesarrollos();
+  if (list.length === 0) {
+    container.innerHTML = '';
+  }
 
   container.innerHTML = list.map(p => {
     const m2txt = [
@@ -2073,7 +2075,15 @@ function renderCards() {
   document.querySelectorAll('.prop-card').forEach(card => {
     card.addEventListener('click', (e) => {
       if (e.target.tagName === 'A') return;
-      selectProp(parseInt(card.dataset.id), true);
+      const id = parseInt(card.dataset.id);
+      const prop = PROPS.find(p => p.id === id);
+      if (!prop) return;
+      // Feedback visual: resaltar tarjeta + enfocar mapa
+      document.querySelectorAll('.prop-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      map.panTo([prop.lat, prop.lng], { animate: true, duration: 0.4 });
+      // Abrir anuncio directamente en nueva pestaña
+      window.open(getListingUrl(prop), '_blank', 'noopener,noreferrer');
     });
   });
 
@@ -2212,12 +2222,25 @@ async function initFromData() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
 
-    // Inyectar datos al scope global
-    PROPS.length = 0;
-    data.propiedades.forEach(p => PROPS.push(p));
+    // MODO SUPLEMENTO: preservar datos hardcodeados (ML, Lamudi, propiedades.com)
+    // Solo agregar del JSON los listings que NO están ya en PROPS (por URL única)
+    if (data.propiedades && data.propiedades.length > 0) {
+      const existingUrls = new Set(PROPS.map(p => p.url).filter(Boolean));
+      let nextId = Math.max(...PROPS.map(p => typeof p.id === 'number' ? p.id : 0)) + 1;
+      data.propiedades.forEach(p => {
+        if (p.url && !existingUrls.has(p.url)) {
+          p.id = nextId++;
+          PROPS.push(p);
+          existingUrls.add(p.url);
+        }
+      });
+    }
 
-    DESARROLLOS.length = 0;
-    if (data.desarrollos) data.desarrollos.forEach(d => DESARROLLOS.push(d));
+    // Actualizar DESARROLLOS desde JSON (datos frescos)
+    if (data.desarrollos && data.desarrollos.length > 0) {
+      DESARROLLOS.length = 0;
+      data.desarrollos.forEach(d => DESARROLLOS.push(d));
+    }
 
     // Actualizar badge con timestamp
     const badge = document.getElementById('update-badge');
