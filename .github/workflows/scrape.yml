@@ -32,7 +32,7 @@ jobs:
 
       - name: 📦 Instalar dependencias
         run: |
-          pip install requests python-dateutil
+          pip install curl_cffi requests python-dateutil
 
       - name: 🕷️ Correr scraper
         run: python scraper/scrape.py

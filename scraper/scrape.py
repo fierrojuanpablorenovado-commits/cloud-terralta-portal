@@ -1,13 +1,16 @@
 """
-Cloud Inmobiliaria — Scraper v3.0
+Cloud Inmobiliaria — Scraper v4.0
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Estrategia (sin browser, 100% API/requests):
+Técnica: curl_cffi — impersona TLS fingerprint de Chrome 120 exacto.
+Esto bypasea Cloudflare/WAF que detectan Python/requests por TLS fingerprint.
+No requiere proxy ni servicios externos.
 
-  1. MercadoLibre API pública  → api.mercadolibre.com (JSON, sin WAF)
-  2. Inmuebles24 via requests  → __NEXT_DATA__ SSR JSON
-  3. Lamudi.com.mx via requests → HTML parsing
+Fuentes:
+  1. MercadoLibre API pública   → api.mercadolibre.com
+  2. Inmuebles24               → requests + __NEXT_DATA__ SSR JSON
+  3. Lamudi.com.mx             → requests + JSON-LD
 
-GitHub Actions corre lunes–viernes 9AM UTC
+GitHub Actions: lunes–viernes 9AM UTC
 """
 
 import json
@@ -15,7 +18,7 @@ import re
 import sys
 import time
 import random
-import requests as req
+import os
 
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -25,26 +28,37 @@ for stream in (sys.stdout, sys.stderr):
     if hasattr(stream, 'reconfigure'):
         stream.reconfigure(encoding='utf-8', errors='replace')
 
+# ── Importar curl_cffi (impersona Chrome TLS) o fallback a requests ───────────
+try:
+    from curl_cffi import requests as cfreq
+    SESSION_CLS = cfreq.Session
+    HAS_CURL_CFFI = True
+    print("  curl_cffi disponible — impersonando Chrome 120")
+except ImportError:
+    import requests as cfreq
+    SESSION_CLS = cfreq.Session
+    HAS_CURL_CFFI = False
+    print("  ⚠ curl_cffi no instalado — usando requests estándar")
+
 # ── Paths ─────────────────────────────────────────────────────────────────────
 OUTPUT_FILE = Path(__file__).parent.parent / "data" / "listings.json"
-
-# ── CDT timezone ──────────────────────────────────────────────────────────────
 CDT = timezone(timedelta(hours=-5))
 
-# ── Browser headers ───────────────────────────────────────────────────────────
+# ── User-Agent Chrome ─────────────────────────────────────────────────────────
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/124.0.0.0 Safari/537.36"
+    "Chrome/120.0.0.0 Safari/537.36"
 )
 HEADERS_WEB = {
     "User-Agent": UA,
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     "Accept-Language": "es-MX,es;q=0.9,en-US;q=0.8",
     "Accept-Encoding": "gzip, deflate, br",
-    "Connection": "keep-alive",
-    "Upgrade-Insecure-Requests": "1",
     "Cache-Control": "max-age=0",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
 }
 HEADERS_API = {
     "User-Agent": UA,
@@ -84,233 +98,151 @@ def guess_coords(text: str):
     return CENTER
 
 
-def rand_sleep(a=0.5, b=1.5):
+def rand_sleep(a=0.3, b=1.0):
     time.sleep(random.uniform(a, b))
+
+
+# ── Session factory ───────────────────────────────────────────────────────────
+def make_session() -> cfreq.Session:
+    """Session con TLS impersonation de Chrome 120 si curl_cffi disponible"""
+    if HAS_CURL_CFFI:
+        return cfreq.Session(impersonate="chrome120")
+    else:
+        s = cfreq.Session()
+        s.headers.update(HEADERS_WEB)
+        return s
+
+
+def get_url(url: str, session=None, extra_headers: dict = None, api: bool = False) -> tuple[int, str | None]:
+    """Fetch URL. Retorna (status_code, body_text)"""
+    s = session or make_session()
+    headers = {**(HEADERS_API if api else HEADERS_WEB), **(extra_headers or {})}
+    try:
+        if HAS_CURL_CFFI:
+            resp = s.get(url, headers=headers, timeout=30, allow_redirects=True)
+        else:
+            resp = s.get(url, headers=headers, timeout=30, allow_redirects=True)
+        return resp.status_code, resp.text
+    except Exception as e:
+        print(f"    Request error: {e}")
+        return 0, None
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FUENTE 1: MercadoLibre API pública
 # ══════════════════════════════════════════════════════════════════════════════
-ML_API_BASE = "https://api.mercadolibre.com"
-
-# Categorías de inmuebles en México (MLM = Mexico)
-# MLM1459 = Inmuebles, sub-categorías:
-ML_CATEGORIES = {
-    "casas_venta":  "MLM1459",   # Inmuebles general
-}
-
-# IDs de estado/ciudad de MercadoLibre para Jalisco/Tlaquepaque
-# Se obtienen de: GET /classified_locations/search?country_id=MX&q=tlaquepaque
-ML_LOCATION_IDS = {
-    # Buscar por query string es más fácil que filtrar por location ID
-}
-
-
-def ml_api_search(query: str, limit: int = 50, offset: int = 0) -> list[dict]:
-    """
-    Busca en MercadoLibre API pública.
-    Docs: https://developers.mercadolibre.com.mx/es_ar/items-y-busquedas
-    """
-    url = f"{ML_API_BASE}/sites/MLM/search"
-    params = {
-        "q": query,
-        "category": "MLM1459",  # Inmuebles México
-        "limit": min(limit, 50),
-        "offset": offset,
-    }
-    try:
-        resp = req.get(url, params=params, headers=HEADERS_API, timeout=20)
-        if resp.status_code == 200:
-            return resp.json().get("results", [])
-        print(f"    ML API HTTP {resp.status_code} para '{query}'")
-        return []
-    except Exception as e:
-        print(f"    ML API error: {e}")
-        return []
-
-
-def ml_api_get_item(item_id: str) -> dict:
-    """Obtiene detalles completos de un item (con atributos completos)"""
-    try:
-        resp = req.get(f"{ML_API_BASE}/items/{item_id}", headers=HEADERS_API, timeout=15)
-        if resp.status_code == 200:
-            return resp.json()
-        return {}
-    except Exception:
-        return {}
-
-
-def parse_ml_result(item: dict) -> dict | None:
-    """Parsea un resultado de MercadoLibre API → nuestro formato"""
-    precio = item.get("price") or item.get("original_price")
-    if not precio:
-        return None
-    precio = int(float(precio))
-
-    # Determinar modalidad por rango de precio o tipo de operación
-    # En ML, las casas en renta se listan con precios mensuales (< 100k)
-    # Las casas en venta con precios > 200k
-    sale_conditions = item.get("sale_conditions", {})
-    modalidad = "Renta"
-    if precio >= 150_000:
-        modalidad = "Venta"
-    elif precio < 150_000:
-        # Podría ser renta o venta de terreno barato. Checar condiciones.
-        modalidad = "Renta"
-
-    titulo = item.get("title", "Propiedad en Terralta")[:80]
-    listing_id = str(item.get("id", ""))
-    url = item.get("permalink", "")
-    thumbnail = item.get("thumbnail", "")
-    if thumbnail:
-        # Subir resolución
-        thumbnail = thumbnail.replace("-I.jpg", "-O.jpg").replace("http://", "https://")
-
-    tipo_prop = "Depto" if "departamento" in titulo.lower() or "depto" in titulo.lower() else "Casa"
-    remate = bool(re.search(r"remate|bancario|embargo", titulo.lower()))
-
-    # Atributos (bedrooms, bathrooms, area)
-    m2c = rec = ban = estac = None
-    attrs = item.get("attributes", [])
-    for attr in attrs:
-        if not isinstance(attr, dict):
-            continue
-        attr_id = attr.get("id", "")
-        val_name = attr.get("value_name") or ""
-        try:
-            val_num = float(re.sub(r"[^\d.]", "", str(val_name))) if val_name else 0
-        except ValueError:
-            val_num = 0
-
-        if attr_id == "COVERED_AREA" or "covered_area" in attr_id.lower():
-            m2c = int(val_num) if val_num else None
-        elif attr_id == "TOTAL_AREA" and not m2c:
-            m2c = int(val_num) if val_num else None
-        elif attr_id == "BEDROOMS":
-            rec = int(val_num) if val_num else None
-        elif attr_id == "BATHROOMS":
-            ban = int(val_num) if val_num else None
-        elif attr_id == "PARKING_LOTS" or attr_id == "GARAGE":
-            estac = int(val_num) if val_num else None
-
-    # Dirección desde seller_address
-    addr_obj = item.get("seller_address", {})
-    city = addr_obj.get("city", {}).get("name", "") if isinstance(addr_obj, dict) else ""
-    calle = city or "Terralta, San Pedro Tlaquepaque"
-    lat, lng = guess_coords(titulo + " " + calle)
-
-    return {
-        "id": listing_id,
-        "modalidad": modalidad,
-        "tipoProp": tipo_prop,
-        "titulo": titulo,
-        "calle": calle,
-        "precio": precio,
-        "m2c": m2c,
-        "rec": rec,
-        "ban": ban,
-        "estac": estac,
-        "extras": "MercadoLibre",
-        "remate": remate,
-        "lat": lat,
-        "lng": lng,
-        "fuente": "MercadoLibre",
-        "img": thumbnail or None,
-        "url": url or None,
-        "listing_id": listing_id,
-    }
-
 
 def scrape_mercadolibre() -> list[dict]:
-    """Scrape completo de MercadoLibre via API pública"""
     print("  → MercadoLibre API pública...")
+    session = make_session()
 
+    # Búsqueda sin category filter primero (más amplia)
     queries = [
-        "casa terralta san pedro tlaquepaque",
         "terralta fraccionamiento jalisco casa",
-        "terralta tlaquepaque venta renta",
+        "casa terralta san pedro tlaquepaque",
     ]
 
     all_items: list[dict] = []
     seen_ids: set[str] = set()
 
     for q in queries:
-        rand_sleep(0.3, 0.8)
-        results = ml_api_search(q, limit=50)
-        for item in results:
-            iid = str(item.get("id", ""))
-            if iid and iid not in seen_ids:
-                seen_ids.add(iid)
-                all_items.append(item)
+        rand_sleep(0.5, 1.2)
+        url = "https://api.mercadolibre.com/sites/MLM/search"
+        status, body = get_url(
+            f"{url}?q={q.replace(' ', '+')}&limit=50",
+            session=session,
+            api=True,
+        )
+        if status == 200 and body:
+            try:
+                results = json.loads(body).get("results", [])
+                for item in results:
+                    iid = str(item.get("id", ""))
+                    if iid and iid not in seen_ids:
+                        seen_ids.add(iid)
+                        all_items.append(item)
+            except Exception as e:
+                print(f"    ML JSON parse error: {e}")
+        else:
+            print(f"    ML API HTTP {status} para '{q}'")
 
     if not all_items:
         print("  ✗ MercadoLibre API: 0 resultados")
         return []
 
-    # Filtrar por relevancia — solo propiedades que mencionen Terralta o Tlaquepaque
-    relevant = []
-    for item in all_items:
-        title = item.get("title", "").lower()
-        addr = json.dumps(item.get("seller_address", {})).lower()
-        if "terralta" in title or "terralta" in addr or "tlaquepaque" in title or "tlaquepaque" in addr:
-            relevant.append(item)
-
+    # Filtrar por relevancia
+    relevant = [
+        item for item in all_items
+        if "terralta" in (item.get("title", "") + json.dumps(item.get("seller_address", {}))).lower()
+        or "tlaquepaque" in (item.get("title", "") + json.dumps(item.get("seller_address", {}))).lower()
+    ]
     print(f"    {len(all_items)} resultados → {len(relevant)} relevantes para Terralta")
 
-    listings = []
-    for item in relevant:
-        parsed = parse_ml_result(item)
-        if parsed:
-            listings.append(parsed)
-
-    print(f"  ✓ {len(listings)} propiedades ML via API")
+    listings = [l for l in (parse_ml_result(i) for i in relevant) if l]
+    print(f"  ✓ {len(listings)} propiedades MercadoLibre")
     return listings
+
+
+def parse_ml_result(item: dict) -> dict | None:
+    precio = item.get("price") or item.get("original_price")
+    if not precio:
+        return None
+    precio = int(float(precio))
+
+    modalidad = "Renta" if precio < 150_000 else "Venta"
+    titulo = item.get("title", "Propiedad en Terralta")[:80]
+    listing_id = str(item.get("id", ""))
+    url = item.get("permalink", "")
+    thumbnail = (item.get("thumbnail") or "").replace("-I.jpg", "-O.jpg").replace("http://", "https://")
+
+    tipo_prop = "Depto" if "departamento" in titulo.lower() or "depto" in titulo.lower() else "Casa"
+    remate = bool(re.search(r"remate|bancario|embargo", titulo.lower()))
+
+    m2c = rec = ban = estac = None
+    for attr in item.get("attributes", []):
+        if not isinstance(attr, dict):
+            continue
+        attr_id = attr.get("id", "")
+        val = attr.get("value_name") or ""
+        try:
+            v = int(float(re.sub(r"[^\d.]", "", str(val)))) if val else 0
+        except ValueError:
+            v = 0
+        if attr_id == "COVERED_AREA" and v:
+            m2c = v
+        elif attr_id == "TOTAL_AREA" and not m2c and v:
+            m2c = v
+        elif attr_id == "BEDROOMS" and v:
+            rec = v
+        elif attr_id == "BATHROOMS" and v:
+            ban = v
+        elif attr_id in ("PARKING_LOTS", "GARAGE") and v:
+            estac = v
+
+    addr_obj = item.get("seller_address", {})
+    city = addr_obj.get("city", {}).get("name", "") if isinstance(addr_obj, dict) else ""
+    calle = city or "Terralta, San Pedro Tlaquepaque"
+    lat, lng = guess_coords(titulo + " " + calle)
+
+    return {
+        "id": listing_id, "modalidad": modalidad, "tipoProp": tipo_prop,
+        "titulo": titulo, "calle": calle, "precio": precio,
+        "m2c": m2c, "rec": rec, "ban": ban, "estac": estac,
+        "extras": "", "remate": remate, "lat": lat, "lng": lng,
+        "fuente": "MercadoLibre", "img": thumbnail or None,
+        "url": url or None, "listing_id": listing_id,
+    }
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FUENTE 2: Inmuebles24 via requests + __NEXT_DATA__
 # ══════════════════════════════════════════════════════════════════════════════
 
-I24_SEARCH_URLS = [
+I24_URLS = [
     "https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html",
     "https://www.inmuebles24.com/casas-en-fraccionamiento-terralta-jalisco.html",
     "https://www.inmuebles24.com/inmuebles-en-san-pedro-tlaquepaque-jalisco.html?q=terralta",
 ]
-
-# User-agents adicionales para rotación
-UAS = [
-    UA,
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0",
-]
-
-
-def make_session(ua: str | None = None) -> req.Session:
-    s = req.Session()
-    h = {**HEADERS_WEB}
-    if ua:
-        h["User-Agent"] = ua
-    s.headers.update(h)
-    return s
-
-
-def fetch_html(url: str, session: req.Session = None, warm_up_url: str = None) -> str | None:
-    """Fetch HTML con requests. Intenta con warm-up de cookies."""
-    s = session or make_session(random.choice(UAS))
-    try:
-        if warm_up_url:
-            rand_sleep(0.5, 1.5)
-            s.get(warm_up_url, timeout=20, allow_redirects=True)
-            rand_sleep(0.5, 1.5)
-        resp = s.get(url, timeout=30, allow_redirects=True)
-        if resp.status_code == 200:
-            return resp.text
-        print(f"    HTTP {resp.status_code}: {url[:80]}")
-        return None
-    except Exception as e:
-        print(f"    fetch error: {e}")
-        return None
 
 
 def extract_next_data(html: str) -> dict | None:
@@ -326,14 +258,11 @@ def extract_next_data(html: str) -> dict | None:
 
 
 def find_postings(obj, depth=0) -> list | None:
-    """Búsqueda recursiva de array de listings en __NEXT_DATA__"""
     if depth > 8:
         return None
     if isinstance(obj, list) and len(obj) >= 2 and isinstance(obj[0], dict):
-        sample = obj[0]
-        signals = ("postingUrl", "operationType", "priceOperationTypes", "realEstateType",
-                   "publicationId", "listingType")
-        if any(k in sample for k in signals):
+        signals = ("postingUrl", "operationType", "priceOperationTypes", "realEstateType", "publicationId")
+        if any(k in obj[0] for k in signals):
             return obj
     if isinstance(obj, dict):
         for k in ("postings", "listings", "results", "items", "data", "searchResults"):
@@ -349,20 +278,19 @@ def find_postings(obj, depth=0) -> list | None:
 
 
 def parse_i24_posting(p: dict) -> dict | None:
-    """Parsea un posting de Inmuebles24 __NEXT_DATA__"""
     precio = None
     for op in p.get("priceOperationTypes", []):
         for price_obj in op.get("prices", []):
             try:
                 amt = float(price_obj.get("amount", 0))
                 cur = price_obj.get("currency", "MXN")
-                precio = int(amt * (17.5 if cur == "USD" else 1))
-                break
+                if amt:
+                    precio = int(amt * (17.5 if cur == "USD" else 1))
+                    break
             except Exception:
                 pass
         if precio:
             break
-
     if not precio:
         return None
 
@@ -374,7 +302,7 @@ def parse_i24_posting(p: dict) -> dict | None:
     tipo_prop = "Depto" if "departamento" in tipo_name.lower() else "Casa"
 
     m2c = rec = ban = estac = None
-    for _k, feat in p.get("mainFeatures", {}).items():
+    for feat in p.get("mainFeatures", {}).values():
         if not isinstance(feat, dict):
             continue
         name = feat.get("name", "").lower()
@@ -407,7 +335,6 @@ def parse_i24_posting(p: dict) -> dict | None:
     url = p.get("postingUrl") or (
         f"https://www.inmuebles24.com/propiedades-{listing_id}.html" if listing_id else None
     )
-
     geo = p.get("geo", {})
     address = ""
     if isinstance(geo, dict):
@@ -420,33 +347,31 @@ def parse_i24_posting(p: dict) -> dict | None:
     calle_short = address.split(",")[0].strip() or "Terralta"
 
     return {
-        "id": listing_id,
-        "modalidad": modalidad,
-        "tipoProp": tipo_prop,
+        "id": listing_id, "modalidad": modalidad, "tipoProp": tipo_prop,
         "titulo": f"{'Casa' if tipo_prop == 'Casa' else 'Depto'} {'Remate' if remate else 'en ' + modalidad} — {calle_short}",
-        "calle": address or "Terralta, San Pedro Tlaquepaque",
-        "precio": precio,
-        "m2c": m2c,
-        "rec": rec,
-        "ban": ban,
-        "estac": estac,
-        "extras": "",
-        "remate": remate,
-        "lat": lat,
-        "lng": lng,
-        "fuente": "Inmuebles24",
-        "img": img,
-        "url": url,
-        "listing_id": listing_id,
+        "calle": address or "Terralta, San Pedro Tlaquepaque", "precio": precio,
+        "m2c": m2c, "rec": rec, "ban": ban, "estac": estac,
+        "extras": "", "remate": remate, "lat": lat, "lng": lng,
+        "fuente": "Inmuebles24", "img": img, "url": url, "listing_id": listing_id,
     }
 
 
 def scrape_inmuebles24() -> list[dict]:
-    print("  → Inmuebles24 (requests + __NEXT_DATA__)...")
-    for url in I24_SEARCH_URLS:
-        html = fetch_html(url, warm_up_url="https://www.inmuebles24.com/")
-        if not html:
+    print("  → Inmuebles24 (curl_cffi + __NEXT_DATA__)...")
+    session = make_session()
+
+    # Warm-up cookie
+    rand_sleep(0.5, 1.5)
+    get_url("https://www.inmuebles24.com/", session=session)
+    rand_sleep(0.5, 1.5)
+
+    for url in I24_URLS:
+        status, html = get_url(url, session=session)
+        if status != 200 or not html:
+            print(f"    HTTP {status}: {url[:80]}")
+            rand_sleep(1, 2)
             continue
+
         nd = extract_next_data(html)
         if nd:
             postings = find_postings(nd)
@@ -456,62 +381,64 @@ def scrape_inmuebles24() -> list[dict]:
                 if listings:
                     print(f"  ✓ {len(listings)} propiedades Inmuebles24")
                     return listings
-        # Intentar siguiente URL
+
         rand_sleep(1, 2)
 
-    print("  ✗ Inmuebles24: 0 propiedades (posible bloqueo por IP)")
+    print("  ✗ Inmuebles24: 0 propiedades")
     return []
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FUENTE 3: Lamudi.com.mx via requests (OLX group — menos restrictivo)
+# FUENTE 3: Lamudi.com.mx
 # ══════════════════════════════════════════════════════════════════════════════
+
+LAMUDI_URLS = {
+    "Venta": "https://www.lamudi.com.mx/jalisco/san-pedro-tlaquepaque/?search=terralta",
+    "Renta": "https://www.lamudi.com.mx/jalisco/san-pedro-tlaquepaque/for-rent/?search=terralta",
+}
+
 
 def scrape_lamudi() -> list[dict]:
     print("  → Lamudi.com.mx...")
-    urls = [
-        "https://www.lamudi.com.mx/jalisco/san-pedro-tlaquepaque/for-sale/?q=terralta",
-        "https://www.lamudi.com.mx/jalisco/san-pedro-tlaquepaque/for-rent/?q=terralta",
-    ]
+    session = make_session()
     listings = []
-    for url in urls:
-        rand_sleep(0.5, 1)
-        modalidad = "Renta" if "for-rent" in url else "Venta"
-        html = fetch_html(url)
-        if not html:
+
+    for modalidad, url in LAMUDI_URLS.items():
+        rand_sleep(0.5, 1.0)
+        status, html = get_url(url, session=session)
+        if status != 200 or not html:
+            print(f"    Lamudi HTTP {status} ({modalidad})")
             continue
 
-        # Lamudi expone JSON-LD y/o __INITIAL_STATE__
-        # Buscar JSON-LD de listings
-        ld_matches = re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL)
-        for ld_str in ld_matches:
+        # JSON-LD
+        for ld_str in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL):
             try:
                 ld = json.loads(ld_str)
-                if isinstance(ld, list):
-                    for item in ld:
-                        l = parse_lamudi_item(item, modalidad)
-                        if l:
-                            listings.append(l)
-                elif isinstance(ld, dict):
-                    l = parse_lamudi_item(ld, modalidad)
+                items = ld if isinstance(ld, list) else [ld]
+                for item in items:
+                    l = parse_lamudi_item(item, modalidad)
                     if l:
                         listings.append(l)
             except Exception:
                 pass
 
-        # Buscar __INITIAL_STATE__ o similar
-        state_m = re.search(r'window\.__INITIAL_STATE__\s*=\s*(\{.*?\})\s*;?\s*</script>', html, re.DOTALL)
-        if state_m:
-            try:
-                state = json.loads(state_m.group(1))
-                postings = find_postings(state)
-                if postings:
-                    for p in postings:
-                        l = parse_lamudi_item(p, modalidad)
-                        if l:
-                            listings.append(l)
-            except Exception:
-                pass
+        # __INITIAL_STATE__ / __INITIAL_DATA__
+        for pattern in (
+            r'window\.__INITIAL_STATE__\s*=\s*(\{.*?\});\s*</script>',
+            r'window\.__INITIAL_DATA__\s*=\s*(\{.*?\});\s*</script>',
+        ):
+            m = re.search(pattern, html, re.DOTALL)
+            if m:
+                try:
+                    state = json.loads(m.group(1))
+                    postings = find_postings(state)
+                    if postings:
+                        for p in postings:
+                            l = parse_lamudi_item(p, modalidad)
+                            if l:
+                                listings.append(l)
+                except Exception:
+                    pass
 
     if listings:
         print(f"  ✓ {len(listings)} propiedades Lamudi")
@@ -521,13 +448,10 @@ def scrape_lamudi() -> list[dict]:
 
 
 def parse_lamudi_item(item: dict, modalidad: str) -> dict | None:
-    """Parsea item de Lamudi"""
     if not isinstance(item, dict):
         return None
-
-    # Precio
     precio = None
-    for key in ("price", "lowPrice", "amount", "offers"):
+    for key in ("price", "lowPrice", "amount"):
         val = item.get(key)
         if isinstance(val, dict):
             val = val.get("price") or val.get("lowPrice")
@@ -537,27 +461,25 @@ def parse_lamudi_item(item: dict, modalidad: str) -> dict | None:
                 break
             except Exception:
                 pass
-    if not precio:
+    if not precio or precio < 1000:
         return None
 
     titulo = str(item.get("name", "") or item.get("title", "Propiedad en Terralta"))[:80]
-    listing_id = str(item.get("identifier", {}).get("value", "") if isinstance(item.get("identifier"), dict) else item.get("id", ""))
+    listing_id = str(
+        (item.get("identifier", {}).get("value", "") if isinstance(item.get("identifier"), dict) else "")
+        or item.get("id", "")
+        or hash(titulo) % 100000
+    )
     url = item.get("url") or item.get("@id") or ""
-
     tipo_prop = "Depto" if "departamento" in titulo.lower() or "depto" in titulo.lower() else "Casa"
     remate = bool(re.search(r"remate|bancario", titulo.lower()))
-
-    # Dirección
     address_obj = item.get("address", {})
-    address = ""
-    if isinstance(address_obj, dict):
-        address = address_obj.get("streetAddress", "") or address_obj.get("addressLocality", "")
-    if not address:
-        address = "Terralta, San Pedro Tlaquepaque"
-
+    address = (
+        (address_obj.get("streetAddress") or address_obj.get("addressLocality") or "")
+        if isinstance(address_obj, dict) else ""
+    ) or "Terralta, San Pedro Tlaquepaque"
     lat, lng = guess_coords(titulo + " " + address)
 
-    # Imagen
     img = None
     for key in ("image", "photo", "thumbnail"):
         raw = item.get(key)
@@ -570,24 +492,12 @@ def parse_lamudi_item(item: dict, modalidad: str) -> dict | None:
             break
 
     return {
-        "id": listing_id or f"lamudi-{hash(titulo) % 100000}",
-        "modalidad": modalidad,
-        "tipoProp": tipo_prop,
-        "titulo": titulo,
-        "calle": address,
-        "precio": precio,
-        "m2c": None,
-        "rec": None,
-        "ban": None,
-        "estac": None,
-        "extras": "",
-        "remate": remate,
-        "lat": lat,
-        "lng": lng,
-        "fuente": "Lamudi",
-        "img": img,
-        "url": url if url.startswith("http") else None,
-        "listing_id": listing_id,
+        "id": listing_id, "modalidad": modalidad, "tipoProp": tipo_prop,
+        "titulo": titulo, "calle": address, "precio": precio,
+        "m2c": None, "rec": None, "ban": None, "estac": None,
+        "extras": "", "remate": remate, "lat": lat, "lng": lng,
+        "fuente": "Lamudi", "img": img,
+        "url": url if url.startswith("http") else None, "listing_id": listing_id,
     }
 
 
@@ -625,43 +535,36 @@ def load_desarrollos() -> list[dict]:
 # Main
 # ══════════════════════════════════════════════════════════════════════════════
 def main():
-    print("\n🏠 Cloud Inmobiliaria · Scraper v3.0")
+    print("\n🏠 Cloud Inmobiliaria · Scraper v4.0")
     print(f"   Zona: Fraccionamiento Terralta, San Pedro Tlaquepaque")
     print(f"   Hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
 
     all_listings: list[dict] = []
 
-    # 1. MercadoLibre API pública (más confiable)
     try:
-        ml = scrape_mercadolibre()
-        all_listings.extend(ml)
+        all_listings.extend(scrape_mercadolibre())
     except Exception as e:
         print(f"  ✗ ML fatal: {e}")
 
-    # 2. Inmuebles24
     try:
-        i24 = scrape_inmuebles24()
-        all_listings.extend(i24)
+        all_listings.extend(scrape_inmuebles24())
     except Exception as e:
         print(f"  ✗ I24 fatal: {e}")
 
-    # 3. Lamudi
     try:
-        lam = scrape_lamudi()
-        all_listings.extend(lam)
+        all_listings.extend(scrape_lamudi())
     except Exception as e:
         print(f"  ✗ Lamudi fatal: {e}")
 
-    # Limpiar
     all_listings = [p for p in all_listings if p.get("precio") and p["precio"] > 0]
     all_listings = dedup(all_listings)
 
-    print(f"\n  Total bruto: {len(all_listings)} propiedades")
+    print(f"\n  Total: {len(all_listings)} propiedades")
 
-    # Guard: nunca sobrescribir con 0
     if len(all_listings) == 0:
-        print("\n⚠️  Scraping = 0 propiedades. Archivo NO modificado.")
-        print("   Causa probable: IP de GitHub Actions bloqueada por portales.")
+        print("\n⚠️  0 propiedades. Archivo NO modificado.")
+        print("   Causa: IP de GitHub Actions bloqueada por WAF.")
+        print("   Los datos actuales siguen activos en el portal.\n")
         sys.exit(0)
 
     all_listings = assign_ids(all_listings)
@@ -677,7 +580,7 @@ def main():
             "fuentes": fuentes,
             "zona": "Fraccionamiento Terralta, San Pedro Tlaquepaque",
             "total": len(all_listings),
-            "scraper_version": "3.0",
+            "scraper_version": "4.0",
         },
         "propiedades": all_listings,
         "desarrollos": desarrollos,
