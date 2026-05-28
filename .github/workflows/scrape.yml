@@ -16,7 +16,7 @@ jobs:
   scrape:
     name: Scrape & Update Listings
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
 
     steps:
       - name: ⬇️ Checkout repo
@@ -32,8 +32,7 @@ jobs:
 
       - name: 📦 Instalar dependencias
         run: |
-          pip install playwright requests python-dateutil playwright-stealth
-          playwright install chromium --with-deps
+          pip install requests python-dateutil
 
       - name: 🕷️ Correr scraper
         run: python scraper/scrape.py
