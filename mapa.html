@@ -305,7 +305,7 @@
     .card-footer {
       margin-top: 8px; padding-top: 8px;
       border-top: 1px solid #f1f3f5;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; flex-direction: column; gap: 6px;
     }
     .fuente-link {
       font-size: 10px; color: #9ca3af; text-decoration: none;
@@ -314,10 +314,10 @@
     .fuente-link:hover { color: #1a2e2b; }
     .m2-tag { font-size: 11px; color: #9ca3af; }
 
-    /* Badge fuente en card footer */
+    /* Badge fuente pequeño */
     .fuente-badge {
-      font-size: 9.5px; font-weight: 700; letter-spacing: .3px;
-      padding: 2px 6px; border-radius: 4px; white-space: nowrap;
+      font-size: 9px; font-weight: 700; letter-spacing: .3px;
+      padding: 1px 5px; border-radius: 4px; white-space: nowrap;
     }
     .fuente-badge.i24  { background: #fff3ed; color: #c05621; }
     .fuente-badge.ml   { background: #fef9c3; color: #92400e; }
@@ -325,19 +325,22 @@
     .fuente-badge.prop { background: #f0fdf4; color: #166534; }
     .fuente-badge.etc  { background: #f3f4f6; color: #6b7280; }
 
-    /* Botón "Ver anuncio" */
+    /* Botones card footer */
+    .card-btns { display: flex; gap: 5px; }
+
     .btn-ver {
-      display: inline-flex; align-items: center; gap: 3px;
-      font-size: 10.5px; font-weight: 700; text-decoration: none;
-      padding: 3px 8px; border-radius: 6px;
-      background: #1a2e2b; color: #fff;
-      transition: opacity .15s; white-space: nowrap;
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
+      font-size: 11px; font-weight: 700; text-decoration: none;
+      padding: 6px 0; border-radius: 8px;
+      background: #1e40af; color: #fff;
+      transition: opacity .15s;
     }
-    .btn-ver:hover { opacity: .82; }
+    .btn-ver:hover { opacity: .85; }
+
     .btn-wa-sm {
-      display: inline-flex; align-items: center; gap: 3px;
-      font-size: 10.5px; font-weight: 700; text-decoration: none;
-      padding: 3px 8px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      font-size: 11px; font-weight: 700; text-decoration: none;
+      padding: 6px 10px; border-radius: 8px;
       background: #25D366; color: #fff;
       transition: opacity .15s; white-space: nowrap;
     }
@@ -2008,12 +2011,15 @@ function renderCards() {
             <div class="spec-item"><span class="spec-ico">🚿</span>${p.ban} baños</div>
             ${p.m2c ? `<div class="spec-item"><span class="spec-ico">📐</span>${p.m2c}m²</div>` : ''}
           </div>
-          <div class="card-footer">
-            <span class="fuente-badge ${p.fuente==='Inmuebles24'?'i24':p.fuente==='MercadoLibre'?'ml':p.fuente==='Lamudi'?'lam':p.fuente&&p.fuente.includes('propiedades')?'prop':'etc'}">${p.fuente||'Portal'}</span>
-            <div style="display:flex;gap:4px;" onclick="event.stopPropagation()">
-              <a href="${getListingUrl(p)}" target="_blank" rel="noopener" class="btn-ver">Ver anuncio →</a>
+          <div class="card-footer" onclick="event.stopPropagation()">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span class="fuente-badge ${p.fuente==='Inmuebles24'?'i24':p.fuente==='MercadoLibre'?'ml':p.fuente==='Lamudi'?'lam':p.fuente&&p.fuente.includes('propiedades')?'prop':'etc'}">${p.fuente||'Portal'}</span>
+              <span class="m2-tag">${p.m2c ? p.m2c + ' m²' : ''}</span>
+            </div>
+            <div class="card-btns">
+              <a href="${getListingUrl(p)}" target="_blank" rel="noopener" class="btn-ver">🔗 Ver anuncio completo</a>
               <a href="https://wa.me/?text=${encodeURIComponent('Hola, me interesa esta propiedad en Terralta:\n\n' + (esRenta ? '🏠 EN RENTA\n' : '💰 EN VENTA\n') + '📍 ' + p.calle + '\n💵 ' + (esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)) + '\n🛏 ' + p.rec + ' rec · 🚿 ' + p.ban + ' baños' + (p.m2c ? ' · 📐 ' + p.m2c + 'm²' : '') + '\n\n¿Pueden darme más información?')}"
-                 target="_blank" rel="noopener" class="btn-wa-sm">📱</a>
+                 target="_blank" rel="noopener" class="btn-wa-sm">📱 WA</a>
             </div>
           </div>
         </div>
