@@ -35,6 +35,11 @@ jobs:
           pip install curl_cffi requests python-dateutil
 
       - name: 🕷️ Correr scraper
+        env:
+          # MercadoLibre OAuth — registra app gratis en https://developers.mercadolibre.com.mx/
+          # Luego agrega ML_APP_ID y ML_APP_SECRET en GitHub → Settings → Secrets → Actions
+          ML_APP_ID: ${{ secrets.ML_APP_ID }}
+          ML_APP_SECRET: ${{ secrets.ML_APP_SECRET }}
         run: python scraper/scrape.py
 
       - name: 📊 Verificar resultados
