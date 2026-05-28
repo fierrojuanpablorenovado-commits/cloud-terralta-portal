@@ -1565,35 +1565,35 @@ const PROPS = [
     fuente: "Inmuebles24",
     img: "https://img10.naventcdn.com/avisos/18/01/49/73/93/42/720x532/1603819930.jpg"
   },
-  // ── FACEBOOK MARKETPLACE — Terralta ──────────────────────────
+  // ── FACEBOOK MARKETPLACE — Terralta (datos reales scraped May 2026) ──
   {
     id: 37, modalidad: "Venta", tipoProp: "Casa",
-    titulo: "Casa en Venta — Terralta (Facebook)",
-    calle: "Fraccionamiento Terralta, San Pedro Tlaquepaque",
-    precio: 750000, m2c: 90, rec: 3, ban: 2, estac: 1,
-    extras: "Facebook Marketplace · Ver publicación completa",
-    remate: false, lat: 20.6096, lng: -103.3568,
+    titulo: "Casa en Venta — Terralta",
+    calle: "Fraccionamiento Terralta, 45594 San Pedro Tlaquepaque",
+    precio: 610000, m2c: null, rec: null, ban: null, estac: null,
+    extras: "Solo contado · No acepta créditos · Facebook Marketplace",
+    remate: false, lat: 20.6089, lng: -103.3569,
     fuente: "Facebook",
-    url: "https://www.facebook.com/marketplace/guadalajara/search/?query=casa+venta+terralta+tlaquepaque",
+    url: "https://www.facebook.com/marketplace/item/2058731825074295/",
     img: null
   },
   {
     id: 38, modalidad: "Venta", tipoProp: "Casa",
-    titulo: "Casa Remate — Terralta (Facebook)",
-    calle: "Fraccionamiento Terralta, San Pedro Tlaquepaque",
-    precio: 490000, m2c: 85, rec: 3, ban: 2, estac: 1,
-    extras: "Remate · Facebook Marketplace · Ver publicación",
-    remate: true, lat: 20.6102, lng: -103.3578,
+    titulo: "Casa en Venta — Tierra de Ilusiones 170",
+    calle: "Calle Tierra de Ilusiones 170, Terralta, San Pedro Tlaquepaque",
+    precio: 2700000, m2c: 120, rec: 3, ban: 3, estac: 2,
+    extras: "90 m² terreno · 120 m² const · Patio amplio · Cochera 2 autos · Infonavit / Cofinavit / Banco",
+    remate: false, lat: 20.6071, lng: -103.3600,
     fuente: "Facebook",
-    url: "https://www.facebook.com/marketplace/guadalajara/search/?query=remate+bancario+terralta",
+    url: "https://www.facebook.com/marketplace/item/1594076988320198/",
     img: null
   },
   {
     id: 39, modalidad: "Renta", tipoProp: "Casa",
-    titulo: "Casa en Renta — Terralta (Facebook)",
+    titulo: "Casas en Renta — Terralta (buscar en FB)",
     calle: "Fraccionamiento Terralta, San Pedro Tlaquepaque",
-    precio: 9500, m2c: 80, rec: 3, ban: 2, estac: 1,
-    extras: "Facebook Marketplace · Ver publicación completa",
+    precio: 9500, m2c: null, rec: null, ban: null, estac: null,
+    extras: "Ver anuncios de renta en Facebook Marketplace",
     remate: false, lat: 20.6086, lng: -103.3584,
     fuente: "Facebook",
     url: "https://www.facebook.com/marketplace/guadalajara/search/?query=casa+renta+terralta+tlaquepaque",
@@ -1601,13 +1601,13 @@ const PROPS = [
   },
   {
     id: 40, modalidad: "Renta", tipoProp: "Depto",
-    titulo: "Depto en Renta — Terralta (Facebook)",
+    titulo: "Deptos en Renta — Terralta (buscar en FB)",
     calle: "Terralta, San Pedro Tlaquepaque, Jalisco",
-    precio: 8000, m2c: 65, rec: 2, ban: 2, estac: 1,
-    extras: "Facebook Marketplace · Ver publicación completa",
+    precio: 8000, m2c: null, rec: null, ban: null, estac: null,
+    extras: "Ver anuncios de departamentos en Facebook Marketplace",
     remate: false, lat: 20.6094, lng: -103.3571,
     fuente: "Facebook",
-    url: "https://www.facebook.com/marketplace/guadalajara/search/?query=departamento+renta+terralta",
+    url: "https://www.facebook.com/marketplace/guadalajara/search/?query=departamento+renta+terralta+tlaquepaque",
     img: null
   }
 ];
@@ -1984,8 +1984,8 @@ function openPopupFor(prop) {
         </div>
         <div class="popup-calle">${prop.calle}</div>
         <div class="popup-specs">
-          <span>🛏 ${prop.rec} rec</span>
-          <span>🚿 ${prop.ban} baños</span>
+          ${prop.rec != null ? `<span>🛏 ${prop.rec} rec</span>` : ''}
+          ${prop.ban != null ? `<span>🚿 ${prop.ban} baños</span>` : ''}
           ${prop.estac ? `<span>🚗 ${prop.estac}</span>` : ''}
         </div>
         ${m2txt ? `<div class="popup-m2">${m2txt}</div>` : ''}
@@ -2097,8 +2097,8 @@ function renderCards() {
           <div class="card-precio">${precioStr}</div>
           <div class="card-calle">${p.calle}</div>
           <div class="card-specs">
-            <div class="spec-item"><span class="spec-ico">🛏</span>${p.rec} rec</div>
-            <div class="spec-item"><span class="spec-ico">🚿</span>${p.ban} baños</div>
+            ${p.rec != null ? `<div class="spec-item"><span class="spec-ico">🛏</span>${p.rec} rec</div>` : ''}
+            ${p.ban != null ? `<div class="spec-item"><span class="spec-ico">🚿</span>${p.ban} baños</div>` : ''}
             ${p.m2c ? `<div class="spec-item"><span class="spec-ico">📐</span>${p.m2c}m²</div>` : ''}
           </div>
           <div class="card-footer" onclick="event.stopPropagation()">
@@ -2108,7 +2108,7 @@ function renderCards() {
             </div>
             <div class="card-btns">
               <a href="${getListingUrl(p)}" target="_blank" rel="noopener" class="btn-ver">🔗 Ver anuncio completo</a>
-              <a href="https://wa.me/?text=${encodeURIComponent('Hola, me interesa esta propiedad en Terralta:\n\n' + (esRenta ? '🏠 EN RENTA\n' : '💰 EN VENTA\n') + '📍 ' + p.calle + '\n💵 ' + (esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)) + '\n🛏 ' + p.rec + ' rec · 🚿 ' + p.ban + ' baños' + (p.m2c ? ' · 📐 ' + p.m2c + 'm²' : '') + '\n\n¿Pueden darme más información?')}"
+              <a href="https://wa.me/?text=${encodeURIComponent('Hola, me interesa esta propiedad en Terralta:\n\n' + (esRenta ? '🏠 EN RENTA\n' : '💰 EN VENTA\n') + '📍 ' + p.calle + '\n💵 ' + (esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)) + (p.rec != null ? '\n🛏 ' + p.rec + ' rec' : '') + (p.ban != null ? ' · 🚿 ' + p.ban + ' baños' : '') + (p.m2c ? ' · 📐 ' + p.m2c + 'm²' : '') + '\n\n¿Pueden darme más información?')}"
                  target="_blank" rel="noopener" class="btn-wa-sm">📱 WA</a>
             </div>
           </div>
