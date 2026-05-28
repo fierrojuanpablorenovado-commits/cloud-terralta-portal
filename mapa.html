@@ -188,6 +188,28 @@
       border: 1.5px solid #fcd9aa;
     }
 
+    /* Facebook Marketplace section */
+    .fb-section {
+      padding: 12px 14px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .fb-section-title {
+      font-size: 11px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 8px; display: flex; align-items: center; gap: 5px;
+    }
+    .fb-btn {
+      width: 100%; padding: 9px 12px; border-radius: 9px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      font-family: inherit; text-align: left;
+      display: flex; align-items: center; gap: 7px;
+      text-decoration: none; color: #1877f2;
+      background: #e7f0fd; border: 1.5px solid #b8d0f7;
+      transition: all .15s; margin-bottom: 5px;
+    }
+    .fb-btn:hover { background: #1877f2; color: #fff; border-color: #1877f2; }
+    .fb-btn:last-child { margin-bottom: 0; }
+
     input[type="range"] {
       width: 100%; -webkit-appearance: none;
       height: 4px; border-radius: 4px;
@@ -323,6 +345,7 @@
     .fuente-badge.ml   { background: #fef9c3; color: #92400e; }
     .fuente-badge.lam  { background: #eff6ff; color: #1d4ed8; }
     .fuente-badge.prop { background: #f0fdf4; color: #166534; }
+    .fuente-badge.fb   { background: #e7f0fd; color: #1877f2; }
     .fuente-badge.etc  { background: #f3f4f6; color: #6b7280; }
 
     /* Botones card footer */
@@ -843,6 +866,7 @@
         <button class="chip" data-tipo="Venta">💰 Venta</button>
         <button class="chip" data-tipo="Renta">🏠 Renta</button>
         <button class="chip" data-tipo="Remate">🔴 Remate</button>
+        <button class="chip" data-tipo="Facebook">🔵 Facebook</button>
         <button class="chip" data-tipo="Nuevo">🏗 Nuevo</button>
       </div>
     </div>
@@ -854,6 +878,23 @@
         <span class="precio-val" id="precio-display">$3,000,000</span>
       </div>
       <input type="range" id="precio-slider" min="400000" max="3000000" step="50000" value="3000000">
+    </div>
+
+    <!-- Facebook Marketplace -->
+    <div class="fb-section">
+      <div class="fb-section-title">🔵 Facebook Marketplace</div>
+      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/search/?query=casa+venta+terralta+tlaquepaque" target="_blank" rel="noopener">
+        💰 Casas en Venta — Terralta
+      </a>
+      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/search/?query=casa+renta+terralta+tlaquepaque" target="_blank" rel="noopener">
+        🏠 Casas/Deptos en Renta — Terralta
+      </a>
+      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/search/?query=remate+bancario+terralta" target="_blank" rel="noopener">
+        🔴 Remates Bancarios — Terralta
+      </a>
+      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/search/?query=departamento+terralta" target="_blank" rel="noopener">
+        🏢 Departamentos — Terralta
+      </a>
     </div>
 
     <!-- Acciones rápidas -->
@@ -1523,6 +1564,51 @@ const PROPS = [
     remate: false, lat: 20.6107, lng: -103.3576,
     fuente: "Inmuebles24",
     img: "https://img10.naventcdn.com/avisos/18/01/49/73/93/42/720x532/1603819930.jpg"
+  },
+  // ── FACEBOOK MARKETPLACE — Terralta ──────────────────────────
+  {
+    id: 37, modalidad: "Venta", tipoProp: "Casa",
+    titulo: "Casa en Venta — Terralta (Facebook)",
+    calle: "Fraccionamiento Terralta, San Pedro Tlaquepaque",
+    precio: 750000, m2c: 90, rec: 3, ban: 2, estac: 1,
+    extras: "Facebook Marketplace · Ver publicación completa",
+    remate: false, lat: 20.6096, lng: -103.3568,
+    fuente: "Facebook",
+    url: "https://www.facebook.com/marketplace/guadalajara/search/?query=casa+venta+terralta+tlaquepaque",
+    img: null
+  },
+  {
+    id: 38, modalidad: "Venta", tipoProp: "Casa",
+    titulo: "Casa Remate — Terralta (Facebook)",
+    calle: "Fraccionamiento Terralta, San Pedro Tlaquepaque",
+    precio: 490000, m2c: 85, rec: 3, ban: 2, estac: 1,
+    extras: "Remate · Facebook Marketplace · Ver publicación",
+    remate: true, lat: 20.6102, lng: -103.3578,
+    fuente: "Facebook",
+    url: "https://www.facebook.com/marketplace/guadalajara/search/?query=remate+bancario+terralta",
+    img: null
+  },
+  {
+    id: 39, modalidad: "Renta", tipoProp: "Casa",
+    titulo: "Casa en Renta — Terralta (Facebook)",
+    calle: "Fraccionamiento Terralta, San Pedro Tlaquepaque",
+    precio: 9500, m2c: 80, rec: 3, ban: 2, estac: 1,
+    extras: "Facebook Marketplace · Ver publicación completa",
+    remate: false, lat: 20.6086, lng: -103.3584,
+    fuente: "Facebook",
+    url: "https://www.facebook.com/marketplace/guadalajara/search/?query=casa+renta+terralta+tlaquepaque",
+    img: null
+  },
+  {
+    id: 40, modalidad: "Renta", tipoProp: "Depto",
+    titulo: "Depto en Renta — Terralta (Facebook)",
+    calle: "Terralta, San Pedro Tlaquepaque, Jalisco",
+    precio: 8000, m2c: 65, rec: 2, ban: 2, estac: 1,
+    extras: "Facebook Marketplace · Ver publicación completa",
+    remate: false, lat: 20.6094, lng: -103.3571,
+    fuente: "Facebook",
+    url: "https://www.facebook.com/marketplace/guadalajara/search/?query=departamento+renta+terralta",
+    img: null
   }
 ];
 
@@ -1712,6 +1798,7 @@ function getListingUrl(p) {
     'propiedades.com':  'https://propiedades.com/jalisco/san_pedro_tlaquepaque/terralta',
     'casasyterrenos.com':'https://www.casasyterrenos.com/jalisco/san-pedro-tlaquepaque/casas/venta?q=terralta',
     'Pincali':          'https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html',
+    'Facebook':         'https://www.facebook.com/marketplace/guadalajara/search/?query=' + (p.modalidad === 'Renta' ? 'renta' : p.remate ? 'remate+bancario' : 'venta') + '+terralta+tlaquepaque',
   };
   // URL directa válida
   const bad = ['listado.mercadolibre', '/jalisco/tlaquepaque/terralta', 'foreclosures/for-sale', 'handleUrlNotRecognize'];
@@ -1735,11 +1822,12 @@ function filtered() {
   if (tipoFiltro === "Nuevo") return [];
   const result = PROPS.filter(p => {
     const modalidad = p.modalidad || "Venta";
+    if (tipoFiltro === "Facebook" && p.fuente !== "Facebook") return false;
     if (tipoFiltro === "Venta" && (p.remate || modalidad === "Renta")) return false;
     if (tipoFiltro === "Renta" && modalidad !== "Renta") return false;
     if (tipoFiltro === "Remate" && !p.remate) return false;
     // No aplicar slider de precio a rentas (escala diferente)
-    if (tipoFiltro !== "Renta" && tipoFiltro !== "Todos" && p.precio > maxPrecio) return false;
+    if (tipoFiltro !== "Renta" && tipoFiltro !== "Todos" && tipoFiltro !== "Facebook" && p.precio > maxPrecio) return false;
     if (tipoFiltro === "Todos" && modalidad !== "Renta" && p.precio > maxPrecio) return false;
     return true;
   });
@@ -2015,7 +2103,7 @@ function renderCards() {
           </div>
           <div class="card-footer" onclick="event.stopPropagation()">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span class="fuente-badge ${p.fuente==='Inmuebles24'?'i24':p.fuente==='MercadoLibre'?'ml':p.fuente==='Lamudi'?'lam':p.fuente&&p.fuente.includes('propiedades')?'prop':'etc'}">${p.fuente||'Portal'}</span>
+              <span class="fuente-badge ${p.fuente==='Inmuebles24'?'i24':p.fuente==='MercadoLibre'?'ml':p.fuente==='Lamudi'?'lam':p.fuente&&p.fuente.includes('propiedades')?'prop':p.fuente==='Facebook'?'fb':'etc'}">${p.fuente||'Portal'}</span>
               <span class="m2-tag">${p.m2c ? p.m2c + ' m²' : ''}</span>
             </div>
             <div class="card-btns">
