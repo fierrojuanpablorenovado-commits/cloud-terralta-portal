@@ -187,6 +187,95 @@
       background: #fff8f0; color: #c05621;
       border: 1.5px solid #fcd9aa;
     }
+    .action-btn--tools {
+      background: linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);
+      color: #fff; border: none;
+    }
+
+    /* ─── MODAL HERRAMIENTAS ─────────────────────────────── */
+    .tools-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,.55); backdrop-filter: blur(3px);
+    }
+    .tools-overlay.open { display: flex; align-items: flex-start; justify-content: flex-end; }
+    .tools-panel {
+      width: 480px; max-width: 98vw; height: 100vh;
+      background: #fff; overflow-y: auto;
+      box-shadow: -4px 0 30px rgba(0,0,0,.18);
+      animation: slideInRight .25s ease;
+    }
+    @keyframes slideInRight { from { transform: translateX(100%) } to { transform: translateX(0) } }
+    .tools-header {
+      background: linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);
+      color: #fff; padding: 20px 22px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .tools-header h2 { font-size: 17px; font-weight: 700; margin: 0; }
+    .tools-header p  { font-size: 12px; color: #93c5fd; margin: 3px 0 0; }
+    .tools-close {
+      background: rgba(255,255,255,.15); border: none; color: #fff;
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+      font-size: 18px; display: flex; align-items: center; justify-content: center;
+    }
+    .tools-body { padding: 20px 22px; }
+
+    /* Steps */
+    .setup-step {
+      display: flex; gap: 14px; margin-bottom: 20px;
+      padding-bottom: 20px; border-bottom: 1px solid #f1f5f9;
+    }
+    .setup-step:last-child { border-bottom: none; }
+    .step-num {
+      min-width: 34px; height: 34px; border-radius: 50%;
+      background: #1e3a5f; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0;
+    }
+    .step-body h3 { font-size: 14px; font-weight: 700; color: #1e293b; margin: 0 0 4px; }
+    .step-body p  { font-size: 12.5px; color: #64748b; margin: 0 0 8px; line-height: 1.5; }
+    .step-body code {
+      display: block; background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 6px; padding: 8px 11px; font-size: 11.5px;
+      color: #1e293b; font-family: monospace; margin: 6px 0;
+      white-space: pre-wrap; word-break: break-all;
+    }
+    .step-dl-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #1e3a5f; color: #fff; text-decoration: none;
+      padding: 8px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+      margin-top: 4px;
+    }
+    .step-dl-btn:hover { background: #2d5a9e; }
+    .step-dl-btn.secondary {
+      background: #f1f5f9; color: #1e3a5f; border: 1.5px solid #cbd5e1;
+    }
+
+    /* Templates WA */
+    .tpl-card {
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 13px 15px; margin-bottom: 11px;
+    }
+    .tpl-title { font-size: 12px; font-weight: 700; color: #1e3a5f; margin-bottom: 7px; }
+    .tpl-msg {
+      font-size: 12px; color: #374151; line-height: 1.6;
+      background: #fff; border-radius: 8px; padding: 10px 12px;
+      border: 1px solid #e5e7eb; white-space: pre-wrap;
+    }
+    .tpl-copy {
+      margin-top: 8px; background: transparent; border: 1.5px solid #cbd5e1;
+      border-radius: 6px; padding: 5px 12px; font-size: 11.5px;
+      color: #475569; cursor: pointer; font-weight: 600;
+    }
+    .tpl-copy:hover { background: #f1f5f9; }
+    .tpl-copy.copied { background: #dcfce7; border-color: #86efac; color: #16a34a; }
+
+    /* Section dividers */
+    .tools-section-title {
+      font-size: 13px; font-weight: 800; color: #0f172a;
+      text-transform: uppercase; letter-spacing: .5px;
+      margin: 22px 0 12px; padding-bottom: 8px;
+      border-bottom: 2px solid #1e3a5f;
+    }
 
     /* Facebook Marketplace section */
     .fb-section {
@@ -908,6 +997,9 @@
       <button class="action-btn action-btn--val" onclick="openValuacion()">
         🏠 Vender / Rentar mi propiedad
       </button>
+      <button class="action-btn action-btn--tools" onclick="openHerramientas()">
+        ⚙️ Configurar WaFlowProX
+      </button>
     </div>
 
   </div><!-- /sidebar -->
@@ -1153,6 +1245,147 @@
 
 
 </main>
+
+<!-- ─── HERRAMIENTAS MODAL ─────────────────────────────── -->
+<div class="tools-overlay" id="toolsOverlay" onclick="closeHerramientas()">
+  <div class="tools-panel" onclick="event.stopPropagation()">
+    <div class="tools-header">
+      <div>
+        <h2>⚙️ WaFlowProX · Guía de configuración</h2>
+        <p>Conecta tu WhatsApp para automatizar seguimientos y mensajes</p>
+      </div>
+      <button class="tools-close" onclick="closeHerramientas()">✕</button>
+    </div>
+    <div class="tools-body">
+
+      <div class="tools-section-title">📥 INSTALACIÓN PASO A PASO</div>
+
+      <div class="setup-step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Descargar los archivos</h3>
+          <p>Descarga el instalador y el generador de licencias en tu PC con Windows.</p>
+          <a class="step-dl-btn" href="https://github.com/fierrojuanpablorenovado-commits/cloud-terralta-portal/releases/download/waflowpro-v1/WaFlowProX.msi" download>
+            ⬇️ WaFlowProX.msi (instalador)
+          </a>
+          <a class="step-dl-btn secondary" href="https://github.com/fierrojuanpablorenovado-commits/cloud-terralta-portal/releases/download/waflowpro-v1/WaKeyGen.exe" download style="margin-left:6px;margin-top:6px">
+            🔑 WaKeyGen.exe (licencia)
+          </a>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Instalar WaFlowProX</h3>
+          <p>Haz clic derecho en <strong>WaFlowProX.msi</strong> → <em>"Ejecutar como administrador"</em>. Sigue el asistente hasta completar la instalación.</p>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Activar tu licencia</h3>
+          <p>Abre <strong>WaKeyGen.exe</strong>, escribe tu nombre y presiona <em>"Generar"</em>. Copia la clave que aparece y pégala en WaFlowProX → <em>Activación de licencia</em>.</p>
+          <p style="font-size:12px;color:#64748b;margin:6px 0 4px">ID de referencia para soporte técnico:</p>
+          <code>KEYGEN-8A0A693F-799E-4767-A74A-917F63BB9029</code>
+          <button class="tpl-copy" onclick="copyText('KEYGEN-8A0A693F-799E-4767-A74A-917F63BB9029', this)">📋 Copiar ID</button>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Vincular tu WhatsApp</h3>
+          <p>En WaFlowProX → <em>"Conectar dispositivo"</em>. Escanea el código QR desde WhatsApp en tu celular: <strong>⋮ Menú → Dispositivos vinculados → Vincular dispositivo</strong>.</p>
+          <p style="margin-top:6px;font-size:11.5px;color:#dc2626;line-height:1.5">⚠️ Recomendación: usa un número de WhatsApp dedicado para la asesoría. Evita enviar mensajes masivos en lote — hazlos de forma natural para proteger tu cuenta.</p>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Conectar IA (opcional)</h3>
+          <p>Si quieres respuestas automáticas con inteligencia artificial: WaFlowProX → <em>Configuración de IA</em> → pega tu clave de API.</p>
+          <a class="step-dl-btn secondary" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">🤖 Obtener API Key de OpenAI</a>
+        </div>
+      </div>
+
+      <div class="tools-section-title">💬 PLANTILLAS DE WHATSAPP</div>
+      <p style="font-size:12px;color:#64748b;margin-bottom:14px">Copia el mensaje, pégalo en WaFlowProX o envíalo directo. Reemplaza <code style="font-size:11px;padding:2px 5px;background:#f1f5f9;border-radius:4px;border:1px solid #e2e8f0">{{campo}}</code> con los datos del cliente.</p>
+
+      <div class="tpl-card">
+        <div class="tpl-title">⏰ Seguimiento — Sin respuesta (15 días)</div>
+        <div class="tpl-msg" id="tpl1">Hola {{nombre}} 👋
+
+Te escribo de nuevo porque me quedé pensando en que aún no encontraste tu casa ideal en Terralta 🏡
+
+Esta semana tenemos nuevas opciones que creo te van a interesar. ¿Tienes 5 minutos para que te cuente?
+
+Saludos,
+{{nombre_asesora}} — Cloud Inmobiliaria · Terralta</div>
+        <button class="tpl-copy" onclick="copyTemplate('tpl1', this)">📋 Copiar mensaje</button>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-title">🎂 Felicitación de cumpleaños</div>
+        <div class="tpl-msg" id="tpl2">¡Feliz cumpleaños {{nombre}}! 🎉🎂
+
+Te deseo un día increíble, lleno de alegría y logros. Que este nuevo año de vida traiga todo lo que mereces — ¡incluyendo tu casa nueva! 🏡✨
+
+Con cariño,
+{{nombre_asesora}} — Cloud Inmobiliaria</div>
+        <button class="tpl-copy" onclick="copyTemplate('tpl2', this)">📋 Copiar mensaje</button>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-title">🏘️ Nueva propiedad disponible</div>
+        <div class="tpl-msg" id="tpl3">Hola {{nombre}}, ¡buenas noticias! 🏡
+
+Acaba de entrar una propiedad en Terralta que coincide con lo que buscas:
+
+📍 {{dirección}}
+💰 Precio: ${{precio}}
+🛏 {{recámaras}} recámaras · 🚿 {{baños}} baños
+✅ {{créditos aceptados}}
+
+¿Te gustaría conocerla esta semana? Tengo horario flexible 📅
+
+{{nombre_asesora}} — Cloud Inmobiliaria · Terralta
+📞 {{teléfono}}</div>
+        <button class="tpl-copy" onclick="copyTemplate('tpl3', this)">📋 Copiar mensaje</button>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-title">📅 Confirmación de visita</div>
+        <div class="tpl-msg" id="tpl4">Hola {{nombre}} ✅
+
+Solo confirmo que mañana te veo a las {{hora}} para visitar la propiedad en:
+📍 {{dirección}}
+
+Ahí resolvemos todas tus dudas. Si necesitas cambiar la hora, avísame con tiempo 🙌
+
+¡Hasta mañana!
+{{nombre_asesora}}</div>
+        <button class="tpl-copy" onclick="copyTemplate('tpl4', this)">📋 Copiar mensaje</button>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-title">🤝 Cierre — Oferta especial</div>
+        <div class="tpl-msg" id="tpl5">Hola {{nombre}}, ¡tengo una noticia importante para ti! 🎯
+
+El propietario aceptó bajar el precio a ${{precio_final}} si cerramos esta semana. Es una oportunidad puntual que no se va a repetir.
+
+¿Seguimos adelante? Te acompaño en todo el proceso, con gusto 🤝
+
+{{nombre_asesora}} — Cloud Inmobiliaria · Terralta
+📞 {{teléfono}}</div>
+        <button class="tpl-copy" onclick="copyTemplate('tpl5', this)">📋 Copiar mensaje</button>
+      </div>
+
+    </div><!-- /tools-body -->
+  </div><!-- /tools-panel -->
+</div><!-- /tools-overlay -->
 
 <!-- ─── SCRIPTS ───────────────────────────────────────────── -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -2580,6 +2813,42 @@ function closeMarketplace() {
   document.body.style.overflow = '';
 }
 
+// ================================================================
+// HERRAMIENTAS — WaFlowProX
+// ================================================================
+function openHerramientas() {
+  document.getElementById('toolsOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeHerramientas() {
+  document.getElementById('toolsOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function copyTemplate(id, btn) {
+  const text = document.getElementById(id).textContent;
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  };
+  (navigator.clipboard ? navigator.clipboard.writeText(text).catch(fallback) : Promise.reject())
+    .catch(fallback)
+    .finally(() => {
+      btn.textContent = '✅ ¡Copiado!'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '📋 Copiar mensaje'; btn.classList.remove('copied'); }, 2200);
+    });
+  if (!navigator.clipboard) { fallback(); btn.textContent = '✅ ¡Copiado!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = '📋 Copiar mensaje'; btn.classList.remove('copied'); }, 2200); }
+}
+function copyText(text, btn) {
+  const orig = btn.textContent;
+  const fallback = () => { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); };
+  (navigator.clipboard ? navigator.clipboard.writeText(text).catch(fallback) : Promise.reject()).catch(fallback);
+  btn.textContent = '✅ Copiado'; btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2200);
+}
+
+// ================================================================
 function submitMarketplace(e) {
   e.preventDefault();
   const tipo   = document.getElementById('mktTipo').value;
