@@ -1140,7 +1140,7 @@
       <div class="calc-body" id="calc-hip">
         <div class="calc-field">
           <label>Precio de la propiedad (MXN)</label>
-          <input type="number" id="hipPrecio" placeholder="1,500,000" value="1500000">
+          <input type="text" inputmode="numeric" id="hipPrecio" placeholder="$1,500,000" value="1,500,000" oninput="fmtInput(this)">
         </div>
         <div class="calc-field">
           <label>Enganche (%)</label>
@@ -1168,7 +1168,7 @@
       <div class="calc-body" id="calc-info" style="display:none">
         <div class="calc-field">
           <label>Salario mensual bruto (MXN)</label>
-          <input type="number" id="infoSalario" placeholder="15,000" value="15000">
+          <input type="text" inputmode="numeric" id="infoSalario" placeholder="$15,000" value="15,000" oninput="fmtInput(this)">
         </div>
         <div class="calc-field">
           <label>Años cotizados en IMSS</label>
@@ -1176,7 +1176,7 @@
         </div>
         <div class="calc-field">
           <label>Saldo en subcuenta de vivienda (MXN)</label>
-          <input type="number" id="infoSaldo" placeholder="50,000" value="50000">
+          <input type="text" inputmode="numeric" id="infoSaldo" placeholder="$50,000" value="50,000" oninput="fmtInput(this)">
         </div>
         <button class="calc-go" onclick="calcInfonavit()">Calcular crédito estimado</button>
         <div class="calc-result" id="infoResult" style="display:none"></div>
@@ -1187,15 +1187,15 @@
       <div class="calc-body" id="calc-rent" style="display:none">
         <div class="calc-field">
           <label>Precio de compra (MXN)</label>
-          <input type="number" id="rentPrecio" placeholder="1,500,000" value="1500000">
+          <input type="text" inputmode="numeric" id="rentPrecio" placeholder="$1,500,000" value="1,500,000" oninput="fmtInput(this)">
         </div>
         <div class="calc-field">
           <label>Renta mensual estimada (MXN)</label>
-          <input type="number" id="rentMensual" placeholder="12,000" value="12000">
+          <input type="text" inputmode="numeric" id="rentMensual" placeholder="$12,000" value="12,000" oninput="fmtInput(this)">
         </div>
         <div class="calc-field">
           <label>Gastos mensuales (mantenimiento, impuestos…)</label>
-          <input type="number" id="rentGastos" placeholder="1,500" value="1500">
+          <input type="text" inputmode="numeric" id="rentGastos" placeholder="$1,500" value="1,500" oninput="fmtInput(this)">
         </div>
         <button class="calc-go" onclick="calcRendimiento()">Calcular rendimiento</button>
         <div class="calc-result" id="rentResult" style="display:none"></div>
@@ -1276,7 +1276,7 @@
           <div class="mkt-row">
             <div class="mkt-field">
               <label>Precio mensual (MXN)</label>
-              <input type="number" id="mktPrecio" placeholder="Ej: 8500" required>
+              <input type="text" inputmode="numeric" id="mktPrecio" placeholder="Ej: $8,500" oninput="fmtInput(this)" required>
             </div>
             <div class="mkt-field">
               <label>Recámaras</label>
@@ -2781,8 +2781,19 @@ function switchCalcTab(tab, el) {
   document.querySelectorAll('.calc-tab').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
 }
+// Formatea un input de texto como número con comas mientras se escribe
+function fmtInput(el) {
+  const raw = el.value.replace(/[^0-9]/g, '');
+  if (!raw) { el.value = ''; return; }
+  el.value = Number(raw).toLocaleString('es-MX');
+}
+// Parsea un input de texto con comas/$ a número
+function parseMXN(id) {
+  return parseFloat((document.getElementById(id).value || '0').replace(/[$,\s]/g, '')) || 0;
+}
+
 function calcHipotecario() {
-  const precio   = parseFloat(document.getElementById('hipPrecio').value) || 0;
+  const precio   = parseMXN('hipPrecio');
   const enganche = parseFloat(document.getElementById('hipEnganche').value) / 100 || 0.2;
   const plazo    = parseInt(document.getElementById('hipPlazo').value) || 15;
   const tasa     = parseFloat(document.getElementById('hipTasa').value) / 100 || 0.115;
@@ -2801,9 +2812,9 @@ function calcHipotecario() {
   };
 }
 function calcInfonavit() {
-  const salario = parseFloat(document.getElementById('infoSalario').value) || 0;
+  const salario = parseMXN('infoSalario');
   const anios   = parseFloat(document.getElementById('infoAnios').value) || 0;
-  const saldo   = parseFloat(document.getElementById('infoSaldo').value) || 0;
+  const saldo   = parseMXN('infoSaldo');
   // Estimación simplificada: crédito ≈ 115 VSM × UMA diario × 365 (cap ~$2.1M)
   const uma = 108.57; // UMA diaria 2025
   const vsmAnual = uma * 365;
@@ -2820,9 +2831,9 @@ function calcInfonavit() {
   };
 }
 function calcRendimiento() {
-  const precio  = parseFloat(document.getElementById('rentPrecio').value) || 0;
-  const renta   = parseFloat(document.getElementById('rentMensual').value) || 0;
-  const gastos  = parseFloat(document.getElementById('rentGastos').value) || 0;
+  const precio  = parseMXN('rentPrecio');
+  const renta   = parseMXN('rentMensual');
+  const gastos  = parseMXN('rentGastos');
   const netaAnual = (renta - gastos) * 12;
   const rendimiento = precio > 0 ? (netaAnual / precio) * 100 : 0;
   const recuperacion = rendimiento > 0 ? (100 / rendimiento).toFixed(1) : '∞';
@@ -2951,7 +2962,7 @@ function submitMarketplace(e) {
   e.preventDefault();
   const tipo   = document.getElementById('mktTipo').value;
   const calle  = document.getElementById('mktCalle').value.trim();
-  const precio = document.getElementById('mktPrecio').value;
+  const precio = parseMXN('mktPrecio');
   const rec    = document.getElementById('mktRec').value;
   const desc   = document.getElementById('mktDesc').value.trim();
   const tel    = document.getElementById('mktTel').value.trim();
