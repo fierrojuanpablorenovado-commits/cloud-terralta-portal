@@ -80,10 +80,14 @@
     .sidebar {
       width: 256px; min-width: 256px;
       background: #fff; border-right: 1px solid #e5e7eb;
-      display: flex; flex-direction: column; overflow-y: auto;
+      display: flex; flex-direction: column; overflow: hidden;
     }
-    .sidebar::-webkit-scrollbar { width: 3px; }
-    .sidebar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+    /* Sección central del sidebar — única que scrollea */
+    .sidebar-scroll {
+      flex: 1; overflow-y: auto; min-height: 0;
+    }
+    .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
 
     /* ─── CONTENT RIGHT — scroll propio, mapa sticky arriba ─── */
     .content-right {
@@ -163,7 +167,7 @@
 
     /* ─── ACTIONS ──────────────────────────────────────────── */
     .action-section {
-      padding: 12px 14px 16px; margin-top: auto;
+      padding: 12px 14px 16px;
       border-top: 1px solid #e5e7eb;
       display: flex; flex-direction: column; gap: 7px;
     }
@@ -975,6 +979,9 @@
       </div>
     </div>
 
+    <!-- Contenido scrolleable del sidebar -->
+    <div class="sidebar-scroll">
+
     <!-- Market Intelligence Strip -->
     <div class="market-intel" id="market-intel">
       <div class="intel-chip"><span class="intel-val" id="mi-ventas">—</span><span class="intel-label">en venta</span></div>
@@ -1022,7 +1029,9 @@
       </a>
     </div>
 
-    <!-- Tarjeta motivacional -->
+    </div><!-- /sidebar-scroll -->
+
+    <!-- Tarjeta motivacional — siempre visible abajo -->
     <div class="motiv-card" id="motivCard">
       <div class="motiv-tag">✨ Mentalidad ganadora · Hoy</div>
       <div class="motiv-quote" id="motivQuote">…</div>
