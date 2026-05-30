@@ -277,6 +277,42 @@
       border-bottom: 2px solid #1e3a5f;
     }
 
+    /* ─── MOTIVACIONAL ──────────────────────────────────── */
+    .motiv-card {
+      margin: 0 14px 14px;
+      background: linear-gradient(135deg, #1a2e2b 0%, #2a5248 60%, #1e3a5f 100%);
+      border-radius: 14px; padding: 16px 15px;
+      color: #fff; position: relative; overflow: hidden;
+    }
+    .motiv-card::before {
+      content: ''; position: absolute; top: -20px; right: -20px;
+      width: 90px; height: 90px; border-radius: 50%;
+      background: rgba(255,255,255,.06);
+    }
+    .motiv-card::after {
+      content: ''; position: absolute; bottom: -30px; left: 10px;
+      width: 70px; height: 70px; border-radius: 50%;
+      background: rgba(255,255,255,.04);
+    }
+    .motiv-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: .6px;
+      color: #6ee7b7; text-transform: uppercase; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .motiv-quote {
+      font-size: 13px; font-weight: 600; line-height: 1.55;
+      color: #f0fdf4; margin-bottom: 10px; position: relative; z-index: 1;
+    }
+    .motiv-author {
+      font-size: 11px; color: #6ee7b7; font-weight: 500;
+    }
+    .motiv-meta {
+      margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.12);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .motiv-meta-label { font-size: 10.5px; color: rgba(255,255,255,.55); }
+    .motiv-meta-val { font-size: 13px; font-weight: 800; color: #fcd34d; }
+
     /* Facebook Marketplace section */
     .fb-section {
       padding: 12px 14px;
@@ -984,6 +1020,23 @@
       <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/search/?query=departamento+terralta" target="_blank" rel="noopener">
         🏢 Departamentos — Terralta
       </a>
+    </div>
+
+    <!-- Tarjeta motivacional -->
+    <div class="motiv-card" id="motivCard">
+      <div class="motiv-tag">✨ Mentalidad ganadora · Hoy</div>
+      <div class="motiv-quote" id="motivQuote">…</div>
+      <div class="motiv-author" id="motivAuthor"></div>
+      <div class="motiv-meta">
+        <div>
+          <div class="motiv-meta-label">Tu comisión potencial hoy</div>
+          <div class="motiv-meta-val" id="motivComision">$0</div>
+        </div>
+        <div style="text-align:right">
+          <div class="motiv-meta-label">Propiedades en tu zona</div>
+          <div class="motiv-meta-val" id="motivProps">—</div>
+        </div>
+      </div>
     </div>
 
     <!-- Acciones rápidas -->
@@ -2608,6 +2661,7 @@ async function initFromData() {
   render();
   drawAllZones();
   updateMarketIntel();
+  if (window._updateMotivComision) window._updateMotivComision();
 }
 
 // PROPS y DESARROLLOS son los arrays declarados arriba (fallback si falla fetch)
@@ -2812,6 +2866,41 @@ function closeMarketplace() {
   document.getElementById('mktOverlay').classList.remove('open');
   document.body.style.overflow = '';
 }
+
+// ================================================================
+// MOTIVACIONAL
+// ================================================================
+(function initMotivacional() {
+  const frases = [
+    { q: "Cada propiedad que vendes no solo cambia tu vida — cambia la vida de una familia entera. Eso es un poder enorme.", a: "Mentalidad Cloud Inmobiliaria" },
+    { q: "La libertad financiera no es suerte. Es una decisión que tomas cada vez que haces una llamada, una visita, un seguimiento.", a: "Sistema de ventas Cloud" },
+    { q: "Una comisión en bienes raíces puede ser más que el sueldo mensual de muchos. Y tú puedes lograr varias al mes.", a: "Cloud Inmobiliaria · Terralta" },
+    { q: "El cliente que hoy ignoras puede ser el cierre de mañana. El seguimiento es donde se gana el dinero.", a: "Regla de oro del asesor" },
+    { q: "No vendes casas. Vendes el lugar donde alguien va a ver crecer a sus hijos, a descansar, a construir su historia.", a: "Filosofía Cloud Inmobiliaria" },
+    { q: "Tu zona — Terralta — está llena de oportunidades. Cada día que esperas es un día que otro asesor puede aprovechar.", a: "Urgencia del mercado" },
+    { q: "La mejor inversión que alguien puede hacer es en su hogar. Tú eres el puente entre el sueño y la realidad.", a: "Cloud Inmobiliaria" },
+  ];
+
+  const dia = new Date().getDay(); // 0=domingo … 6=sábado
+  const { q, a } = frases[dia % frases.length];
+  document.getElementById('motivQuote').textContent = `"${q}"`;
+  document.getElementById('motivAuthor').textContent = `— ${a}`;
+
+  // Comisión potencial: 3% sobre precio promedio de las propiedades cargadas
+  // Se actualiza después de initFromData()
+  window._updateMotivComision = function() {
+    try {
+      const ventas = PROPS.filter(p => p.modalidad === 'Venta' && p.precio > 0);
+      if (ventas.length) {
+        const avg = ventas.reduce((s, p) => s + p.precio, 0) / ventas.length;
+        const comision = avg * 0.03;
+        document.getElementById('motivComision').textContent =
+          '$' + Math.round(comision).toLocaleString('es-MX');
+      }
+      document.getElementById('motivProps').textContent = PROPS.length + ' activas';
+    } catch(e) {}
+  };
+})();
 
 // ================================================================
 // HERRAMIENTAS — WaFlowProX

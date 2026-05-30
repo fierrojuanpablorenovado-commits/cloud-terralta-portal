@@ -1,4 +1,4 @@
-name: 🏠 Daily Listings Scraper
+name: 🏠 Daily Listings Scraper + Deploy
 
 on:
   schedule:
@@ -14,9 +14,9 @@ on:
 
 jobs:
   scrape:
-    name: Scrape & Update Listings
+    name: Scrape, Update & Deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: ⬇️ Checkout repo
@@ -30,14 +30,12 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: 📦 Instalar dependencias
+      - name: 📦 Instalar dependencias Python
         run: |
           pip install curl_cffi requests python-dateutil
 
       - name: 🕷️ Correr scraper
         env:
-          # MercadoLibre OAuth — registra app gratis en https://developers.mercadolibre.com.mx/
-          # Luego agrega ML_APP_ID y ML_APP_SECRET en GitHub → Settings → Secrets → Actions
           ML_APP_ID: ${{ secrets.ML_APP_ID }}
           ML_APP_SECRET: ${{ secrets.ML_APP_SECRET }}
         run: python scraper/scrape.py
@@ -55,21 +53,35 @@ jobs:
           "
 
       - name: 💾 Commit y push si hay cambios
+        id: git_push
         run: |
           git config --global user.email "bot@cloudinmobiliaria.mx"
           git config --global user.name "Cloud Inmo Bot"
           git add data/listings.json
           if git diff --staged --quiet; then
             echo "Sin cambios en los listings. Nada que commitear."
+            echo "changed=false" >> $GITHUB_OUTPUT
           else
             TOTAL=$(cat data/listings.json | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['_meta']['total'])")
             git commit -m "🏠 Listings actualizados: ${TOTAL} propiedades · $(TZ='America/Mexico_City' date +'%Y-%m-%d %H:%M CDT')"
             git push
+            echo "changed=true" >> $GITHUB_OUTPUT
             echo "✅ Datos actualizados y publicados"
           fi
+
+      - name: 🚀 Deploy a Vercel (siempre, haya o no cambios)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm install -g vercel --silent
+          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          vercel build --prod --token=$VERCEL_TOKEN
+          vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+          echo "✅ Portal actualizado en https://cloud-terralta-portal.vercel.app"
 
       - name: 📢 Notificación si falla
         if: failure()
         run: |
-          echo "❌ El scraper falló. Revisar logs de GitHub Actions."
-          # Aquí se puede agregar webhook a Slack/WhatsApp si se desea
+          echo "❌ El scraper o deploy falló. Revisar logs de GitHub Actions."
