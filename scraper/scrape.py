@@ -718,6 +718,14 @@ def main():
     print(f"   Fuentes: {', '.join(fuentes)}")
     print(f"   Actualizado: {ts}\n")
 
+    # Localizar imágenes: descargar copias estáticas para que TODOS vean lo mismo
+    try:
+        import localize_images
+        print("📸 Localizando imágenes (snapshot estático)...")
+        localize_images.main()
+    except Exception as e:
+        print(f"⚠️ No se pudieron localizar imágenes: {e}")
+
 
 if __name__ == "__main__":
     main()
