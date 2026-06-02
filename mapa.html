@@ -1542,21 +1542,7 @@ El propietario aceptó bajar el precio a ${{precio_final}} si cerramos esta sema
 // y distribuidas por calle según mapa Google Maps del listing MLM-2899509175
 // ================================================================
 const PROPS = [
-  {
-    id: 1,
-    tipo: "Mercado",
-    titulo: "Casa en Tierra de Esperanza",
-    calle: "Tierra De Esperanza, Terralta",
-    precio: 2980000,
-    m2c: 96, m2t: null, rec: 3, ban: 3, estac: 2,
-    extras: "Jardín · Condominio cerrado · 15 años antigüedad",
-    remate: false,
-    lat: 20.6071, lng: -103.3604,
-    url: "https://casa.mercadolibre.com.mx/MLM-2899509175",
-    fuente: "MercadoLibre",
-    img: "/data/img/627027bda71a10ce.webp"
-  },
-  {
+    {
     id: 4,
     tipo: "Mercado",
     titulo: "Casa en Tierra Contenta 170",
@@ -1804,50 +1790,6 @@ const PROPS = [
     img: "/data/img/5a047d41b3137e22.jpg"
   },
   // ── FACEBOOK MARKETPLACE — Terralta (datos reales scraped May 2026) ──
-  {
-    id: 37, modalidad: "Venta", tipoProp: "Casa",
-    titulo: "Casa en Venta — Terralta",
-    calle: "Fraccionamiento Terralta, 45594 San Pedro Tlaquepaque",
-    precio: 610000, m2c: null, rec: null, ban: null, estac: null,
-    extras: "Solo contado · No acepta créditos · Facebook Marketplace",
-    remate: false, lat: 20.6089, lng: -103.3569,
-    fuente: "Facebook",
-    url: "https://www.facebook.com/marketplace/item/2058731825074295/",
-    img: null
-  },
-  {
-    id: 38, modalidad: "Venta", tipoProp: "Casa",
-    titulo: "Casa en Venta — Tierra de Ilusiones 170",
-    calle: "Calle Tierra de Ilusiones 170, Terralta, San Pedro Tlaquepaque",
-    precio: 2700000, m2c: 120, rec: 3, ban: 3, estac: 2,
-    extras: "90 m² terreno · 120 m² const · Patio amplio · Cochera 2 autos · Infonavit / Cofinavit / Banco",
-    remate: false, lat: 20.6071, lng: -103.3600,
-    fuente: "Facebook",
-    url: "https://www.facebook.com/marketplace/item/1594076988320198/",
-    img: null
-  },
-  {
-    id: 39, modalidad: "Renta", tipoProp: "Casa",
-    titulo: "Casas en Renta — Terralta (buscar en FB)",
-    calle: "Fraccionamiento Terralta, San Pedro Tlaquepaque",
-    precio: 9500, m2c: null, rec: null, ban: null, estac: null,
-    extras: "Ver anuncios de renta en Facebook Marketplace",
-    remate: false, lat: 20.6086, lng: -103.3584,
-    fuente: "Facebook",
-    url: "https://www.facebook.com/marketplace/guadalajara/propertyrentals/?query=terralta&exact=false",
-    img: null
-  },
-  {
-    id: 40, modalidad: "Renta", tipoProp: "Depto",
-    titulo: "Deptos en Renta — Terralta (buscar en FB)",
-    calle: "Terralta, San Pedro Tlaquepaque, Jalisco",
-    precio: 8000, m2c: null, rec: null, ban: null, estac: null,
-    extras: "Ver anuncios de departamentos en Facebook Marketplace",
-    remate: false, lat: 20.6094, lng: -103.3571,
-    fuente: "Facebook",
-    url: "https://www.facebook.com/marketplace/guadalajara/propertyrentals/?query=departamento+terralta&exact=false",
-    img: null
-  }
 ];
 
 // ================================================================
@@ -2349,7 +2291,12 @@ function renderCards() {
               <span class="m2-tag">${p.m2c ? p.m2c + ' m²' : ''}</span>
             </div>
             <div class="card-btns">
-              <a href="${getListingUrl(p)}" target="_blank" rel="noopener" class="btn-ver">🔗 Ver anuncio completo</a>
+              ${(()=>{
+                const DIRECT_URL = p.url && !['foreclosures/for-sale','handleUrlNotRecognize'].some(s=>p.url.includes(s));
+                const btnLabel = DIRECT_URL ? '🔗 Ver anuncio' : '🔍 Buscar en ' + (p.fuente||'portal');
+                const btnStyle = DIRECT_URL ? '' : 'background:#6b7280;';
+                return `<a href="${getListingUrl(p)}" target="_blank" rel="noopener" class="btn-ver" style="${btnStyle}">${btnLabel}</a>`;
+              })()}
               <a href="https://wa.me/?text=${encodeURIComponent('Hola, me interesa esta propiedad en Terralta:\n\n' + (esRenta ? '🏠 EN RENTA\n' : '💰 EN VENTA\n') + '📍 ' + p.calle + '\n💵 ' + (esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)) + (p.rec != null ? '\n🛏 ' + p.rec + ' rec' : '') + (p.ban != null ? ' · 🚿 ' + p.ban + ' baños' : '') + (p.m2c ? ' · 📐 ' + p.m2c + 'm²' : '') + '\n\n¿Pueden darme más información?')}"
                  target="_blank" rel="noopener" class="btn-wa-sm">📱 WA</a>
             </div>
