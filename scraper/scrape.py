@@ -415,21 +415,70 @@ def parse_i24(p: dict) -> dict | None:
     }
 
 
-def scrape_inmuebles24() -> list[dict]:
-    print("  → Inmuebles24 (requests directo)...")
-    session = make_web_session()
+def _fetch_with_playwright(url: str) -> str | None:
+    """Usa Playwright (Chrome headless real) para bypasear Cloudflare."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return None
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=True,
+                args=["--no-sandbox", "--disable-setuid-sandbox",
+                      "--disable-blink-features=AutomationControlled"]
+            )
+            ctx = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                           "AppleWebKit/537.36 (KHTML, like Gecko) "
+                           "Chrome/131.0.0.0 Safari/537.36",
+                locale="es-MX",
+                extra_http_headers={"Accept-Language": "es-MX,es;q=0.9"},
+            )
+            page = ctx.new_page()
+            # Eliminar señales de automatización
+            page.add_init_script("""
+                Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+                Object.defineProperty(navigator, 'plugins', {get: () => [1,2,3]});
+            """)
+            page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            # Esperar a que Cloudflare pase el challenge (hasta 8s)
+            for _ in range(16):
+                if "just a moment" not in page.title().lower():
+                    break
+                page.wait_for_timeout(500)
+            html = page.content()
+            browser.close()
+            return html
+    except Exception as e:
+        print(f"    Playwright error: {e}")
+        return None
 
-    # Warm-up cookie
-    jitter(0.5, 1.5)
-    http_get("https://www.inmuebles24.com/", session=session)
-    jitter(0.5, 1.5)
+
+def scrape_inmuebles24() -> list[dict]:
+    print("  → Inmuebles24 (Playwright + fallback HTTP)...")
 
     for url in I24_URLS:
-        status, html = http_get(url, session=session)
-        if status != 200 or not html:
-            print(f"    HTTP {status}: {url[:80]}")
-            jitter(1, 2)
-            continue
+        html = None
+
+        # 1er intento: Playwright (bypasea Cloudflare con Chrome real)
+        html = _fetch_with_playwright(url)
+        if html and "just a moment" in html.lower():
+            print(f"    Playwright: Cloudflare no resuelto en {url[:60]}")
+            html = None
+
+        # 2do intento: HTTP directo (funciona desde IP residencial / local)
+        if not html:
+            status, html = http_get(url)
+            if status != 200 or not html:
+                print(f"    HTTP {status}: {url[:80]}")
+                jitter(1, 2)
+                continue
+            if "just a moment" in html.lower():
+                print(f"    HTTP bloqueado por Cloudflare: {url[:60]}")
+                jitter(1, 2)
+                continue
+
         nd = get_next_data(html)
         if nd:
             postings = find_postings(nd)
@@ -441,7 +490,7 @@ def scrape_inmuebles24() -> list[dict]:
                     return listings
         jitter(1, 2)
 
-    print("  ✗ Inmuebles24: 0 propiedades (IP bloqueada — funciona desde IP residencial)")
+    print("  ✗ Inmuebles24: 0 propiedades (Cloudflare bloqueó aun con Playwright)")
     return []
 
 

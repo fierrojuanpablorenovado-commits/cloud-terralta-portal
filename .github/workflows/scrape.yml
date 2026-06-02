@@ -34,7 +34,10 @@ jobs:
 
       - name: 📦 Instalar dependencias Python
         run: |
-          pip install curl_cffi requests python-dateutil
+          pip install curl_cffi requests python-dateutil playwright
+
+      - name: 🌐 Instalar Playwright Chromium
+        run: playwright install chromium --with-deps
 
       - name: 🕷️ Correr scraper
         env:
