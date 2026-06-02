@@ -46,6 +46,14 @@ CDT = timezone(timedelta(hours=-5))
 ML_APP_ID     = os.environ.get("ML_APP_ID", "")
 ML_APP_SECRET = os.environ.get("ML_APP_SECRET", "")
 
+# ── Proxy residencial IPRoyal — bypass bloqueo IPs datacenter GH Actions ──────
+PROXY_URL = os.environ.get("PROXY_URL", "")
+PROXIES = {"http": PROXY_URL, "https": PROXY_URL} if PROXY_URL else {}
+if PROXY_URL:
+    print(f"   Proxy residencial: configurado ({PROXY_URL.split('@')[-1] if '@' in PROXY_URL else 'OK'})")
+else:
+    print("   Proxy residencial: NO configurado (algunos portales pueden bloquear)")
+
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
       "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
 
@@ -94,9 +102,14 @@ def jitter(a=0.3, b=1.2):
 # ── HTTP helpers ──────────────────────────────────────────────────────────────
 def make_web_session():
     if HAS_CURL:
-        return cfreq.Session(impersonate=IMPERSONATE)
+        s = cfreq.Session(impersonate=IMPERSONATE)
+        if PROXY_URL:
+            s.proxies = PROXIES
+        return s
     s = cfreq.Session()
     s.headers.update(HEADERS_WEB)
+    if PROXY_URL:
+        s.proxies = PROXIES
     return s
 
 
@@ -105,9 +118,11 @@ def http_get(url: str, session=None, headers: dict = None, timeout=30) -> tuple[
     h = headers or {}
     try:
         if HAS_CURL:
-            resp = s.get(url, headers=h, timeout=timeout, allow_redirects=True)
+            resp = s.get(url, headers=h, timeout=timeout, allow_redirects=True,
+                         proxies=PROXIES if PROXY_URL else None)
         else:
-            resp = s.get(url, headers={**HEADERS_WEB, **h}, timeout=timeout, allow_redirects=True)
+            resp = s.get(url, headers={**HEADERS_WEB, **h}, timeout=timeout,
+                         allow_redirects=True, proxies=PROXIES if PROXY_URL else None)
         return resp.status_code, resp.text
     except Exception as e:
         print(f"    GET error: {e}")

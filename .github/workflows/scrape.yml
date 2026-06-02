@@ -38,6 +38,7 @@ jobs:
         env:
           ML_APP_ID: ${{ secrets.ML_APP_ID }}
           ML_APP_SECRET: ${{ secrets.ML_APP_SECRET }}
+          PROXY_URL: ${{ secrets.PROXY_URL }}
         run: python scraper/scrape.py
 
       - name: 📊 Verificar resultados
