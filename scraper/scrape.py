@@ -114,15 +114,23 @@ def make_web_session():
 
 
 def http_get(url: str, session=None, headers: dict = None, timeout=30) -> tuple[int, str | None]:
-    s = session or make_web_session()
-    h = headers or {}
+    """
+    Si PROXY_URL está configurado, usa requests estándar (compatible con HTTP proxies).
+    Si no hay proxy, usa curl_cffi con Chrome impersonation (bypass WAF sin proxy).
+    """
+    h = {**HEADERS_WEB, **(headers or {})}
     try:
-        if HAS_CURL:
-            resp = s.get(url, headers=h, timeout=timeout, allow_redirects=True,
-                         proxies=PROXIES if PROXY_URL else None)
+        if PROXY_URL:
+            # curl_cffi tiene incompatibilidad de TLS con proxies HTTP — usar requests
+            import requests as stdreq
+            resp = stdreq.get(url, headers=h, proxies=PROXIES,
+                              timeout=timeout, allow_redirects=True)
+        elif HAS_CURL:
+            s = session or make_web_session()
+            resp = s.get(url, headers=headers or {}, timeout=timeout, allow_redirects=True)
         else:
-            resp = s.get(url, headers={**HEADERS_WEB, **h}, timeout=timeout,
-                         allow_redirects=True, proxies=PROXIES if PROXY_URL else None)
+            s = session or make_web_session()
+            resp = s.get(url, headers=h, timeout=timeout, allow_redirects=True)
         return resp.status_code, resp.text
     except Exception as e:
         print(f"    GET error: {e}")
