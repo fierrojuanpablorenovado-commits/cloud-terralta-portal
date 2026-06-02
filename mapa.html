@@ -2720,16 +2720,23 @@ async function initFromData() {
     }
 
     // Actualizar badge con timestamp
+    // ultima_revision = cuándo corrió el scraper (siempre hoy si el cron corrió)
+    // actualizado     = cuándo se encontraron propiedades nuevas
     const badge = document.getElementById('update-badge');
-    if (data._meta && data._meta.actualizado) {
-      const fecha = new Date(data._meta.actualizado);
-      const ahora = new Date();
-      const diffH = Math.floor((ahora - fecha) / 3600000);
-      const absDiff = Math.abs(diffH);
-      const diffLabel = absDiff === 0 ? 'recién actualizado'
-        : absDiff < 24 ? `hace ${absDiff}h`
-        : `hace ${Math.floor(absDiff/24)}d`;
-      badge.textContent = `✓ Datos reales · ${diffLabel}`;
+    if (data._meta) {
+      const tsRevision = data._meta.ultima_revision || data._meta.actualizado;
+      const tsData     = data._meta.actualizado;
+      if (tsRevision) {
+        const ahora = new Date();
+        const diffH = Math.abs(Math.floor((ahora - new Date(tsRevision)) / 3600000));
+        const revLabel = diffH === 0 ? 'hoy'
+          : diffH < 24 ? `hace ${diffH}h`
+          : `hace ${Math.floor(diffH/24)}d`;
+        badge.textContent = `✓ Revisado ${revLabel}`;
+        badge.title = `Última revisión: ${new Date(tsRevision).toLocaleString('es-MX')}\nÚltimos datos nuevos: ${new Date(tsData).toLocaleString('es-MX')}`;
+      } else {
+        badge.textContent = '✓ Datos reales';
+      }
     } else {
       badge.textContent = '✓ Datos reales';
     }
