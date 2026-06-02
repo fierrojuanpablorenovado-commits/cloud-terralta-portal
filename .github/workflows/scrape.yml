@@ -57,16 +57,16 @@ jobs:
         run: |
           git config --global user.email "bot@cloudinmobiliaria.mx"
           git config --global user.name "Cloud Inmo Bot"
-          git add data/listings.json
+          git add data/listings.json data/img/ mapa.html
           if git diff --staged --quiet; then
-            echo "Sin cambios en los listings. Nada que commitear."
+            echo "Sin cambios. Nada que commitear."
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             TOTAL=$(cat data/listings.json | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['_meta']['total'])")
-            git commit -m "🏠 Listings actualizados: ${TOTAL} propiedades · $(TZ='America/Mexico_City' date +'%Y-%m-%d %H:%M CDT')"
+            git commit -m "🏠 Portal actualizado: ${TOTAL} props · $(TZ='America/Mexico_City' date +'%Y-%m-%d %H:%M CDT')"
             git push
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "✅ Datos actualizados y publicados"
+            echo "✅ Portal actualizado y publicado"
           fi
 
       - name: 🚀 Deploy a Vercel (siempre, haya o no cambios)

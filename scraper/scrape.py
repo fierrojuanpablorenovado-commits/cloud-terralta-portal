@@ -732,6 +732,14 @@ def main():
     print(f"   Fuentes: {', '.join(fuentes)}")
     print(f"   Actualizado: {ts}\n")
 
+    # Verificar que los links directos siguen vivos — eliminar inactivos
+    try:
+        import verify_links
+        print("\n🔗 Verificando links de propiedades...")
+        verify_links.main()
+    except Exception as e:
+        print(f"⚠️ No se pudieron verificar links: {e}")
+
     # Localizar imágenes: descargar copias estáticas para que TODOS vean lo mismo
     try:
         import localize_images
