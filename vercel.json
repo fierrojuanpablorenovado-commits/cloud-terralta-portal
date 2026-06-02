@@ -2,16 +2,16 @@
   "version": 2,
   "headers": [
     {
-      "source": "/data/img/(.*)",
+      "source": "/data/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
+        { "key": "Cache-Control", "value": "public, max-age=300, stale-while-revalidate=3600" },
         { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     },
     {
-      "source": "/data/(.*)",
+      "source": "/data/img/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=300, stale-while-revalidate=3600" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
         { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     },

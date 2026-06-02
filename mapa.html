@@ -6,7 +6,22 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+  <meta name="theme-color" content="#1a2e2b">
   <title>Cloud Inmobiliaria · Portal Exclusivo · Terralta</title>
+  <meta name="description" content="Portal inmobiliario exclusivo de Terralta, San Pedro Tlaquepaque. Casas, departamentos y remates bancarios con datos reales actualizados a diario. Tu asesora Cloud Inmobiliaria.">
+
+  <!-- Open Graph — preview al compartir por WhatsApp / redes -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Cloud Inmobiliaria">
+  <meta property="og:title" content="🏡 Portal Exclusivo Terralta · Cloud Inmobiliaria">
+  <meta property="og:description" content="Encuentra tu casa en Terralta: venta, renta y remates bancarios con precios reales. Atención personalizada de tu asesora.">
+  <meta property="og:image" content="https://cloud-terralta-portal.vercel.app/data/img/b6d0fb9a9613cf25.jpg">
+  <meta property="og:url" content="https://cloud-terralta-portal.vercel.app/mapa">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="🏡 Portal Exclusivo Terralta · Cloud Inmobiliaria">
+  <meta name="twitter:description" content="Casas, departamentos y remates en Terralta con datos reales actualizados a diario.">
+  <meta name="twitter:image" content="https://cloud-terralta-portal.vercel.app/data/img/b6d0fb9a9613cf25.jpg">
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -922,6 +937,69 @@
     }
     .map-overlay strong { color: #1a2e2b; font-size: 13px; }
     .map-overlay .src { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+
+    /* ─── FAB FILTROS (solo móvil) ────────────────────────── */
+    .fab-filtros {
+      display: none;
+      position: fixed; bottom: 18px; right: 18px; z-index: 1200;
+      background: linear-gradient(135deg,#1a2e2b 0%,#2a5248 100%);
+      color: #fff; border: none; border-radius: 100px;
+      padding: 13px 20px; font-size: 14px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+      box-shadow: 0 6px 20px rgba(26,46,43,.4);
+      align-items: center; gap: 7px;
+    }
+    .fab-filtros:active { transform: scale(.96); }
+
+    /* ═══════════════════════════════════════════════════════
+       RESPONSIVE — TABLET Y MÓVIL
+       ═══════════════════════════════════════════════════════ */
+    @media (max-width: 860px) {
+      body { overflow-y: auto; overflow-x: hidden; height: auto; }
+
+      header {
+        height: auto; min-height: 56px; flex-wrap: wrap;
+        gap: 8px; padding: 9px 14px; position: sticky;
+      }
+      .logo-tagline { display: none; }
+      .header-right { gap: 7px; flex-wrap: wrap; }
+      .zona-pill, .data-badge { font-size: 10.5px; padding: 4px 9px; }
+
+      main { flex-direction: column; height: auto; margin-top: 0; overflow: visible; }
+
+      /* Mapa + cards primero (lo que importa) */
+      .content-right { order: 1; overflow: visible; }
+      .map-wrap { position: relative; height: 44vh; min-height: 270px; }
+
+      /* Sidebar (filtros, calc, herramientas) debajo */
+      .sidebar {
+        order: 2; width: 100%; min-width: 0;
+        overflow: visible; border-right: none;
+        border-top: 8px solid #f3f4f6;
+      }
+      .sidebar-scroll { overflow: visible; }
+
+      /* Cards: 2 columnas en tablet */
+      .prop-list { grid-template-columns: 1fr 1fr; padding: 12px; gap: 12px; }
+      .card-img-wrap { height: 160px; }
+
+      /* FAB visible solo en móvil/tablet */
+      .fab-filtros { display: inline-flex; }
+
+      /* Zonas chips scroll horizontal */
+      .zonas-bar { overflow-x: auto; white-space: nowrap; }
+    }
+
+    @media (max-width: 540px) {
+      .prop-list { grid-template-columns: 1fr; }
+      .card-img-wrap { height: 200px; }
+      .map-wrap { height: 40vh; min-height: 240px; }
+      .logo-name { font-size: 14px; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .calc-modal, .mkt-modal { width: 94vw; max-height: 88vh; }
+      .tools-panel { width: 100vw; }
+      .mkt-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -991,7 +1069,7 @@
     </div>
 
     <!-- Tipo filter -->
-    <div class="filters-section">
+    <div class="filters-section" id="filtros-section">
       <div class="filter-label">Filtrar por tipo</div>
       <div class="tipo-chips">
         <button class="chip active" data-tipo="Todos">Todos</button>
@@ -1307,6 +1385,9 @@
 
 
 </main>
+
+<!-- ─── FAB FILTROS (solo móvil) ───────────────────────── -->
+<button class="fab-filtros" onclick="scrollToFiltros()">🔍 Filtros y herramientas</button>
 
 <!-- ─── HERRAMIENTAS MODAL ─────────────────────────────── -->
 <div class="tools-overlay" id="toolsOverlay" onclick="closeHerramientas()">
@@ -2387,7 +2468,7 @@ function renderCards() {
       <div class="prop-card${selectedId === p.id ? ' active' : ''}" data-id="${p.id}">
         <div class="card-img-wrap" data-icon="${placeholderIcon}">
           ${p.img
-            ? `<img class="card-img" src="${imgProxy(p.img)}" alt="${p.titulo}" onerror="cardImgError(this)">`
+            ? `<img class="card-img" src="${imgProxy(p.img)}" alt="${p.titulo}" loading="lazy" decoding="async" onerror="cardImgError(this)">`
             : p.fuente === 'Facebook'
               ? `<a href="${listingUrl}" target="_blank" rel="noopener" style="display:block;width:100%;height:100%;text-decoration:none;"><div class="card-img-ph" style="background:linear-gradient(135deg,#1877f2 0%,#0d5dbf 100%);cursor:pointer;"><span>📷</span><small style="color:#fff;font-size:11px;font-weight:600;">Ver fotos en Facebook</small></div></a>`
               : `<div class="card-img-ph"><span>${placeholderIcon}</span><small>Sin foto disponible</small></div>`
@@ -2445,7 +2526,7 @@ function renderCards() {
       devCard.innerHTML = `
         <div class="card-img-wrap">
           ${dev.img
-            ? `<img class="card-img" src="${imgProxy(dev.img)}" alt="${dev.nombre}" onerror="cardImgError(this)">`
+            ? `<img class="card-img" src="${imgProxy(dev.img)}" alt="${dev.nombre}" loading="lazy" decoding="async" onerror="cardImgError(this)">`
             : `<div class="card-img-ph"><span>🏗</span><small>Sin fotografía</small></div>`
           }
           <div class="dev-badge">🏗 NUEVO</div>
@@ -2885,6 +2966,14 @@ function openMarketplace() {
 function closeMarketplace() {
   document.getElementById('mktOverlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+
+// ================================================================
+// FAB FILTROS (móvil) — scroll a la sección de filtros
+// ================================================================
+function scrollToFiltros() {
+  const el = document.getElementById('filtros-section');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ================================================================
