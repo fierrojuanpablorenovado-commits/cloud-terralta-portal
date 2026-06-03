@@ -152,25 +152,27 @@
       text-transform: uppercase; letter-spacing: .4px; }
 
     /* ─── FILTERS ──────────────────────────────────────────── */
-    .filters-section { padding: 12px 14px; border-bottom: 1px solid #e5e7eb; }
+    .filters-section { padding: 12px 14px 10px; border-bottom: 2px solid #e5e7eb; background: #f8fafc; }
     .filter-label {
-      font-size: 10px; font-weight: 700; color: #9ca3af;
-      text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px;
+      font-size: 11px; font-weight: 800; color: #1a2e2b;
+      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 9px;
+      display: flex; align-items: center; gap: 5px;
     }
     /* Chips de tipo: 2 por fila */
-    .tipo-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .tipo-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
     .chip {
-      padding: 7px 6px; border-radius: 8px;
-      border: 1.5px solid #e5e7eb; background: #f8fafc;
-      font-size: 11.5px; font-weight: 600; color: #6b7280;
+      padding: 9px 6px; border-radius: 9px;
+      border: 2px solid #e5e7eb; background: #fff;
+      font-size: 12px; font-weight: 700; color: #374151;
       cursor: pointer; transition: all .15s; font-family: inherit;
       text-align: center; white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
     }
     /* Botón "Todos" ocupa todo el ancho */
-    .chip[data-tipo="Todos"] { grid-column: 1 / -1; }
-    .chip.active { border-color: #1a2e2b; background: #1a2e2b; color: #fff; }
-    .chip:hover:not(.active) { border-color: #1a2e2b; color: #1a2e2b; background: #f0fdf4; }
+    .chip[data-tipo="Todos"] { grid-column: 1 / -1; background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+    .chip.active { border-color: #1a2e2b; background: #1a2e2b; color: #fff; box-shadow: 0 2px 8px rgba(26,46,43,.25); }
+    .chip:hover:not(.active) { border-color: #1a2e2b; color: #1a2e2b; background: #f0fdf4; transform: translateY(-1px); }
 
     /* ─── PRECIO ───────────────────────────────────────────── */
     .precio-section { padding: 12px 14px; border-bottom: 1px solid #e5e7eb; }
@@ -1090,20 +1092,20 @@
       <input type="range" id="precio-slider" min="400000" max="3000000" step="50000" value="3000000">
     </div>
 
-    <!-- Facebook Marketplace -->
+    <!-- Portales externos — buscar más propiedades -->
     <div class="fb-section">
-      <div class="fb-section-title">🔵 Facebook Marketplace · Terralta</div>
+      <div class="fb-section-title">🔍 Buscar más propiedades</div>
+      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/venta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener" style="color:#f97316;background:#fff7ed;border-color:#fed7aa;">
+        🛒 MercadoLibre — Casas en Venta
+      </a>
+      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/renta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener" style="color:#f97316;background:#fff7ed;border-color:#fed7aa;">
+        🛒 MercadoLibre — Casas en Renta
+      </a>
+      <a class="fb-btn" href="https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html" target="_blank" rel="noopener" style="color:#16a34a;background:#f0fdf4;border-color:#bbf7d0;">
+        🏡 Inmuebles24 — Terralta
+      </a>
       <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/propertyforsale/?query=terralta&exact=false" target="_blank" rel="noopener">
-        💰 Casas en Venta — Terralta
-      </a>
-      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/propertyrentals/?query=terralta&exact=false" target="_blank" rel="noopener">
-        🏠 Casas y Deptos en Renta — Terralta
-      </a>
-      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/propertyforsale/?query=remate+bancario+terralta&exact=false" target="_blank" rel="noopener">
-        🔴 Remates Bancarios — Terralta
-      </a>
-      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/propertyrentals/?query=departamento+terralta&exact=false" target="_blank" rel="noopener">
-        🏢 Departamentos en Renta — Terralta
+        🔵 Facebook Marketplace — Terralta
       </a>
     </div>
 
@@ -1973,8 +1975,12 @@ function imgProxy(url) {
 function getListingUrl(p) {
   const SEARCH = {
     'Inmuebles24':      'https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html',
-    'MercadoLibre':     'https://inmuebles.mercadolibre.com.mx/casas-departamentos/' + (p.modalidad === 'Renta' ? 'alquiler' : 'venta') + '/jalisco/san-pedro-tlaquepaque/terralta/',
-    'Lamudi':           'https://www.lamudi.com.mx/jalisco/san-pedro-tlaquepaque/' + (p.modalidad === 'Renta' ? 'for-rent' : '') + '/?search=terralta',
+    'MercadoLibre':     p.modalidad === 'Renta'
+      ? 'https://inmuebles.mercadolibre.com.mx/casas/renta/san-pedro-tlaquepaque/terralta/'
+      : 'https://inmuebles.mercadolibre.com.mx/casas/venta/san-pedro-tlaquepaque/terralta/',
+    'Lamudi':           p.modalidad === 'Renta'
+      ? 'https://www.lamudi.com.mx/jalisco/san-pedro-tlaquepaque/terralta/casas/for-rent/'
+      : 'https://www.lamudi.com.mx/jalisco/san-pedro-tlaquepaque/terralta/casas/for-sale/',
     'propiedades.com':  'https://propiedades.com/jalisco/san_pedro_tlaquepaque/terralta',
     'casasyterrenos.com':'https://www.casasyterrenos.com/jalisco/san-pedro-tlaquepaque/casas/venta?q=terralta',
     'Pincali':          'https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html',
