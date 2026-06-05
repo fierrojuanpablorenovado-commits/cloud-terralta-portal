@@ -152,7 +152,7 @@
       text-transform: uppercase; letter-spacing: .4px; }
 
     /* ─── FILTERS ──────────────────────────────────────────── */
-    .filters-section { padding: 12px 14px 10px; border-bottom: 2px solid #e5e7eb; background: #f8fafc; }
+    .filters-section { padding: 12px 14px 12px; border-bottom: 2px solid #d1fae5; background: #f0fdf4; border-left: 4px solid #16a34a; }
     .filter-label {
       font-size: 11px; font-weight: 800; color: #1a2e2b;
       text-transform: uppercase; letter-spacing: .6px; margin-bottom: 9px;
@@ -172,6 +172,7 @@
     /* Botón "Todos" ocupa todo el ancho */
     .chip[data-tipo="Todos"] { grid-column: 1 / -1; background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
     .chip.active { border-color: #1a2e2b; background: #1a2e2b; color: #fff; box-shadow: 0 2px 8px rgba(26,46,43,.25); }
+    .chip[data-tipo="Todos"].active { background: #16a34a; border-color: #16a34a; }
     .chip:hover:not(.active) { border-color: #1a2e2b; color: #1a2e2b; background: #f0fdf4; transform: translateY(-1px); }
 
     /* ─── PRECIO ───────────────────────────────────────────── */
@@ -334,27 +335,30 @@
     .motiv-meta-label { font-size: 10.5px; color: rgba(255,255,255,.55); }
     .motiv-meta-val { font-size: 13px; font-weight: 800; color: #fcd34d; }
 
-    /* Facebook Marketplace section */
+    /* Portales externos — buscar más propiedades */
     .fb-section {
-      padding: 12px 14px;
+      padding: 10px 14px 12px;
       border-top: 1px solid #e5e7eb;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
     }
     .fb-section-title {
+      grid-column: 1 / -1;
       font-size: 11px; font-weight: 700; color: #6b7280;
       text-transform: uppercase; letter-spacing: .5px;
-      margin-bottom: 8px; display: flex; align-items: center; gap: 5px;
+      margin-bottom: 4px; display: flex; align-items: center; gap: 5px;
     }
     .fb-btn {
-      width: 100%; padding: 9px 12px; border-radius: 9px;
-      font-size: 12px; font-weight: 600; cursor: pointer;
-      font-family: inherit; text-align: left;
+      padding: 8px 6px; border-radius: 8px;
+      font-size: 11px; font-weight: 600; cursor: pointer;
+      font-family: inherit; text-align: center;
+      display: flex; align-items: center; justify-content: center; gap: 3px;
+      line-height: 1.2;
       display: flex; align-items: center; gap: 7px;
       text-decoration: none; color: #1877f2;
       background: #e7f0fd; border: 1.5px solid #b8d0f7;
-      transition: all .15s; margin-bottom: 5px;
+      transition: all .15s; text-decoration: none; color: #1d4ed8;
     }
-    .fb-btn:hover { background: #1877f2; color: #fff; border-color: #1877f2; }
-    .fb-btn:last-child { margin-bottom: 0; }
+    .fb-btn:hover { background: #1877f2; color: #fff !important; border-color: #1877f2; }
 
     input[type="range"] {
       width: 100%; -webkit-appearance: none;
@@ -1083,6 +1087,23 @@
       </div>
     </div>
 
+    <!-- Portales externos — buscar más propiedades -->
+    <div class="fb-section">
+      <div class="fb-section-title">🔍 Buscar en portales</div>
+      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/venta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener" style="color:#f97316;background:#fff7ed;border-color:#fed7aa;">
+        🛒 ML Venta
+      </a>
+      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/renta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener" style="color:#f97316;background:#fff7ed;border-color:#fed7aa;">
+        🛒 ML Renta
+      </a>
+      <a class="fb-btn" href="https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html" target="_blank" rel="noopener" style="color:#16a34a;background:#f0fdf4;border-color:#bbf7d0;">
+        🏡 Inmuebles24
+      </a>
+      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/propertyforsale/?query=terralta&exact=false" target="_blank" rel="noopener">
+        🔵 Marketplace
+      </a>
+    </div>
+
     <!-- Price slider -->
     <div class="precio-section">
       <div class="precio-row">
@@ -1090,23 +1111,6 @@
         <span class="precio-val" id="precio-display">$3,000,000</span>
       </div>
       <input type="range" id="precio-slider" min="400000" max="3000000" step="50000" value="3000000">
-    </div>
-
-    <!-- Portales externos — buscar más propiedades -->
-    <div class="fb-section">
-      <div class="fb-section-title">🔍 Buscar más propiedades</div>
-      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/venta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener" style="color:#f97316;background:#fff7ed;border-color:#fed7aa;">
-        🛒 MercadoLibre — Casas en Venta
-      </a>
-      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/renta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener" style="color:#f97316;background:#fff7ed;border-color:#fed7aa;">
-        🛒 MercadoLibre — Casas en Renta
-      </a>
-      <a class="fb-btn" href="https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html" target="_blank" rel="noopener" style="color:#16a34a;background:#f0fdf4;border-color:#bbf7d0;">
-        🏡 Inmuebles24 — Terralta
-      </a>
-      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/propertyforsale/?query=terralta&exact=false" target="_blank" rel="noopener">
-        🔵 Facebook Marketplace — Terralta
-      </a>
     </div>
 
     </div><!-- /sidebar-scroll -->
