@@ -320,6 +320,17 @@ def get_next_data(html: str) -> dict | None:
     return None
 
 
+def get_preloaded_state(html: str) -> dict | None:
+    """Extrae window.__PRELOADED_STATE__ — formato actual Navent/Inmuebles24."""
+    m = re.search(r'window\.__PRELOADED_STATE__\s*=\s*(\{.*?);\s*(?:window\.|</script>)', html, re.DOTALL)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except Exception:
+            pass
+    return None
+
+
 def find_postings(obj, depth=0) -> list | None:
     if depth > 8:
         return None
@@ -414,6 +425,121 @@ def get_i24_phone(listing_id: str, url: str) -> str | None:
             return m.group(1)
 
     return None
+
+
+def parse_i24_preloaded(p: dict) -> dict | None:
+    """
+    Parsea un posting de window.__PRELOADED_STATE__ (formato actual Navent/I24).
+    Incluye coordenadas reales, foto HD y teléfono WhatsApp directo.
+    """
+    # Precio
+    precio = None
+    for op in p.get("priceOperationTypes", []):
+        for po in (op.get("prices") or []):
+            try:
+                amt = float(po.get("amount", 0))
+                cur = po.get("currency", "MN")
+                if amt:
+                    precio = int(amt * (17.5 if cur in ("USD", "US$") else 1))
+                    break
+            except Exception:
+                pass
+        if precio:
+            break
+    if not precio:
+        return None
+
+    # Modalidad
+    op_name = ""
+    try:
+        op_name = p["priceOperationTypes"][0]["operationType"]["name"].lower()
+    except Exception:
+        pass
+    modalidad = "Renta" if "alquiler" in op_name or "renta" in op_name else "Venta"
+
+    # Tipo de propiedad
+    tipo_name = (p.get("realEstateType") or {}).get("name", "Casas")
+    tipo_prop = "Depto" if "departamento" in tipo_name.lower() else "Casa"
+
+    # Features (m², rec, baños, estac)
+    feats = p.get("mainFeatures", {}) or {}
+    m2c = rec = ban = estac = None
+    for fid, key in [("CFT101","m2c"), ("CFT100","m2t"), ("CFT2","rec"), ("CFT3","ban"), ("CFT7","estac")]:
+        if fid in feats:
+            try:
+                v = int(float(feats[fid]["value"]))
+                if key == "m2c":
+                    m2c = v
+                elif key == "m2t" and not m2c:
+                    m2c = v
+                elif key == "rec":
+                    rec = v
+                elif key == "ban":
+                    ban = v
+                elif key == "estac":
+                    estac = v
+            except Exception:
+                pass
+
+    # Ubicación y coordenadas reales
+    address = ""
+    lat, lng = CENTER
+    try:
+        pl = p.get("postingLocation", {}) or {}
+        addr_obj = pl.get("address", {}) or {}
+        address = addr_obj.get("name", "")
+        gl = ((pl.get("postingGeolocation") or {}).get("geolocation") or {})
+        if gl.get("latitude") and gl.get("longitude"):
+            lat = float(gl["latitude"])
+            lng = float(gl["longitude"])
+        else:
+            lat, lng = coords(address + " " + (p.get("title") or ""))
+    except Exception:
+        lat, lng = coords(p.get("title", ""))
+
+    # Imagen HD
+    img = None
+    try:
+        pics = ((p.get("visiblePictures") or {}).get("pictures") or [])
+        if pics:
+            img = pics[0].get("url730x532") or pics[0].get("url360x266")
+    except Exception:
+        pass
+
+    # URL directa del anuncio
+    listing_id = str(p.get("postingId", "") or "")
+    url_path = p.get("url", "")
+    url = ("https://www.inmuebles24.com" + url_path) if url_path else (
+        f"https://www.inmuebles24.com/propiedades-{listing_id}.html" if listing_id else None
+    )
+
+    # Teléfono WhatsApp — campo "whatsApp": "52 3342022298" (código país + 10 dígitos)
+    telefono = None
+    wa_raw = str(p.get("whatsApp", "") or "").replace(" ", "").replace("-", "")
+    if wa_raw:
+        # Quitar código de país "52" si el número tiene 12 dígitos
+        if len(wa_raw) == 12 and wa_raw.startswith("52"):
+            wa_raw = wa_raw[2:]
+        mt = re.search(r"([2-9]\d{9})", wa_raw)
+        if mt:
+            telefono = mt.group(1)
+    if not telefono:
+        telefono = find_phone_in_obj(p)  # fallback recursivo
+
+    remate = bool(re.search(r"remate|bancario|hipotecario|recuperaci", str(p).lower()))
+    titulo = (p.get("title") or "")[:80]
+    calle_short = address.split(",")[0].strip() or "Terralta"
+
+    result = {
+        "id": listing_id, "modalidad": modalidad, "tipoProp": tipo_prop,
+        "titulo": titulo, "calle": address or "Terralta, San Pedro Tlaquepaque",
+        "precio": precio, "m2c": m2c, "rec": rec, "ban": ban, "estac": estac,
+        "extras": "", "remate": remate, "lat": lat, "lng": lng,
+        "fuente": "Inmuebles24", "img": img, "url": url, "listing_id": listing_id,
+    }
+    if telefono:
+        result["telefono"] = telefono
+    return result
 
 
 def parse_i24(p: dict) -> dict | None:
@@ -533,29 +659,45 @@ def _fetch_with_playwright(url: str) -> str | None:
 
 
 def scrape_inmuebles24() -> list[dict]:
-    print("  → Inmuebles24 (Playwright + fallback HTTP)...")
+    """
+    Scraper Inmuebles24 via curl_cffi (TLS Chrome) + __PRELOADED_STATE__.
+    Extrae coordenadas reales, fotos HD y telefonos WhatsApp directamente
+    de los resultados de busqueda -- sin visitar paginas de detalle.
+    """
+    print("  → Inmuebles24 (curl_cffi + __PRELOADED_STATE__)...")
+    session = make_web_session()
 
     for url in I24_URLS:
-        html = None
+        jitter(0.5, 1.2)
 
-        # 1er intento: Playwright (bypasea Cloudflare con Chrome real)
-        html = _fetch_with_playwright(url)
-        if html and "just a moment" in html.lower():
-            print(f"    Playwright: Cloudflare no resuelto en {url[:60]}")
-            html = None
+        # curl_cffi con TLS Chrome impersonation -- mas efectivo contra Cloudflare
+        status, html = http_get(url, session=session)
+        if status != 200 or not html:
+            print(f"    HTTP {status}: {url[:60]}")
+            continue
 
-        # 2do intento: HTTP directo (funciona desde IP residencial / local)
-        if not html:
-            status, html = http_get(url)
-            if status != 200 or not html:
-                print(f"    HTTP {status}: {url[:80]}")
-                jitter(1, 2)
-                continue
-            if "just a moment" in html.lower():
-                print(f"    HTTP bloqueado por Cloudflare: {url[:60]}")
+        blocked = "just a moment" in html.lower() or "attention required" in html.lower()
+        if blocked:
+            print(f"    curl_cffi bloqueado, intentando Playwright: {url[:60]}")
+            html = _fetch_with_playwright(url)
+            if not html or "just a moment" in html.lower():
+                print(f"    Playwright tambien bloqueado")
                 jitter(1, 2)
                 continue
 
+        # Ruta principal: __PRELOADED_STATE__ (formato actual Navent)
+        state = get_preloaded_state(html)
+        if state:
+            postings = (state.get("listStore") or {}).get("listPostings") or []
+            if postings:
+                listings = [parse_i24_preloaded(p) for p in postings]
+                listings = [l for l in listings if l]
+                if listings:
+                    with_tel = sum(1 for l in listings if l.get("telefono"))
+                    print(f"  ✓ {len(listings)} propiedades I24 -- {with_tel} con tel WhatsApp")
+                    return listings
+
+        # Fallback: __NEXT_DATA__ (formato anterior)
         nd = get_next_data(html)
         if nd:
             postings = find_postings(nd)
@@ -563,30 +705,12 @@ def scrape_inmuebles24() -> list[dict]:
                 listings = [parse_i24(p) for p in postings]
                 listings = [l for l in listings if l]
                 if listings:
-                    print(f"  ✓ {len(listings)} propiedades Inmuebles24")
-                    # Enriquecer con teléfonos desde páginas de detalle
-                    MAX_PHONE_FETCH = 15  # límite para no saturar ni tardar demasiado
-                    print(f"  📞 Extrayendo teléfonos (hasta {MAX_PHONE_FETCH} listings)...")
-                    found = 0
-                    for listing in listings[:MAX_PHONE_FETCH]:
-                        try:
-                            phone = get_i24_phone(
-                                listing.get('listing_id', ''),
-                                listing.get('url', '')
-                            )
-                            if phone:
-                                listing['telefono'] = phone
-                                found += 1
-                                print(f"    ✓ {listing.get('calle','')[:30]}: {phone}")
-                            else:
-                                print(f"    – {listing.get('calle','')[:30]}: sin teléfono")
-                        except Exception as e:
-                            print(f"    ✗ Error: {e}")
-                    print(f"  📞 {found}/{min(len(listings), MAX_PHONE_FETCH)} teléfonos obtenidos")
+                    print(f"  ✓ {len(listings)} propiedades I24 (fallback NEXT_DATA)")
                     return listings
+
         jitter(1, 2)
 
-    print("  ✗ Inmuebles24: 0 propiedades (Cloudflare bloqueó aun con Playwright)")
+    print("  ✗ Inmuebles24: 0 propiedades")
     return []
 
 
