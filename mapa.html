@@ -1247,6 +1247,62 @@
     .spec-item { color: #64748b !important; }
     .fuente-badge { font-size: 9px !important; }
     .m2-tag { font-size: 11px !important; color: #94a3b8 !important; }
+
+    /* ─── PORTALES: links de texto, sin cajas ─────────────────── */
+    .fb-section {
+      padding: 8px 14px 12px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 2px !important;
+      border-top: 1px solid #1d3b32 !important;
+      background: transparent !important;
+    }
+    .fb-section-title {
+      font-size: 9px !important;
+      font-weight: 700 !important;
+      letter-spacing: 1px !important;
+      text-transform: uppercase !important;
+      color: #4d7a68 !important;
+      margin-bottom: 4px !important;
+    }
+    .fb-btn {
+      display: block !important;
+      padding: 6px 4px !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+      color: #86efac !important;
+      text-decoration: none !important;
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      border-bottom: 1px solid rgba(255,255,255,.05) !important;
+      transition: color .15s, padding-left .15s !important;
+      text-align: left !important;
+      cursor: pointer !important;
+    }
+    .fb-btn:hover {
+      color: #ecfdf5 !important;
+      padding-left: 8px !important;
+      background: transparent !important;
+      border-bottom-color: rgba(255,255,255,.05) !important;
+    }
+    .fb-btn:last-of-type { border-bottom: none !important; }
+
+    /* ─── WA BUTTON: verde WhatsApp sólido ─────────────────────── */
+    .btn-wa-sm {
+      background: #25D366 !important;
+      color: #fff !important;
+      border: none !important;
+      padding: 9px 12px !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      border-radius: 6px !important;
+      min-height: 36px !important;
+    }
+    .btn-wa-sm:hover { background: #1aad54 !important; opacity: 1 !important; }
+
+    /* ─── MOTIV CARD dentro del scroll ─────────────────────────── */
+    .sidebar-scroll .motiv-card { margin: 12px 12px 0 !important; }
   </style>
 </head>
 <body>
@@ -1311,6 +1367,23 @@
     <!-- Contenido scrolleable del sidebar -->
     <div class="sidebar-scroll">
 
+    <!-- Tarjeta motivacional — arriba del scroll -->
+    <div class="motiv-card" id="motivCard" style="margin:12px 12px 0;">
+      <div class="motiv-tag">Mentalidad ganadora · Hoy</div>
+      <div class="motiv-quote" id="motivQuote">…</div>
+      <div class="motiv-author" id="motivAuthor"></div>
+      <div class="motiv-meta">
+        <div>
+          <div class="motiv-meta-label">Tu comisión hoy</div>
+          <div class="motiv-meta-val" id="motivComision">$0</div>
+        </div>
+        <div style="text-align:right">
+          <div class="motiv-meta-label">Propiedades zona</div>
+          <div class="motiv-meta-val" id="motivProps">—</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Market Intelligence Strip -->
     <div class="market-intel" id="market-intel">
       <div class="intel-chip"><span class="intel-val" id="mi-ventas">—</span><span class="intel-label">en venta</span></div>
@@ -1334,20 +1407,11 @@
 
     <!-- Portales externos — buscar más propiedades -->
     <div class="fb-section">
-      <div class="fb-section-title">Portales externos</div>
-      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/venta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener">
-        MercadoLibre — Venta
-      </a>
-      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/renta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener">
-        MercadoLibre — Renta
-      </a>
-      <a class="fb-btn" href="https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html" target="_blank" rel="noopener">
-        Inmuebles24
-      </a>
-      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/propertyforsale/?query=terralta&exact=false" target="_blank" rel="noopener" title="Requiere sesión activa en Facebook">
-        Facebook Marketplace
-      </a>
-      <div style="font-size:9px;color:#4d7a68;margin-top:2px;">* Requiere sesión FB activa</div>
+      <div class="fb-section-title">Buscar en portales</div>
+      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/venta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener">MercadoLibre Venta ↗</a>
+      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/renta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener">MercadoLibre Renta ↗</a>
+      <a class="fb-btn" href="https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html" target="_blank" rel="noopener">Inmuebles24 ↗</a>
+      <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/propertyforsale/?query=terralta&exact=false" target="_blank" rel="noopener">Facebook Marketplace ↗</a>
     </div>
 
     <!-- Price slider -->
@@ -1360,23 +1424,6 @@
     </div>
 
     </div><!-- /sidebar-scroll -->
-
-    <!-- Tarjeta motivacional — siempre visible abajo -->
-    <div class="motiv-card" id="motivCard">
-      <div class="motiv-tag">Mentalidad ganadora · Hoy</div>
-      <div class="motiv-quote" id="motivQuote">…</div>
-      <div class="motiv-author" id="motivAuthor"></div>
-      <div class="motiv-meta">
-        <div>
-          <div class="motiv-meta-label">Tu comisión potencial hoy</div>
-          <div class="motiv-meta-val" id="motivComision">$0</div>
-        </div>
-        <div style="text-align:right">
-          <div class="motiv-meta-label">Propiedades en tu zona</div>
-          <div class="motiv-meta-val" id="motivProps">—</div>
-        </div>
-      </div>
-    </div>
 
     <!-- Acciones rápidas -->
     <div class="action-section">
