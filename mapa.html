@@ -5,7 +5,7 @@
   <script>
     /* Auto cache-buster — incrementar V en cada deploy para forzar recarga instantánea */
     (function(){
-      var V='17';
+      var V='18';
       var p=new URLSearchParams(location.search);
       if(p.get('v')!==V){p.set('v',V);location.replace(location.pathname+'?'+p.toString());}
     })();
@@ -1886,7 +1886,7 @@
             </div>
             <div class="help-item">
               <div class="help-item-label">Cómo funciona</div>
-              <div class="help-item-desc">Cada entrada tiene un botón WA que abre el chat con el pitch de co-brokerage listo. El botón <strong>"Copiar todo"</strong> copia la lista formateada para tu CRM.</div>
+              <div class="help-item-desc">Cada entrada tiene un botón WA que abre el chat con el pitch de co-brokerage listo. El botón <strong>"Copiar para CRM"</strong> copia la lista formateada para pegar en Google Sheets o tu CRM.</div>
             </div>
             <div class="help-item">
               <div class="help-item-label">Rutina recomendada</div>
@@ -1912,7 +1912,11 @@
           <h3>Contactos vendedores</h3>
           <div class="export-header-sub" id="exportCount">cargando...</div>
         </div>
-        <button class="export-copy-all" onclick="copiarTodosContactos(this)">Copiar todo</button>
+        <button class="export-copy-all" onclick="copiarTodosContactos(this)">📋 Copiar para CRM</button>
+      </div>
+      <div style="font-size:11px;color:#94a3b8;padding:0 4px 10px;line-height:1.4;">
+        💡 Usa los botones <strong style="color:#86efac">WA Comisión</strong> de cada card para prospectar uno a uno.<br>
+        Este botón copia la lista para pegarla en tu CRM, Google Sheets o libreta de contactos.
       </div>
       <div id="exportBody"></div>
       <div class="export-close" onclick="cerrarExport()">Cerrar</div>
@@ -3042,9 +3046,9 @@ function renderCards() {
     const placeholderIcon = tipoProp === "Depto" ? "🏢" : "🏠";
     const listingUrl = getListingUrl(p);
 
-    // Calculadora mensualidades (solo venta)
+    // Calculadora mensualidades — todas las propiedades en venta (incluye remates: referencia útil)
     const calcId = `calc-${p.id}`;
-    const calcHtml = (!esRenta && !p.remate) ? `
+    const calcHtml = !esRenta ? `
       <button class="btn-calc-toggle" id="btn-calc-toggle-${p.id}" onclick="toggleCardCalc(${p.id}, event)">Mensualidad estimada ▸</button>
       <div class="card-calc-panel" id="${calcId}">
         <div class="card-calc-slider-wrap">
@@ -3134,9 +3138,10 @@ function renderCards() {
                   '\n\n¿Manejas esquema de comisión compartida? Tengo clientes activos buscando en Terralta y con gusto la trabajamos juntos.' +
                   '\n\nQuedo al pendiente. 🙏'
                 );
-                // Solo mostrar si tiene teléfono — va directo al vendedor
-                if (!p.telefono) return '';
-                const waHref = 'https://wa.me/52' + p.telefono + '?text=' + waComision;
+                // Si tiene teléfono → abre chat directo; sin teléfono → WA sin número (agente elige contacto)
+                const waHref = p.telefono
+                  ? 'https://wa.me/52' + p.telefono + '?text=' + waComision
+                  : 'https://wa.me/?text=' + waComision;
                 return '<a href="' + waHref + '" target="_blank" rel="noopener" class="btn-wa-sm">WA Comisión</a>';
               })()}
               ${(()=>{
@@ -3406,7 +3411,7 @@ function copiarTodosContactos(btn) {
   navigator.clipboard.writeText(lines).then(() => {
     btn.textContent = '✓ Copiado';
     btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copiar todo'; btn.classList.remove('copied'); }, 2000);
+    setTimeout(() => { btn.textContent = '📋 Copiar para CRM'; btn.classList.remove('copied'); }, 2000);
   }).catch(() => {
     alert('Lista de contactos:\n\n' + lines);
   });
