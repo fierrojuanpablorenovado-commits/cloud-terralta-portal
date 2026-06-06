@@ -2443,7 +2443,7 @@ function renderCards() {
           </select>
         </div>
         <div class="card-calc-result" id="calc-result-${p.id}">
-          <strong id="calc-val-${p.id}">$${Math.round(calcMensualidad(${p.precio},0.2,0.11,20)).toLocaleString('es-MX')}/mes</strong>
+          <strong id="calc-val-${p.id}">$${Math.round(calcMensualidad(p.precio,0.2,0.11,20)).toLocaleString('es-MX')}/mes</strong>
           <small>* Estimado a tasa bancaria 11% anual / 240 meses</small>
         </div>
       </div>` : '';
