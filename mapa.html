@@ -35,6 +35,29 @@
       height: 100vh;
     }
 
+    /* ─── DESIGN TOKENS ───────────────────────────────────── */
+    :root {
+      --brand:        #16a34a;
+      --brand-dark:   #15803d;
+      --brand-light:  #f0fdf4;
+      --brand-mid:    #dcfce7;
+      --brand-border: #86efac;
+      --dark:         #1a2e2b;
+      --dark-2:       #2a5248;
+      --surface:      #ffffff;
+      --bg:           #f8fafc;
+      --border:       #e5e7eb;
+      --text:         #111827;
+      --text-2:       #4b5563;
+      --text-muted:   #9ca3af;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md:    0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+      --shadow-hover: 0 8px 28px rgba(26,46,43,.14), 0 4px 12px rgba(0,0,0,.06);
+      --r:    12px;
+      --r-sm: 8px;
+      --r-xs: 6px;
+    }
+
     /* ─── HEADER ──────────────────────────────────────────── */
     header {
       position: fixed;
@@ -62,7 +85,7 @@
 
     .logo-text { line-height: 1.1; }
     .logo-name { font-size: 15px; font-weight: 800; letter-spacing: -.4px; color: #1a2e2b; }
-    .logo-tagline { font-size: 10.5px; color: #9ca3af; font-weight: 400; }
+    .logo-tagline { font-size: 11px; color: var(--text-muted); font-weight: 400; }
 
     .header-right { display: flex; align-items: center; gap: 10px; }
 
@@ -119,12 +142,12 @@
       font-size: 13px; font-weight: 800; color: #1a2e2b;
       text-transform: uppercase; letter-spacing: .8px;
     }
-    .sidebar-sub { font-size: 10.5px; color: #9ca3af; margin-top: 3px; line-height: 1.4; }
+    .sidebar-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
 
     /* Stats 2×2 — número grande + label */
     .stats-row {
       display: grid; grid-template-columns: 1fr 1fr;
-      gap: 6px; margin-top: 12px;
+      gap: 8px; margin-top: 12px;
     }
     .stat-chip {
       background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 10px;
@@ -162,7 +185,7 @@
     .tipo-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
     .chip {
-      padding: 9px 6px; border-radius: 9px;
+      padding: 10px 6px; border-radius: 9px;
       border: 2px solid #e5e7eb; background: #fff;
       font-size: 12px; font-weight: 700; color: #374151;
       cursor: pointer; transition: all .15s; font-family: inherit;
@@ -187,7 +210,7 @@
     .action-section {
       padding: 12px 14px 16px;
       border-top: 1px solid #e5e7eb;
-      display: flex; flex-direction: column; gap: 7px;
+      display: flex; flex-direction: column; gap: 8px;
     }
     .action-btn {
       width: 100%; padding: 10px 14px; border-radius: 9px;
@@ -390,10 +413,10 @@
 
     /* Property grid — fluye natural, content-right hace el scroll */
     .prop-list {
-      padding: 10px;
+      padding: 12px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+      gap: 12px;
       align-content: start;
       background: #f3f4f6;
     }
@@ -409,12 +432,17 @@
 
     /* Property card */
     .prop-card {
-      border: 1.5px solid #e5e7eb; border-radius: 12px;
-      overflow: hidden; cursor: pointer; background: #fff;
-      transition: all .18s;
-      flex-shrink: 0; /* evita que el flex container aplaste las tarjetas */
+      border: 1.5px solid #e5e7eb; border-radius: var(--r);
+      overflow: hidden; cursor: pointer; background: var(--surface);
+      transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
     }
-    .prop-card:hover { border-color: #1a2e2b; box-shadow: 0 4px 14px rgba(26,46,43,.1); }
+    .prop-card:hover {
+      border-color: var(--brand-border);
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-3px);
+    }
     .prop-card.active {
       border: 2.5px solid #16a34a;
       box-shadow: 0 0 0 3px rgba(22,163,74,.25), 0 6px 20px rgba(22,163,74,.18);
@@ -429,8 +457,12 @@
       padding: 4px 8px; letter-spacing: .3px;
     }
 
-    .card-img-wrap { position: relative; height: 150px; overflow: hidden; background: #e5e7eb; }
-    .card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-img-wrap { position: relative; height: 155px; overflow: hidden; background: #e5e7eb; }
+    .card-img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform .35s ease;
+    }
+    .prop-card:hover .card-img { transform: scale(1.04); }
 
     /* Property type tag */
     .tipo-tag {
@@ -464,20 +496,21 @@
       font-size: 10.5px; font-weight: 700; color: #1a2e2b;
     }
 
-    .card-body { padding: 11px 13px 12px; }
-    .card-precio { font-size: 16px; font-weight: 700; color: #1a2e2b; }
+    .card-body { padding: 12px 14px 10px; }
+    .card-precio { font-size: 17px; font-weight: 800; color: var(--dark); letter-spacing: -.3px; line-height: 1.2; }
     .card-calle {
-      font-size: 11.5px; color: #6b7280; margin-top: 2px;
+      font-size: 12px; color: var(--text-2); margin-top: 3px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      line-height: 1.4; font-weight: 400;
     }
-    .card-specs { display: flex; gap: 12px; margin-top: 7px; }
-    .spec-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #6b7280; }
+    .card-specs { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+    .spec-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-2); font-weight: 500; }
     .spec-ico { font-size: 13px; }
 
     .card-footer {
-      margin-top: 8px; padding-top: 8px;
-      border-top: 1px solid #f1f3f5;
-      display: flex; flex-direction: column; gap: 6px;
+      margin-top: 0; padding: 10px 14px 12px;
+      border-top: 1px solid #f0f2f4;
+      display: flex; flex-direction: column; gap: 8px;
     }
     .fuente-link {
       font-size: 10px; color: #9ca3af; text-decoration: none;
@@ -502,22 +535,23 @@
     .card-btns { display: flex; gap: 5px; }
 
     .btn-ver {
-      flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
-      font-size: 11px; font-weight: 700; text-decoration: none;
-      padding: 6px 0; border-radius: 8px;
-      background: #1e40af; color: #fff;
-      transition: opacity .15s;
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+      font-size: 12px; font-weight: 700; text-decoration: none;
+      padding: 9px 0; border-radius: var(--r-xs); min-height: 36px;
+      background: var(--brand); color: #fff;
+      transition: background .15s;
     }
-    .btn-ver:hover { opacity: .85; }
+    .btn-ver:hover { background: var(--brand-dark); opacity: 1; }
 
     .btn-wa-sm {
-      display: flex; align-items: center; justify-content: center; gap: 4px;
-      font-size: 11px; font-weight: 700; text-decoration: none;
-      padding: 6px 10px; border-radius: 8px;
-      background: #25D366; color: #fff;
-      transition: opacity .15s; white-space: nowrap;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      font-size: 12px; font-weight: 700; text-decoration: none;
+      padding: 9px 12px; border-radius: var(--r-xs); min-height: 36px;
+      background: var(--brand-light); color: var(--brand);
+      border: 1.5px solid var(--brand-border);
+      transition: background .15s, border-color .15s; white-space: nowrap;
     }
-    .btn-wa-sm:hover { opacity: .85; }
+    .btn-wa-sm:hover { background: var(--brand-mid); border-color: var(--brand); opacity: 1; }
 
     /* No results */
     .no-results {
@@ -694,12 +728,12 @@
       border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;
     }
     .intel-chip {
-      padding: 9px 4px; text-align: center;
+      padding: 10px 4px; text-align: center;
       border-right: 1px solid #e5e7eb;
     }
     .intel-chip:last-child { border-right: none; }
-    .intel-val { font-size: 11.5px; font-weight: 800; color: #1a2e2b; display: block; }
-    .intel-label { font-size: 9px; color: #9ca3af; display: block; margin-top: 1px; text-transform: uppercase; letter-spacing: .3px; }
+    .intel-val { font-size: 14px; font-weight: 800; color: var(--dark); display: block; line-height: 1.2; }
+    .intel-label { font-size: 9px; color: var(--text-muted); display: block; margin-top: 2px; text-transform: uppercase; letter-spacing: .3px; }
 
     /* ─── LEAD MODAL ─────────────────────────────────────── */
     .lead-overlay {
@@ -2494,10 +2528,7 @@ function renderCards() {
               <a href="https://wa.me/?text=${encodeURIComponent('Hola, me interesa esta propiedad en Terralta:\n\n' + (esRenta ? '🏠 EN RENTA\n' : '💰 EN VENTA\n') + '📍 ' + p.calle + '\n💵 ' + (esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)) + (p.rec != null ? '\n🛏 ' + p.rec + ' rec' : '') + (p.ban != null ? ' · 🚿 ' + p.ban + ' baños' : '') + (p.m2c ? ' · 📐 ' + p.m2c + 'm²' : '') + '\n\n¿Pueden darme más información?')}"
                  target="_blank" rel="noopener" class="btn-wa-sm">📱 WA</a>
             </div>
-            <div class="card-btns" style="margin-top:4px;">
-              <button class="btn-copy-wa" style="flex:1;" onclick="copyMsgWAById(this,${p.id})" title="Copiar mensaje de venta">📋 Copiar msg</button>
-              <button class="btn-flyer" style="flex:1;" onclick="generarFlyer(${p.id}, event)" title="Generar flyer PNG">🖼 Flyer PNG</button>
-            </div>
+
           </div>
         </div>
       </div>
