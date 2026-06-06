@@ -1006,6 +1006,140 @@
       .tools-panel { width: 100vw; }
       .mkt-row { grid-template-columns: 1fr; }
     }
+
+    /* ─── FEATURE 1: BOTÓN COPIAR MENSAJE WA ─────────────── */
+    .btn-copy-wa {
+      background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0;
+      border-radius: 7px; padding: 5px 10px; font-size: 11px; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: all .15s;
+      white-space: nowrap;
+    }
+    .btn-copy-wa:hover { background: #dcfce7; }
+    .btn-copy-wa.copied { background: #16a34a; color: #fff; border-color: #16a34a; }
+
+    /* ─── FEATURE 2: CALCULADORA MENSUALIDAD EN TARJETA ──── */
+    .card-calc-panel {
+      background: #f8fafc; padding: 8px; border-radius: 8px;
+      border: 1px solid #e5e7eb; margin-top: 6px; display: none;
+    }
+    .card-calc-panel.open { display: block; }
+    .card-calc-slider-wrap { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .card-calc-slider-wrap label { font-size: 10.5px; color: #6b7280; white-space: nowrap; }
+    .card-calc-result {
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px;
+      padding: 6px 8px; text-align: center;
+    }
+    .card-calc-result strong { font-size: 13px; color: #15803d; display: block; }
+    .card-calc-result small { font-size: 9.5px; color: #9ca3af; }
+    .btn-calc-toggle {
+      background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0;
+      border-radius: 7px; padding: 5px 8px; font-size: 10.5px; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: all .15s; width: 100%;
+      text-align: left; margin-top: 6px;
+    }
+    .btn-calc-toggle:hover { background: #dcfce7; }
+    .btn-calc-toggle.open { background: #dcfce7; }
+
+    /* ─── FEATURE 3: COMPARADOR ──────────────────────────── */
+    .compare-btn {
+      position: absolute; top: 8px; right: 8px; z-index: 10;
+      background: rgba(255,255,255,.9); border: 2px solid #e5e7eb;
+      border-radius: 6px; padding: 3px 7px; font-size: 10px; font-weight: 700;
+      cursor: pointer; transition: all .15s; font-family: inherit;
+    }
+    .compare-btn.active { background: #1a2e2b; color: #fff; border-color: #1a2e2b; }
+    .compare-fab {
+      display: none; position: sticky; bottom: 18px;
+      margin: 0 18px 12px auto; width: fit-content;
+      background: #1a2e2b; color: #fff; border: none; border-radius: 100px;
+      padding: 10px 20px; font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: inherit; z-index: 500;
+      box-shadow: 0 4px 16px rgba(26,46,43,.35);
+      transition: all .15s;
+    }
+    .compare-fab.visible { display: block; }
+    .compare-fab:hover { opacity: .88; }
+
+    /* Modal comparador */
+    .comparador-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(3px);
+      align-items: flex-start; justify-content: center;
+      padding: 40px 20px; overflow-y: auto;
+    }
+    .comparador-overlay.open { display: flex; }
+    .comparador-modal {
+      background: #fff; border-radius: 16px; width: 100%; max-width: 900px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35); flex-shrink: 0;
+    }
+    .comparador-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px 12px; border-bottom: 1px solid #e5e7eb;
+    }
+    .comparador-header h3 { font-size: 15px; font-weight: 800; color: #1a2e2b; }
+    .comparador-close {
+      background: #f3f4f6; border: none; width: 28px; height: 28px;
+      border-radius: 50%; cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center; color: #6b7280;
+    }
+    .comparador-table-wrap { overflow-x: auto; padding: 16px 20px 20px; }
+    .comparador-table {
+      border-collapse: collapse; width: 100%; min-width: 480px;
+    }
+    .comparador-table th {
+      width: 200px; padding: 10px 12px; text-align: left;
+      background: #f8fafc; font-size: 12px; font-weight: 700;
+      color: #1a2e2b; border: 1px solid #e5e7eb; vertical-align: top;
+    }
+    .comparador-table td {
+      padding: 10px 12px; border: 1px solid #e5e7eb;
+      font-size: 12px; color: #374151; vertical-align: top; width: 200px;
+    }
+    .comparador-table tr:nth-child(even) td { background: #f9fafb; }
+    .comparador-table .row-label {
+      font-weight: 600; color: #6b7280; font-size: 11px;
+      background: #f3f4f6 !important; text-transform: uppercase; letter-spacing: .3px;
+    }
+
+    /* ─── FEATURE 4: FLYER PNG ───────────────────────────── */
+    .btn-flyer {
+      background: #7c3aed20; color: #7c3aed; border: 1.5px solid #7c3aed40;
+      border-radius: 7px; padding: 5px 10px; font-size: 11px; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: all .15s; white-space: nowrap;
+    }
+    .btn-flyer:hover { background: #7c3aed30; }
+
+    /* ─── FEATURE 5: MODO PRESENTACIÓN ──────────────────── */
+    .btn-presentar {
+      display: flex; align-items: center; gap: 5px;
+      background: #1a2e2b; color: #fff; border: none;
+      padding: 7px 14px; border-radius: 100px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      font-family: inherit; transition: all .15s;
+    }
+    .btn-presentar:hover { opacity: .85; }
+    .btn-presentar.active { background: #dc2626; }
+
+    body.modo-presentacion .sidebar { display: none !important; }
+    body.modo-presentacion .prop-list { grid-template-columns: repeat(4, 1fr) !important; }
+    body.modo-presentacion .header-tools { display: none !important; }
+    body.modo-presentacion header { padding: 0 18px; }
+
+    .presentacion-banner {
+      display: none; background: linear-gradient(135deg, #1a2e2b 0%, #2a5248 100%);
+      color: #fff; padding: 10px 20px; text-align: center;
+      font-size: 14px; font-weight: 600; letter-spacing: .3px;
+      flex-shrink: 0;
+    }
+    body.modo-presentacion .presentacion-banner { display: block; }
+
+    .presentacion-exit {
+      display: none; position: fixed; top: 14px; right: 18px; z-index: 1100;
+      background: #dc2626; color: #fff; border: none;
+      border-radius: 100px; padding: 7px 16px;
+      font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
+    }
+    body.modo-presentacion .presentacion-exit { display: flex; align-items: center; gap: 5px; }
   </style>
 </head>
 <body>
@@ -1019,12 +1153,16 @@
       <div class="logo-tagline">Portal Exclusivo · Terralta, San Pedro Tlaquepaque</div>
     </div>
   </div>
-  <div class="header-right">
+  <div class="header-right header-tools">
     <div class="data-badge" id="update-badge">🔄 Cargando...</div>
     <div class="zona-pill">📍 Fracc. Terralta · CP 45594</div>
     <button class="zona-btn active" id="btn-zona-terralta" onclick="toggleZona('terralta')">🗺 Ver zona</button>
   </div>
+  <button class="btn-presentar" id="btn-presentar" onclick="togglePresentacion()">🖥 Presentar</button>
 </header>
+
+<!-- Botón salir modo presentación (flotante) -->
+<button class="presentacion-exit" onclick="togglePresentacion()">✕ Salir presentación</button>
 
 <!-- Selector de zonas macro (expandible) -->
 <div class="zona-selector" id="zona-selector" style="display:none;">
@@ -1154,6 +1292,9 @@
   <!-- ─── CONTENT RIGHT ───────────────────────────────────── -->
   <div class="content-right">
 
+    <!-- Banner modo presentación -->
+    <div class="presentacion-banner">🏡 Terralta · Casas y Departamentos disponibles · Cloud Inmobiliaria</div>
+
     <!-- Mapa arriba -->
     <div class="map-wrap">
       <div id="map"></div>
@@ -1175,6 +1316,9 @@
 
     <!-- Property grid abajo -->
     <div class="prop-list" id="prop-list"></div>
+
+    <!-- FAB comparador (sticky dentro del scroll) -->
+    <button class="compare-fab" id="compare-fab" onclick="openComparador()">⚖️ Comparar (<span id="compare-count">0</span>)</button>
 
   </div><!-- /content-right -->
 
@@ -1330,6 +1474,19 @@
             📱 Quiero que me contacten
           </button>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── COMPARADOR MODAL ────────────────────────────────── -->
+  <div class="comparador-overlay" id="comparadorOverlay" onclick="closeComparador()">
+    <div class="comparador-modal" onclick="event.stopPropagation()">
+      <div class="comparador-header">
+        <h3>⚖️ Comparar propiedades</h3>
+        <button class="comparador-close" onclick="closeComparador()">✕</button>
+      </div>
+      <div class="comparador-table-wrap">
+        <table class="comparador-table" id="comparador-table"></table>
       </div>
     </div>
   </div>
@@ -1913,6 +2070,8 @@ let maxPrecio = 3000000;
 let markers = {};
 let devMarkers = {};
 let activePopup = null;
+let comparadorList = []; // Feature 3: comparador de propiedades
+let modoPresentacion = false; // Feature 5: modo presentación
 
 // ================================================================
 // MAP — centrado en Av. Terralta (coords Nominatim verificadas)
@@ -2270,6 +2429,28 @@ function renderCards() {
     const placeholderIcon = tipoProp === "Depto" ? "🏢" : "🏠";
     const listingUrl = getListingUrl(p);
 
+    // Calculadora mensualidades (solo venta)
+    const calcId = `calc-${p.id}`;
+    const calcHtml = (!esRenta && !p.remate) ? `
+      <button class="btn-calc-toggle" id="btn-calc-toggle-${p.id}" onclick="toggleCardCalc(${p.id}, event)">🧮 Calcular mensualidad</button>
+      <div class="card-calc-panel" id="${calcId}">
+        <div class="card-calc-slider-wrap">
+          <label>Enganche:</label>
+          <select onchange="updateCardCalc(${p.id},this.value)" style="border:1px solid #e5e7eb;border-radius:6px;padding:2px 6px;font-size:11px;font-family:inherit;">
+            <option value="10">10%</option>
+            <option value="20" selected>20%</option>
+            <option value="30">30%</option>
+          </select>
+        </div>
+        <div class="card-calc-result" id="calc-result-${p.id}">
+          <strong id="calc-val-${p.id}">$${Math.round(calcMensualidad(${p.precio},0.2,0.11,20)).toLocaleString('es-MX')}/mes</strong>
+          <small>* Estimado a tasa bancaria 11% anual / 240 meses</small>
+        </div>
+      </div>` : '';
+
+    // Checkbox comparar
+    const inComparador = comparadorList.includes(p.id);
+
     return `
       <div class="prop-card${selectedId === p.id ? ' active' : ''}" data-id="${p.id}">
         <div class="card-img-wrap" data-icon="${placeholderIcon}">
@@ -2285,8 +2466,9 @@ function renderCards() {
               ? '<div class="renta-badge">EN RENTA</div>'
               : '<div class="mercado-badge">💰 Venta</div>'
           }
-          <div class="tipo-tag">${tipoProp.toUpperCase()}</div>
+          <div class="tipo-tag" style="top:auto;bottom:8px;right:8px;">${tipoProp.toUpperCase()}</div>
           ${esRenta ? '' : `<div class="rend-badge">↑ ${p.remate ? '15–25' : '8–10'}% rend. anual</div>`}
+          <button class="compare-btn${inComparador ? ' active' : ''}" onclick="toggleComparar(${p.id}, event)">${inComparador ? '⚖️✓' : '⚖️'}</button>
         </div>
         <div class="card-body">
           <div class="card-precio">${precioStr}</div>
@@ -2296,6 +2478,7 @@ function renderCards() {
             ${p.ban != null ? `<div class="spec-item"><span class="spec-ico">🚿</span>${p.ban} baños</div>` : ''}
             ${p.m2c ? `<div class="spec-item"><span class="spec-ico">📐</span>${p.m2c}m²</div>` : ''}
           </div>
+          ${calcHtml}
           <div class="card-footer" onclick="event.stopPropagation()">
             <div style="display:flex;align-items:center;justify-content:space-between;">
               <span class="fuente-badge ${p.fuente==='Inmuebles24'?'i24':p.fuente==='MercadoLibre'?'ml':p.fuente==='Lamudi'?'lam':p.fuente&&p.fuente.includes('propiedades')?'prop':p.fuente==='Facebook'?'fb':'etc'}">${p.fuente||'Portal'}</span>
@@ -2310,6 +2493,10 @@ function renderCards() {
               })()}
               <a href="https://wa.me/?text=${encodeURIComponent('Hola, me interesa esta propiedad en Terralta:\n\n' + (esRenta ? '🏠 EN RENTA\n' : '💰 EN VENTA\n') + '📍 ' + p.calle + '\n💵 ' + (esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)) + (p.rec != null ? '\n🛏 ' + p.rec + ' rec' : '') + (p.ban != null ? ' · 🚿 ' + p.ban + ' baños' : '') + (p.m2c ? ' · 📐 ' + p.m2c + 'm²' : '') + '\n\n¿Pueden darme más información?')}"
                  target="_blank" rel="noopener" class="btn-wa-sm">📱 WA</a>
+            </div>
+            <div class="card-btns" style="margin-top:4px;">
+              <button class="btn-copy-wa" style="flex:1;" onclick="copyMsgWAById(this,${p.id})" title="Copiar mensaje de venta">📋 Copiar msg</button>
+              <button class="btn-flyer" style="flex:1;" onclick="generarFlyer(${p.id}, event)" title="Generar flyer PNG">🖼 Flyer PNG</button>
             </div>
           </div>
         </div>
@@ -2890,6 +3077,342 @@ function submitMarketplace(e) {
   window.open(waUrl, '_blank');
   closeMarketplace();
   document.getElementById('mktForm').reset();
+}
+
+// ================================================================
+// FEATURE 1 — COPIAR MENSAJE WA
+// ================================================================
+function copyMsgWAById(btn, propId) {
+  const prop = PROPS.find(p => p.id === propId);
+  if (!prop) return;
+  const mod = prop.modalidad || 'Venta';
+  const esRenta = mod === 'Renta';
+  const tipoProp = prop.tipoProp || 'Casa';
+  const msg = [
+    '🏡 *' + tipoProp + ' en ' + mod + ' — Terralta*',
+    '📍 ' + prop.calle,
+    '💵 ' + (esRenta ? '$' + prop.precio.toLocaleString('es-MX') + '/mes' : fmtPrecioFull(prop.precio)),
+    [prop.rec != null ? '🛏 ' + prop.rec + ' rec' : null,
+     prop.ban != null ? '🚿 ' + prop.ban + ' baños' : null,
+     prop.m2c ? '📐 ' + prop.m2c + 'm²' : null].filter(Boolean).join(' · '),
+    prop.extras ? '✨ ' + prop.extras : null,
+    '',
+    '¿Te interesa? Soy asesora de Cloud Inmobiliaria, con gusto te agendo visita 🤝'
+  ].filter(l => l !== null).join('\n');
+
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = msg; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  };
+  const orig = btn.textContent;
+  const done = () => {
+    btn.textContent = '✓ Copiado'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(msg).then(done).catch(() => { fallback(); done(); });
+  } else {
+    fallback(); done();
+  }
+}
+
+// ================================================================
+// FEATURE 2 — CALCULADORA MENSUALIDAD EN TARJETA
+// ================================================================
+function calcMensualidad(precio, enganchePct, tasaAnual, anos) {
+  const capital = precio * (1 - enganchePct);
+  const r = tasaAnual / 12;
+  const n = anos * 12;
+  if (r === 0) return capital / n;
+  return capital * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+}
+
+function toggleCardCalc(propId, e) {
+  e.stopPropagation();
+  const panel = document.getElementById('calc-' + propId);
+  const btn   = document.getElementById('btn-calc-toggle-' + propId);
+  if (!panel) return;
+  panel.classList.toggle('open');
+  btn.classList.toggle('open');
+  btn.textContent = panel.classList.contains('open') ? '▲ Ocultar calculadora' : '🧮 Calcular mensualidad';
+}
+
+function updateCardCalc(propId, enganchePctStr) {
+  const prop = PROPS.find(p => p.id === propId);
+  if (!prop) return;
+  const enganchePct = parseFloat(enganchePctStr) / 100;
+  const mensual = calcMensualidad(prop.precio, enganchePct, 0.11, 20);
+  const el = document.getElementById('calc-val-' + propId);
+  if (el) el.textContent = '$' + Math.round(mensual).toLocaleString('es-MX') + '/mes';
+}
+
+// ================================================================
+// FEATURE 3 — COMPARADOR DE PROPIEDADES
+// ================================================================
+
+function toggleComparar(propId, e) {
+  e.stopPropagation();
+  const idx = comparadorList.indexOf(propId);
+  if (idx === -1) {
+    if (comparadorList.length >= 3) {
+      alert('Máximo 3 propiedades para comparar. Quita una antes de agregar otra.');
+      return;
+    }
+    comparadorList.push(propId);
+  } else {
+    comparadorList.splice(idx, 1);
+  }
+  // Actualizar botón de esta tarjeta
+  const card = document.querySelector(`.prop-card[data-id="${propId}"]`);
+  if (card) {
+    const btn = card.querySelector('.compare-btn');
+    if (btn) {
+      btn.classList.toggle('active', comparadorList.includes(propId));
+      btn.textContent = comparadorList.includes(propId) ? '⚖️ Comparando' : '⚖️ Comparar';
+    }
+  }
+  // Actualizar FAB
+  const fab = document.getElementById('compare-fab');
+  const cnt = document.getElementById('compare-count');
+  if (fab && cnt) {
+    cnt.textContent = comparadorList.length;
+    fab.classList.toggle('visible', comparadorList.length >= 2);
+  }
+}
+
+function openComparador() {
+  const props = comparadorList.map(id => PROPS.find(p => p.id === id)).filter(Boolean);
+  if (props.length < 2) return;
+
+  const filas = [
+    { label: 'Foto', key: '_foto' },
+    { label: 'Precio', key: '_precio' },
+    { label: 'Tipo', key: '_tipo' },
+    { label: 'Calle', key: 'calle' },
+    { label: 'Recámaras', key: 'rec' },
+    { label: 'Baños', key: 'ban' },
+    { label: 'M² construidos', key: 'm2c' },
+    { label: 'Precio / m²', key: '_pm2' },
+    { label: 'Modalidad', key: '_modalidad' },
+    { label: 'Fuente', key: 'fuente' },
+    { label: 'Ver anuncio', key: '_link' },
+  ];
+
+  let html = '<thead><tr><th class="row-label">—</th>';
+  props.forEach(p => {
+    html += `<th>${p.titulo}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  filas.forEach(fila => {
+    html += `<tr><td class="row-label">${fila.label}</td>`;
+    props.forEach(p => {
+      const mod = p.modalidad || 'Venta';
+      const esRenta = mod === 'Renta';
+      let val = '';
+      switch(fila.key) {
+        case '_foto':
+          val = p.img
+            ? `<img src="${p.img}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;" onerror="this.replaceWith(document.createTextNode('Sin foto'))">`
+            : (p.tipoProp === 'Depto' ? '🏢' : '🏠');
+          break;
+        case '_precio':
+          val = `<strong style="color:#1a2e2b;">${esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)}</strong>`;
+          break;
+        case '_tipo':
+          val = (p.tipoProp || 'Casa') + (p.remate ? ' · <span style="color:#dc2626;font-weight:700">REMATE</span>' : '');
+          break;
+        case '_pm2':
+          val = p.m2c && !esRenta ? '$' + Math.round(p.precio / p.m2c).toLocaleString('es-MX') + '/m²' : '—';
+          break;
+        case '_modalidad':
+          val = mod;
+          break;
+        case '_link':
+          val = `<a href="${getListingUrl(p)}" target="_blank" style="color:#1e40af;font-weight:600;font-size:11px;">Ver anuncio →</a>`;
+          break;
+        default:
+          val = p[fila.key] != null ? p[fila.key] : '—';
+      }
+      html += `<td>${val}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+
+  document.getElementById('comparador-table').innerHTML = html;
+  document.getElementById('comparadorOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeComparador() {
+  document.getElementById('comparadorOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ================================================================
+// FEATURE 4 — GENERADOR DE FLYER PNG
+// ================================================================
+function generarFlyer(propId, e) {
+  e.stopPropagation();
+  const prop = PROPS.find(p => p.id === propId);
+  if (!prop) return;
+
+  const W = 800, H = 500;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  function drawFlyer() {
+    // Fondo blanco
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+
+    // Franja verde izquierda
+    ctx.fillStyle = '#1a2e2b';
+    ctx.fillRect(0, 0, 30, H);
+
+    // Franja verde superior
+    ctx.fillStyle = '#1a2e2b';
+    ctx.fillRect(30, 0, W - 30, 80);
+
+    // Franja verde inferior
+    ctx.fillStyle = '#1a2e2b';
+    ctx.fillRect(30, H - 60, W - 30, 60);
+
+    // Título en franja superior
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 22px Inter, Arial, sans-serif';
+    ctx.fillText('CLOUD INMOBILIARIA', 50, 32);
+    ctx.font = '500 13px Inter, Arial, sans-serif';
+    ctx.fillStyle = '#6ee7b7';
+    ctx.fillText('Portal Exclusivo · Terralta, San Pedro Tlaquepaque', 50, 55);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 12px Inter, Arial, sans-serif';
+    ctx.fillText('terralta.cloudInmobiliaria.mx', 50, 72);
+
+    // Área de contenido
+    const contentX = 50, contentY = 100;
+    const mod = prop.modalidad || 'Venta';
+    const tipoProp = prop.tipoProp || 'Casa';
+    const esRenta = mod === 'Renta';
+
+    // Precio grande
+    ctx.fillStyle = '#16a34a';
+    ctx.font = 'bold 32px Inter, Arial, sans-serif';
+    const precioTxt = esRenta
+      ? '$' + prop.precio.toLocaleString('es-MX') + '/mes'
+      : fmtPrecioFull(prop.precio);
+    ctx.fillText(precioTxt, contentX, contentY + 30);
+
+    // Tipo badge
+    ctx.fillStyle = '#1a2e2b';
+    ctx.fillRect(contentX, contentY + 44, 120, 22);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 11px Inter, Arial, sans-serif';
+    ctx.fillText((tipoProp + ' · ' + mod).toUpperCase(), contentX + 8, contentY + 59);
+
+    // Calle
+    ctx.fillStyle = '#374151';
+    ctx.font = '500 14px Inter, Arial, sans-serif';
+    ctx.fillText(prop.calle, contentX, contentY + 88);
+
+    // Specs
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '500 13px Inter, Arial, sans-serif';
+    const specs = [];
+    if (prop.rec != null) specs.push(prop.rec + ' rec.');
+    if (prop.ban != null) specs.push(prop.ban + ' banos');
+    if (prop.m2c) specs.push(prop.m2c + ' m2');
+    ctx.fillText(specs.join('  |  '), contentX, contentY + 115);
+
+    // Extras
+    if (prop.extras) {
+      ctx.fillStyle = '#374151';
+      ctx.font = '400 12px Inter, Arial, sans-serif';
+      const extrasClean = prop.extras.replace(/[^\x00-\x7F]/g, '').trim() || prop.extras;
+      ctx.fillText(extrasClean, contentX, contentY + 140);
+    }
+
+    // Línea divisoria
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(contentX, contentY + 160);
+    ctx.lineTo(500, contentY + 160);
+    ctx.stroke();
+
+    // Pie de página en franja verde
+    ctx.fillStyle = '#6ee7b7';
+    ctx.font = '500 12px Inter, Arial, sans-serif';
+    ctx.fillText('Terralta, San Pedro Tlaquepaque, Jalisco', 50, H - 38);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 12px Inter, Arial, sans-serif';
+    ctx.fillText('Contacto: +52 33 1234 5678', 50, H - 20);
+
+    // Descargar
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'flyer-terralta-' + prop.id + '.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }, 'image/png');
+  }
+
+  // Si tiene imagen, intentar cargarla primero
+  if (prop.img) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      drawFlyer();
+      // Dibujar imagen encima en zona derecha (después del drawFlyer base)
+      const ctx2 = canvas.getContext('2d');
+      const imgX = W - 280, imgY = 100, imgW = 260, imgH = 200;
+      ctx2.save();
+      ctx2.beginPath();
+      ctx2.roundRect(imgX, imgY, imgW, imgH, 8);
+      ctx2.clip();
+      ctx2.drawImage(img, imgX, imgY, imgW, imgH);
+      ctx2.restore();
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'flyer-terralta-' + prop.id + '.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      }, 'image/png');
+    };
+    img.onerror = () => drawFlyer(); // sin imagen si falla CORS
+    img.src = prop.img;
+  } else {
+    drawFlyer();
+  }
+}
+
+// ================================================================
+// FEATURE 5 — MODO PRESENTACIÓN
+// ================================================================
+
+function togglePresentacion() {
+  modoPresentacion = !modoPresentacion;
+  document.body.classList.toggle('modo-presentacion', modoPresentacion);
+  const btn = document.getElementById('btn-presentar');
+  if (btn) {
+    btn.textContent = modoPresentacion ? '✕ Salir' : '🖥 Presentar';
+    btn.classList.toggle('active', modoPresentacion);
+  }
+  // En modo presentación, el sidebar queda oculto por CSS
+  // Trigger re-layout del mapa
+  setTimeout(() => { if (window.map) window.map.invalidateSize(); }, 300);
 }
 </script>
 </body>
