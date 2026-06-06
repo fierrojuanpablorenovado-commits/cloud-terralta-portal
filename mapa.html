@@ -5,7 +5,7 @@
   <script>
     /* Auto cache-buster — incrementar V en cada deploy para forzar recarga instantánea */
     (function(){
-      var V='12';
+      var V='13';
       var p=new URLSearchParams(location.search);
       if(p.get('v')!==V){p.set('v',V);location.replace(location.pathname+'?'+p.toString());}
     })();
@@ -1310,6 +1310,88 @@
     }
     .btn-wa-sm:hover { background: #1aad54 !important; opacity: 1 !important; }
 
+    /* ── OPP BADGE — precio bajo mercado ────────────────── */
+    .opp-badge {
+      position: absolute; bottom: 32px; left: 8px;
+      background: linear-gradient(135deg,#059669,#047857);
+      color: #fff; border-radius: 5px; padding: 2px 7px;
+      font-size: 9px; font-weight: 800; letter-spacing: .3px;
+      pointer-events: none; z-index: 3;
+    }
+    /* ── ROI ESTIMADO ────────────────────────────────────── */
+    .card-roi {
+      font-size: 10.5px; color: #059669; font-weight: 600;
+      padding: 4px 0 2px; letter-spacing: .1px; border-top: 1px solid #f0fdf4;
+    }
+    /* ── BTN CLIENTE ─────────────────────────────────────── */
+    .btn-cliente {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      font-size: 12px !important; font-weight: 700; text-decoration: none;
+      padding: 9px 8px; border-radius: 6px; min-height: 36px;
+      background: #2563eb; color: #fff !important; border: none;
+      transition: background .15s; white-space: nowrap;
+    }
+    .btn-cliente:hover { background: #1d4ed8; opacity: 1; }
+    /* btn-ver y btn-wa-sm ocupan fila completa + fila 2x en 2da row */
+    .btn-ver   { flex: 1 1 100%; }
+    .btn-wa-sm { flex: 1; }
+    /* ── EXPORTAR OVERLAY ────────────────────────────────── */
+    #exportOverlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.55);
+      z-index: 2200; display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    #exportOverlay.open { opacity: 1; pointer-events: all; }
+    #exportPanel {
+      background: #fff; border-radius: 16px 16px 0 0;
+      width: 100%; max-width: 480px; max-height: 82vh;
+      display: flex; flex-direction: column; padding: 0;
+      box-shadow: 0 -8px 32px rgba(0,0,0,.18);
+      transform: translateY(20px); transition: transform .25s;
+    }
+    #exportOverlay.open #exportPanel { transform: translateY(0); }
+    .export-header {
+      padding: 18px 20px 12px; border-bottom: 1px solid #e5e7eb;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .export-header h3 { font-size: 15px; font-weight: 700; color: #111; margin: 0; }
+    .export-header-sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+    .export-copy-all {
+      background: #25D366; color: #fff; border: none; border-radius: 8px;
+      padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .export-copy-all:hover { background: #1aad54; }
+    .export-copy-all.copied { background: #16a34a; }
+    #exportBody { overflow-y: auto; flex: 1; padding: 8px 0; }
+    .export-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 20px; gap: 10px; border-bottom: 1px solid #f3f4f6;
+    }
+    .export-item:last-child { border-bottom: none; }
+    .export-info { flex: 1; min-width: 0; }
+    .export-info strong { display: block; font-size: 13px; font-weight: 700; color: #111; }
+    .export-info span { font-size: 11px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+    .export-info small { font-size: 10px; color: #9ca3af; }
+    .export-wa-btn {
+      display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+      background: #25D366; color: #fff; border-radius: 8px;
+      padding: 7px 12px; font-size: 11px; font-weight: 700;
+      text-decoration: none; transition: background .15s;
+    }
+    .export-wa-btn:hover { background: #1aad54; }
+    .export-close {
+      padding: 14px 20px; border-top: 1px solid #e5e7eb;
+      text-align: center; cursor: pointer; font-size: 13px;
+      color: #6b7280; font-weight: 600;
+    }
+    .export-close:hover { color: #111; }
+    .export-no-tel {
+      padding: 16px 20px; text-align: center;
+      font-size: 12px; color: #9ca3af;
+    }
+
     /* ─── MOTIV CARD dentro del scroll ─────────────────────────── */
     .sidebar-scroll .motiv-card { margin: 12px 12px 0 !important; }
   </style>
@@ -1414,6 +1496,12 @@
       </div>
     </div>
 
+    <!-- Herramientas de prospección para agente -->
+    <div class="fb-section">
+      <div class="fb-section-title">Herramientas agente</div>
+      <button class="fb-btn" onclick="exportarContactos()" style="text-align:left;cursor:pointer;background:none;border:none;width:100%;font-family:inherit;">Exportar vendedores + WA ↗</button>
+    </div>
+
     <!-- Portales externos — buscar más propiedades -->
     <div class="fb-section">
       <div class="fb-section-title">Buscar en portales</div>
@@ -1486,6 +1574,21 @@
   </div><!-- /content-right -->
 
   <!-- ─── LEAD CAPTURE MODAL ──────────────────────────────── -->
+  <!-- ── EXPORTAR CONTACTOS VENDEDORES ─────────────────────── -->
+  <div id="exportOverlay" onclick="if(event.target===this)cerrarExport()">
+    <div id="exportPanel">
+      <div class="export-header">
+        <div>
+          <h3>Contactos vendedores</h3>
+          <div class="export-header-sub" id="exportCount">cargando...</div>
+        </div>
+        <button class="export-copy-all" onclick="copiarTodosContactos(this)">Copiar todo</button>
+      </div>
+      <div id="exportBody"></div>
+      <div class="export-close" onclick="cerrarExport()">Cerrar</div>
+    </div>
+  </div>
+
   <div class="lead-overlay" id="leadOverlay" onclick="closeLead()">
     <div class="lead-modal" onclick="event.stopPropagation()">
       <div class="lead-header">
@@ -1864,6 +1967,19 @@ El propietario aceptó bajar el precio a ${{precio_final}} si cerramos esta sema
 // CONFIG — actualizar según asesor
 // ================================================================
 const ASESORA_WA = ''; // No se usa número fijo — mensaje de co-brokerage va al vendedor
+// ── Stats de mercado — se calculan al cargar datos ────────────
+let MARKET_STATS = { avgPrecioM2: 28941, avgRentPerM2: 148 };
+
+function calcMarketStats() {
+  const ventas = PROPS.filter(p => p.modalidad !== 'Renta' && !p.remate && p.m2c > 0 && p.precio > 0);
+  const rentas = PROPS.filter(p => p.modalidad === 'Renta' && p.precio > 0 && p.m2c > 0);
+  if (ventas.length > 0) {
+    MARKET_STATS.avgPrecioM2 = ventas.reduce((s,p) => s + p.precio / p.m2c, 0) / ventas.length;
+  }
+  if (rentas.length > 0) {
+    MARKET_STATS.avgRentPerM2 = rentas.reduce((s,p) => s + p.precio / p.m2c, 0) / rentas.length;
+  }
+}
 // ================================================================
 // DATOS REALES — Fraccionamiento Terralta, Tlaquepaque, Jal.
 // CP 45594 · Fuente: MercadoLibre, propiedades.com, nestoria.mx
@@ -2635,6 +2751,7 @@ function renderCards() {
           }
           <div class="tipo-tag" style="top:auto;bottom:8px;right:8px;">${tipoProp.toUpperCase()}</div>
           ${esRenta ? '' : `<div class="rend-badge">↑ ${p.remate ? '15–25' : '8–10'}% rend. anual</div>`}
+          ${(!esRenta && !p.remate && p.m2c > 0 && MARKET_STATS.avgPrecioM2 > 0 && (p.precio/p.m2c) < MARKET_STATS.avgPrecioM2 * 0.85) ? `<div class="opp-badge">↓${Math.round((1 - (p.precio/p.m2c)/MARKET_STATS.avgPrecioM2)*100)}% precio zona</div>` : ''}
           <button class="compare-btn${inComparador ? ' active' : ''}" onclick="toggleComparar(${p.id}, event)">${inComparador ? '⚖️✓' : '⚖️'}</button>
         </div>
         <div class="card-body">
@@ -2645,6 +2762,7 @@ function renderCards() {
             ${p.ban != null ? `<div class="spec-item"><span class="spec-ico">🚿</span>${p.ban} baños</div>` : ''}
             ${p.m2c ? `<div class="spec-item"><span class="spec-ico">📐</span>${p.m2c}m²</div>` : ''}
           </div>
+          ${(!esRenta && !p.remate && p.m2c > 0 && MARKET_STATS.avgRentPerM2 > 0) ? `<div class="card-roi">Est. renta ~$${Math.round(MARKET_STATS.avgRentPerM2 * p.m2c).toLocaleString('es-MX')}/mes · ${((MARKET_STATS.avgRentPerM2 * p.m2c * 12) / p.precio * 100).toFixed(1)}% anual</div>` : ''}
           ${calcHtml}
           <div class="card-footer" onclick="event.stopPropagation()">
             <div style="display:flex;align-items:center;">
@@ -2661,10 +2779,14 @@ function renderCards() {
                 const precioTxt = esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio);
                 const specsTxt = [p.rec != null ? p.rec+' rec' : '', p.ban != null ? p.ban+' baños' : '', p.m2c ? p.m2c+'m²' : ''].filter(Boolean).join(' · ');
                 const waMsg = encodeURIComponent('Hola, buen día 👋\n\nSoy agente inmobiliaria de Cloud Inmobiliaria. Vi tu propiedad en ' + fuente + ':\n\n📍 ' + p.calle + '\n💰 ' + precioTxt + (specsTxt ? '\n' + specsTxt : '') + '\n\n¿Manejas esquema de comisión compartida? Tengo clientes activos buscando en Terralta y con gusto la trabajamos juntos.\n\nQuedo al pendiente.');
-                const waHref = p.telefono
-                  ? 'https://wa.me/52' + p.telefono + '?text=' + waMsg
-                  : 'https://wa.me/?text=' + waMsg;
+                const waHref = p.telefono ? 'https://wa.me/52' + p.telefono + '?text=' + waMsg : 'https://wa.me/?text=' + waMsg;
                 return '<a href="' + waHref + '" target="_blank" rel="noopener" class="btn-wa-sm"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Comisión</a>';
+              })()}
+              ${(()=>{
+                const precioTxt2 = esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio);
+                const specsTxt2 = [p.rec != null ? p.rec+' rec' : '', p.ban != null ? p.ban+' baños' : '', p.m2c ? p.m2c+'m²' : ''].filter(Boolean).join(' · ');
+                const clienteMsg = encodeURIComponent('Vi una propiedad en Terralta que puede interesarte:\n\n📍 ' + p.calle + '\n💰 ' + precioTxt2 + (specsTxt2 ? '\n' + specsTxt2 : '') + '\n\n¿La agendamos para verla?');
+                return '<a href="https://wa.me/?text=' + clienteMsg + '" target="_blank" rel="noopener" class="btn-cliente"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg> Cliente</a>';
               })()}
             </div>
 
@@ -2861,6 +2983,56 @@ setTimeout(() => {
 // ================================================================
 // INIT — carga datos dinámicos del JSON y arranca el mapa
 // ================================================================
+// EXPORTAR CONTACTOS VENDEDORES
+// ================================================================
+function exportarContactos() {
+  const vendedores = PROPS
+    .filter(p => p.telefono && !p.remate)
+    .sort((a, b) => (a.modalidad === 'Renta' ? 1 : 0) - (b.modalidad === 'Renta' ? 1 : 0) || a.precio - b.precio);
+
+  const body = document.getElementById('exportBody');
+  if (!vendedores.length) {
+    body.innerHTML = '<div class="export-no-tel">No hay teléfonos disponibles aún. Espera el próximo scrape.</div>';
+  } else {
+    const WA_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+    body.innerHTML = vendedores.map(p => {
+      const specs = [p.rec != null ? p.rec+' rec' : '', p.ban != null ? p.ban+' ban' : '', p.m2c ? p.m2c+'m²' : ''].filter(Boolean).join(' · ');
+      const precioTxt = p.modalidad === 'Renta' ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio);
+      const msg = encodeURIComponent('Hola, buen día 👋\n\nSoy agente inmobiliaria de Cloud Inmobiliaria. Vi tu propiedad en ' + (p.fuente||'portal') + ':\n\n📍 ' + p.calle + '\n💰 ' + precioTxt + (specs ? '\n' + specs : '') + '\n\n¿Manejas esquema de comisión compartida? Tengo clientes activos buscando en Terralta.\n\nQuedo al pendiente.');
+      return `<div class="export-item">
+        <div class="export-info">
+          <strong>${precioTxt}</strong>
+          <span>${p.calle.substring(0,38)}</span>
+          ${specs ? `<small>${specs} · ${p.fuente||''}</small>` : `<small>${p.fuente||''}</small>`}
+        </div>
+        <a href="https://wa.me/52${p.telefono}?text=${msg}" target="_blank" rel="noopener" class="export-wa-btn">${WA_SVG} ${p.telefono}</a>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('exportCount').textContent = vendedores.length + ' vendedores';
+  document.getElementById('exportOverlay').classList.add('open');
+}
+
+function cerrarExport() {
+  document.getElementById('exportOverlay').classList.remove('open');
+}
+
+function copiarTodosContactos(btn) {
+  const vendedores = PROPS.filter(p => p.telefono && !p.remate).sort((a,b) => a.precio - b.precio);
+  const lines = vendedores.map((p, i) => {
+    const specs = [p.rec != null ? p.rec+' rec' : '', p.ban != null ? p.ban+' ban' : '', p.m2c ? p.m2c+'m²' : ''].filter(Boolean).join(' · ');
+    return `${i+1}. ${p.calle.substring(0,40)}\n   ${p.modalidad === 'Renta' ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio)}${specs ? ' · '+specs : ''}\n   WA: +52 ${p.telefono}`;
+  }).join('\n\n');
+  navigator.clipboard.writeText(lines).then(() => {
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar todo'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    alert('Lista de contactos:\n\n' + lines);
+  });
+}
+// ================================================================
 async function initFromData() {
   try {
     const res = await fetch('./data/listings.json?v=' + Date.now());
@@ -2923,6 +3095,7 @@ async function initFromData() {
   }
 
   // Arrancar mapa siempre (con datos del JSON o los hardcodeados como fallback)
+  calcMarketStats();
   render();
   drawAllZones();
   updateMarketIntel();
