@@ -5,7 +5,7 @@
   <script>
     /* Auto cache-buster — incrementar V en cada deploy para forzar recarga instantánea */
     (function(){
-      var V='13';
+      var V='14';
       var p=new URLSearchParams(location.search);
       if(p.get('v')!==V){p.set('v',V);location.replace(location.pathname+'?'+p.toString());}
     })();
@@ -1394,6 +1394,161 @@
 
     /* ─── MOTIV CARD dentro del scroll ─────────────────────────── */
     .sidebar-scroll .motiv-card { margin: 12px 12px 0 !important; }
+
+    /* ══════════════════════════════════════════════════════════════
+       SISTEMA TUTORIAL — help-fab · guía-modal · tour-bienvenida
+    ══════════════════════════════════════════════════════════════ */
+
+    /* FAB flotante "?" */
+    .help-fab {
+      position: fixed; bottom: 28px; right: 22px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #1e3a5f; border: 2px solid #2563eb;
+      color: #93c5fd; font-size: 19px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 1700;
+      box-shadow: 0 4px 20px rgba(37,99,235,.4);
+      transition: all .2s; user-select: none; font-family: inherit;
+    }
+    .help-fab:hover { background: #2563eb; color: #fff; transform: scale(1.1); }
+
+    /* Overlay guía de referencia */
+    #helpOverlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.65);
+      z-index: 2300; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    #helpOverlay.open { opacity: 1; pointer-events: all; }
+    #helpPanel {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 20px;
+      width: 94%; max-width: 500px; max-height: 88vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,.65);
+      transform: translateY(16px) scale(.97); transition: transform .25s;
+    }
+    #helpOverlay.open #helpPanel { transform: translateY(0) scale(1); }
+    .help-head {
+      padding: 20px 22px 14px; border-bottom: 1px solid #1e293b;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .help-head-title { font-size: 15px; font-weight: 800; color: #f1f5f9; }
+    .help-head-sub { font-size: 11px; color: #64748b; margin-top: 3px; }
+    .help-close-btn {
+      background: none; border: none; color: #475569; font-size: 20px;
+      cursor: pointer; padding: 0 2px; transition: color .15s; line-height: 1; flex-shrink: 0;
+    }
+    .help-close-btn:hover { color: #f1f5f9; }
+    .help-body { overflow-y: auto; flex: 1; padding: 4px 0 8px; }
+
+    .help-section { border-bottom: 1px solid #0f1e30; }
+    .help-section:last-child { border-bottom: none; }
+    .help-section-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 22px; cursor: pointer; transition: background .15s;
+    }
+    .help-section-header:hover { background: rgba(255,255,255,.04); }
+    .help-section-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+    .help-section-title { font-size: 13px; font-weight: 700; color: #e2e8f0; flex: 1; }
+    .help-section-arrow { color: #334155; font-size: 10px; transition: transform .2s; }
+    .help-section.open .help-section-arrow { transform: rotate(90deg); color: #60a5fa; }
+    .help-section-body { display: none; padding: 0 22px 16px; }
+    .help-section.open .help-section-body { display: block; }
+
+    .help-item { margin-bottom: 13px; }
+    .help-item:last-child { margin-bottom: 0; }
+    .help-item-label {
+      font-size: 10px; font-weight: 800; color: #475569;
+      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px;
+    }
+    .help-item-desc { font-size: 12.5px; color: #cbd5e1; line-height: 1.55; }
+    .help-item-desc strong { color: #e2e8f0; }
+    .help-item-desc em { color: #94a3b8; font-style: normal; }
+    .help-tip {
+      margin-top: 7px; background: rgba(37,99,235,.1);
+      border-left: 3px solid #2563eb; border-radius: 0 6px 6px 0;
+      padding: 7px 10px; font-size: 11.5px; color: #93c5fd; line-height: 1.45;
+    }
+    .help-tip.green { background: rgba(16,185,129,.08); border-color: #10b981; color: #6ee7b7; }
+    .help-tip.amber { background: rgba(245,158,11,.08); border-color: #f59e0b; color: #fcd34d; }
+    .help-foot {
+      padding: 12px 22px; border-top: 1px solid #1e293b;
+      display: flex; gap: 8px; flex-shrink: 0;
+    }
+    .help-foot button {
+      flex: 1; background: none; border: 1px solid #1e293b; color: #475569;
+      border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .15s; font-family: inherit;
+    }
+    .help-foot button:hover { border-color: #334155; color: #94a3b8; background: rgba(255,255,255,.03); }
+    .help-foot .btn-tour-again { background: rgba(37,99,235,.1); color: #60a5fa; border-color: rgba(37,99,235,.3); }
+    .help-foot .btn-tour-again:hover { background: rgba(37,99,235,.2); color: #93c5fd; }
+
+    /* Tour primera visita */
+    #tourOverlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.8);
+      z-index: 2500; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    #tourOverlay.open { opacity: 1; pointer-events: all; }
+    #tourPanel {
+      background: #0f172a; border: 1px solid #1e3a5f;
+      border-radius: 24px; width: 92%; max-width: 420px;
+      padding: 28px 26px 22px;
+      box-shadow: 0 32px 80px rgba(0,0,0,.75);
+      transform: translateY(20px) scale(.96); transition: transform .3s;
+    }
+    #tourOverlay.open #tourPanel { transform: translateY(0) scale(1); }
+    .tour-progress { display: flex; gap: 6px; margin-bottom: 24px; }
+    .tour-dot { flex: 1; height: 3px; border-radius: 3px; background: #1e293b; transition: background .3s; }
+    .tour-dot.active { background: #2563eb; }
+    .tour-icon { font-size: 38px; margin-bottom: 14px; display: block; }
+    .tour-title { font-size: 19px; font-weight: 800; color: #f1f5f9; margin-bottom: 10px; line-height: 1.2; }
+    .tour-body { font-size: 13.5px; color: #94a3b8; line-height: 1.65; margin-bottom: 18px; }
+    .tour-body strong { color: #e2e8f0; }
+    .tour-tag {
+      display: inline-block; padding: 1px 7px; border-radius: 4px;
+      font-size: 11px; font-weight: 800; letter-spacing: .2px; vertical-align: middle;
+    }
+    .tour-tag.green { background: rgba(16,185,129,.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,.25); }
+    .tour-tag.blue  { background: rgba(37,99,235,.15);  color: #93c5fd; border: 1px solid rgba(37,99,235,.25);  }
+    .tour-nav { display: flex; gap: 8px; align-items: center; }
+    .tour-btn-next {
+      flex: 1; background: #2563eb; color: #fff; border: none;
+      border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: background .15s; font-family: inherit;
+    }
+    .tour-btn-next:hover { background: #1d4ed8; }
+    .tour-btn-skip {
+      background: none; border: 1px solid #1e293b; color: #334155;
+      border-radius: 12px; padding: 12px 14px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .15s; font-family: inherit;
+    }
+    .tour-btn-skip:hover { border-color: #334155; color: #64748b; }
+
+    /* Workflow box en sidebar */
+    .workflow-box {
+      margin: 10px 12px 0; background: rgba(37,99,235,.07);
+      border: 1px solid rgba(37,99,235,.18); border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .workflow-box-title {
+      font-size: 9.5px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .8px; color: #3b82f6; margin-bottom: 10px;
+    }
+    .wf-step { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .wf-step:last-child { margin-bottom: 0; }
+    .wf-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #2563eb; color: #fff; font-size: 10px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .wf-text strong { display: block; font-size: 11.5px; color: #e2e8f0; line-height: 1.2; font-weight: 700; }
+    .wf-text span { font-size: 10.5px; color: #334155; }
   </style>
 </head>
 <body>
@@ -1413,6 +1568,7 @@
     <button class="zona-btn active" id="btn-zona-terralta" onclick="toggleZona('terralta')">Ver zona</button>
   </div>
   <button class="btn-presentar" id="btn-presentar" onclick="togglePresentacion()">Presentar</button>
+  <button class="btn-presentar" onclick="abrirGuia()" title="Guía de uso del portal" style="background:#1e3a5f;color:#93c5fd;border-color:#2563eb;margin-left:4px;">? Guía</button>
 </header>
 
 <!-- Botón salir modo presentación (flotante) -->
@@ -1481,6 +1637,23 @@
       <div class="intel-chip"><span class="intel-val" id="mi-rentas">—</span><span class="intel-label">en renta</span></div>
       <div class="intel-chip"><span class="intel-val" id="mi-avgm2">—</span><span class="intel-label">prom/m²</span></div>
       <div class="intel-chip"><span class="intel-val" id="mi-remates">—</span><span class="intel-label">remates</span></div>
+    </div>
+
+    <!-- Flujo de trabajo — guía visual para la agente -->
+    <div class="workflow-box">
+      <div class="workflow-box-title">Tu flujo para cerrar</div>
+      <div class="wf-step">
+        <div class="wf-num">1</div>
+        <div class="wf-text"><strong>Detecta oportunidades</strong><span>Badge verde = precio bajo mercado</span></div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">2</div>
+        <div class="wf-text"><strong>Negocia comisión</strong><span>Botón verde → mensaje al vendedor</span></div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">3</div>
+        <div class="wf-text"><strong>Cierra con tu cliente</strong><span>Botón azul → reenvía la propiedad</span></div>
+      </div>
     </div>
 
     <!-- Tipo filter -->
@@ -1574,6 +1747,151 @@
   </div><!-- /content-right -->
 
   <!-- ─── LEAD CAPTURE MODAL ──────────────────────────────── -->
+  <!-- ── FAB GUÍA FLOTANTE ───────────────────────────────────── -->
+  <button class="help-fab" onclick="abrirGuia()" title="Guía de uso del portal" aria-label="Abrir guía">?</button>
+
+  <!-- ── TOUR BIENVENIDA (primera visita) ────────────────────── -->
+  <div id="tourOverlay" onclick="if(event.target===this)skipTour()">
+    <div id="tourPanel"><!-- contenido dinámico vía JS --></div>
+  </div>
+
+  <!-- ── GUÍA DE REFERENCIA ───────────────────────────────────── -->
+  <div id="helpOverlay" onclick="if(event.target===this)cerrarGuia()">
+    <div id="helpPanel">
+      <div class="help-head">
+        <div>
+          <div class="help-head-title">Guía del portal · Cloud Inmobiliaria</div>
+          <div class="help-head-sub">Cómo usar cada función para vender y rentar más rápido</div>
+        </div>
+        <button class="help-close-btn" onclick="cerrarGuia()" aria-label="Cerrar guía">✕</button>
+      </div>
+      <div class="help-body">
+
+        <!-- 1. NAVEGAR EL PORTAL -->
+        <div class="help-section open" id="hs1">
+          <div class="help-section-header" onclick="toggleHelpSection(this)">
+            <div class="help-section-icon" style="background:rgba(37,99,235,.1)">🗺️</div>
+            <span class="help-section-title">Navegar el portal</span>
+            <span class="help-section-arrow">▶</span>
+          </div>
+          <div class="help-section-body">
+            <div class="help-item">
+              <div class="help-item-label">Mapa + Cards</div>
+              <div class="help-item-desc">El mapa muestra los pines de cada propiedad. Las cards de abajo tienen todos los detalles: precio, m², recámaras, baños y fuente del anuncio.</div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-label">Filtros del sidebar</div>
+              <div class="help-item-desc">Usa los chips <strong>Venta / Renta / Remate</strong> para filtrar por tipo. El slider de precio filtra por presupuesto máximo de tu cliente.</div>
+              <div class="help-tip green">Empieza siempre con <strong>Todos</strong> para ver el mercado completo, luego filtra según lo que busca tu cliente activo.</div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-label">Pines en el mapa</div>
+              <div class="help-item-desc">Haz clic en cualquier pin del mapa para ver el resumen de la propiedad. Los pines verdes son ventas, azules rentas, rojos remates.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. BADGE OPORTUNIDAD -->
+        <div class="help-section" id="hs2">
+          <div class="help-section-header" onclick="toggleHelpSection(this)">
+            <div class="help-section-icon" style="background:rgba(5,150,105,.1)">🔥</div>
+            <span class="help-section-title">Badge "↓X% precio zona"</span>
+            <span class="help-section-arrow">▶</span>
+          </div>
+          <div class="help-section-body">
+            <div class="help-item">
+              <div class="help-item-label">Qué significa</div>
+              <div class="help-item-desc">La propiedad tiene precio/m² al menos <strong>15% por debajo</strong> del promedio calculado en tiempo real de las ventas activas en Terralta.</div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-label">Por qué importa</div>
+              <div class="help-item-desc">Hay margen para negociar tu comisión <em>y</em> para que el cliente perciba que hizo un buen negocio. Doble argumento de cierre.</div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-label">Cuándo actuar</div>
+              <div class="help-item-desc">Inmediatamente. Las propiedades con precio bajo mercado son las primeras en moverse.</div>
+              <div class="help-tip green">→ Cuando ves este badge, llama hoy. No mañana. Hoy.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. ROI ESTIMADO -->
+        <div class="help-section" id="hs3">
+          <div class="help-section-header" onclick="toggleHelpSection(this)">
+            <div class="help-section-icon" style="background:rgba(5,150,105,.1)">📈</div>
+            <span class="help-section-title">ROI estimado por card</span>
+            <span class="help-section-arrow">▶</span>
+          </div>
+          <div class="help-section-body">
+            <div class="help-item">
+              <div class="help-item-label">Qué muestra</div>
+              <div class="help-item-desc">El estimado de renta mensual y el <strong>rendimiento anual</strong> si se comprara la propiedad y se rentara a los precios actuales de la zona.</div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-label">Cómo usarlo en tu pitch</div>
+              <div class="help-item-desc">Cuando tu cliente quiere invertir: <em>"Esta propiedad genera ~$12,000/mes en renta — eso es 7% anual sobre tu inversión, mejor que muchos instrumentos financieros."</em></div>
+              <div class="help-tip green">→ Yield &gt;6% anual = propiedad muy atractiva para inversionista. Úsalo como argumento de cierre cuando el cliente duda del precio.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. BOTONES WHATSAPP -->
+        <div class="help-section" id="hs4">
+          <div class="help-section-header" onclick="toggleHelpSection(this)">
+            <div class="help-section-icon" style="background:rgba(37,99,235,.1)">💬</div>
+            <span class="help-section-title">Los 2 botones de WhatsApp</span>
+            <span class="help-section-arrow">▶</span>
+          </div>
+          <div class="help-section-body">
+            <div class="help-item">
+              <div class="help-item-label">Botón verde — "Comisión"</div>
+              <div class="help-item-desc">Abre WhatsApp <strong>directo con el vendedor o agente</strong>. El mensaje ya está redactado: te presentas de Cloud Inmobiliaria y preguntas si trabaja con comisión compartida (co-brokerage).</div>
+              <div class="help-tip green">→ Úsalo cuando quieres sumar una propiedad a tu portafolio activo sin ser tú quien tiene el anuncio. Es prospección inteligente.</div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-label">Botón azul — "Cliente"</div>
+              <div class="help-item-desc">Abre WhatsApp <strong>para reenviar la propiedad a un cliente tuyo</strong>. El mensaje incluye las specs y pregunta si quieren agendar visita. Tú eliges el contacto de tu lista.</div>
+              <div class="help-tip">→ Cuando tienes un cliente buscando en Terralta, mándale la card directo desde aquí. Sin copiar nada a mano.</div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-label">Flujo óptimo</div>
+              <div class="help-item-desc">Primero <strong>Comisión</strong> para confirmar que el vendedor acepta co-brokerage. Si acepta, inmediatamente <strong>Cliente</strong> para cerrar el triángulo: tú en el medio.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. EXPORTAR Y PROSPECTAR -->
+        <div class="help-section" id="hs5">
+          <div class="help-section-header" onclick="toggleHelpSection(this)">
+            <div class="help-section-icon" style="background:rgba(245,158,11,.08)">📋</div>
+            <span class="help-section-title">Exportar y prospectar en bulk</span>
+            <span class="help-section-arrow">▶</span>
+          </div>
+          <div class="help-section-body">
+            <div class="help-item">
+              <div class="help-item-label">Dónde está</div>
+              <div class="help-item-desc">Sidebar → <strong>Herramientas agente → Exportar vendedores + WA</strong>. Muestra la lista completa de todos los vendedores con teléfono disponible.</div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-label">Cómo funciona</div>
+              <div class="help-item-desc">Cada entrada tiene un botón WA que abre el chat con el pitch de co-brokerage listo. El botón <strong>"Copiar todo"</strong> copia la lista formateada para tu CRM.</div>
+            </div>
+            <div class="help-item">
+              <div class="help-item-label">Rutina recomendada</div>
+              <div class="help-item-desc">Cada lunes: abre la lista, copia todos, marca los que ya contactaste, envía WA a los nuevos. Constancia = resultados.</div>
+              <div class="help-tip amber">→ 20 mensajes enviados = 2-3 respuestas promedio = 1 cita potencial. Una cita a la semana puede cambiar el mes.</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /help-body -->
+      <div class="help-foot">
+        <button onclick="cerrarGuia()">Cerrar</button>
+        <button class="btn-tour-again" onclick="cerrarGuia();setTimeout(iniciarTourDeNuevo,300)">Ver tour de inicio</button>
+      </div>
+    </div><!-- /helpPanel -->
+  </div><!-- /helpOverlay -->
+
   <!-- ── EXPORTAR CONTACTOS VENDEDORES ─────────────────────── -->
   <div id="exportOverlay" onclick="if(event.target===this)cerrarExport()">
     <div id="exportPanel">
@@ -3104,6 +3422,8 @@ async function initFromData() {
 
 // PROPS y DESARROLLOS son los arrays declarados arriba (fallback si falla fetch)
 initFromData();
+// Tour de bienvenida — se muestra solo la primera vez (localStorage check)
+checkFirstVisit();
 
 // ================================================================
 // MARKET INTELLIGENCE — stats dinámicas calculadas de PROPS
@@ -3739,6 +4059,118 @@ function generarFlyer(propId, e) {
   } else {
     drawFlyer();
   }
+}
+
+// ================================================================
+// SISTEMA TUTORIAL — guía + tour de bienvenida
+// ================================================================
+
+// ── Guía de referencia ────────────────────────────────────────
+function abrirGuia() {
+  document.getElementById('helpOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function cerrarGuia() {
+  document.getElementById('helpOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function toggleHelpSection(headerEl) {
+  const section = headerEl.closest('.help-section');
+  const isOpen = section.classList.contains('open');
+  // Cerrar todas
+  document.querySelectorAll('.help-section').forEach(s => s.classList.remove('open'));
+  // Abrir la clickeada si estaba cerrada
+  if (!isOpen) section.classList.add('open');
+}
+
+// ── Tour de bienvenida (primera visita) ──────────────────────
+const TOUR_DATA = [
+  {
+    icon: '🏠',
+    title: 'Tu radar de Terralta',
+    body: 'Este portal te muestra <strong>todas las propiedades disponibles</strong> en Terralta en tiempo real — ventas, rentas y remates. Filtra, compara y actúa más rápido que cualquier agente de la zona.',
+    tip: null
+  },
+  {
+    icon: '🔥',
+    title: 'Badge de oportunidad',
+    body: 'Cuando una card tiene el badge <strong>↓X% precio zona</strong>, esa propiedad está al menos <strong>15% por debajo del promedio de mercado</strong> en Terralta. Calculado en tiempo real.',
+    tip: '→ Llama hoy, no mañana. A ese precio hay margen para tu comisión y para que el cliente sienta que ganó.'
+  },
+  {
+    icon: '💬',
+    title: 'Dos botones, dos movimientos',
+    body: 'Cada card tiene dos botones de WhatsApp:<br><br>' +
+      '<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,.12);border-radius:5px;padding:2px 8px;font-size:12px;font-weight:700;color:#6ee7b7;border:1px solid rgba(16,185,129,.2)">Comisión</span>' +
+      ' → Contacta al <strong style="color:#e2e8f0">vendedor</strong> para negociar co-brokerage.<br><br>' +
+      '<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(37,99,235,.12);border-radius:5px;padding:2px 8px;font-size:12px;font-weight:700;color:#93c5fd;border:1px solid rgba(37,99,235,.2)">Cliente</span>' +
+      ' → Reenvía la propiedad a <strong style="color:#e2e8f0">tu cliente</strong>.',
+    tip: null
+  },
+  {
+    icon: '📋',
+    title: 'Prospección en bulk cada lunes',
+    body: 'Sidebar → <strong>Herramientas agente → Exportar vendedores</strong>. Ves todos los teléfonos de un golpe. Un clic por contacto abre el WA con el pitch listo.',
+    tip: '→ 20 mensajes a la semana = 2-3 respuestas = 1 cita potencial. Así se construye el pipeline.'
+  }
+];
+
+let _tourStep = 0;
+
+function iniciarTourDeNuevo() {
+  _tourStep = 0;
+  renderTourStep();
+  document.getElementById('tourOverlay').classList.add('open');
+}
+
+function checkFirstVisit() {
+  if (!localStorage.getItem('cloud_portal_v2_guided')) {
+    setTimeout(() => {
+      _tourStep = 0;
+      renderTourStep();
+      document.getElementById('tourOverlay').classList.add('open');
+    }, 1600);
+  }
+}
+
+function renderTourStep() {
+  const d = TOUR_DATA[_tourStep];
+  const total = TOUR_DATA.length;
+
+  const dotsHtml = TOUR_DATA.map((_, i) =>
+    `<div class="tour-dot${i <= _tourStep ? ' active' : ''}"></div>`
+  ).join('');
+
+  const isLast = _tourStep === total - 1;
+
+  document.getElementById('tourPanel').innerHTML = `
+    <div class="tour-progress">${dotsHtml}</div>
+    <span class="tour-icon">${d.icon}</span>
+    <div class="tour-title">${d.title}</div>
+    <div class="tour-body">${d.body}</div>
+    ${d.tip ? `<div class="help-tip" style="margin-bottom:16px">${d.tip}</div>` : ''}
+    <div class="tour-nav">
+      ${isLast
+        ? `<button class="tour-btn-skip" onclick="skipTour()" style="visibility:hidden">·</button>`
+        : `<button class="tour-btn-skip" onclick="skipTour()">Saltar</button>`}
+      <button class="tour-btn-next" onclick="nextTourStep()">${isLast ? '¡Listo, entendido!' : 'Siguiente →'}</button>
+    </div>
+    <div style="text-align:center;margin-top:10px;font-size:10px;color:#334155">${_tourStep + 1} de ${total}</div>
+  `;
+}
+
+function nextTourStep() {
+  if (_tourStep < TOUR_DATA.length - 1) {
+    _tourStep++;
+    renderTourStep();
+  } else {
+    skipTour();
+  }
+}
+
+function skipTour() {
+  document.getElementById('tourOverlay').classList.remove('open');
+  localStorage.setItem('cloud_portal_v2_guided', '1');
 }
 
 // ================================================================
