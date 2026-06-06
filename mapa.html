@@ -1174,90 +1174,79 @@
     }
     body.modo-presentacion .presentacion-exit { display: flex; align-items: center; gap: 5px; }
 
-    /* ═══════════════════════════════════════════════════════════
-       SIDEBAR PREMIUM DARK — jerarquía visual gama alta
-    ════════════════════════════════════════════════════════════ */
-    .sidebar { background: #0c1a17; border-right: 1px solid #162a24; }
-    .sidebar-top { border-bottom-color: #162a24; }
-    .sidebar-heading { color: #e2f0eb; }
-    .sidebar-sub { color: #4d7a68; }
+    /* ─── ANIMACIÓN DE ENTRADA — TARJETAS ─────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px) scale(.98); }
+      to   { opacity: 1; transform: translateY(0)   scale(1); }
+    }
+    .prop-card { animation: fadeUp .3s cubic-bezier(.22,1,.36,1) both; }
+    .prop-card:nth-child(1)  { animation-delay: .00s }
+    .prop-card:nth-child(2)  { animation-delay: .05s }
+    .prop-card:nth-child(3)  { animation-delay: .09s }
+    .prop-card:nth-child(4)  { animation-delay: .13s }
+    .prop-card:nth-child(5)  { animation-delay: .17s }
+    .prop-card:nth-child(6)  { animation-delay: .20s }
+    .prop-card:nth-child(n+7){ animation-delay: .23s }
 
-    /* Stats chips */
-    .stats-row .stat-chip { background: rgba(22,163,74,.05); border-color: #1a3329; }
-    .stats-row .stat-chip strong { color: #ecfdf5; }
-    .stats-row .stat-chip span { color: #4d7a68; }
+    /* ─── TIPOGRAFÍA — 4 NIVELES NORMALIZADOS ─────────────────── */
+    .card-precio          { font-size: 18px !important; font-weight: 800 !important; letter-spacing: -.4px; }
+    .card-calle           { font-size: 13px !important; }
+    .spec-item            { font-size: 12px !important; font-weight: 500 !important; }
+    .btn-ver, .btn-wa-sm  { font-size: 12px !important; font-weight: 700 !important; }
+    .stat-chip strong     { font-size: 20px !important; font-weight: 800 !important; line-height: 1 !important; }
+    .stat-chip span       { font-size: 9.5px !important; }
+    .intel-val            { font-size: 15px !important; font-weight: 800 !important; }
+    .chip                 { font-size: 11px !important; font-weight: 600 !important; letter-spacing: .1px; }
+    .filter-label         { font-size: 9px !important; font-weight: 700 !important; letter-spacing: 1.1px !important; text-transform: uppercase !important; }
+    .fb-section-title     { font-size: 9px !important; font-weight: 700 !important; letter-spacing: 1.1px !important; text-transform: uppercase !important; }
+    .fb-btn               { font-size: 12px !important; font-weight: 600 !important; }
+    .action-btn           { font-size: 12.5px !important; font-weight: 600 !important; }
+    .logo-name            { font-size: 16px !important; font-weight: 800 !important; letter-spacing: -.5px !important; }
+    .logo-tagline         { font-size: 11px !important; }
+    .data-badge           { font-size: 11px !important; font-weight: 600 !important; }
+    .zona-pill            { font-size: 11px !important; font-weight: 600 !important; }
+    .results-bar          { font-size: 12px !important; }
 
-    /* Market Intel */
-    .market-intel { border-top-color: #162a24; border-bottom-color: #162a24; }
-    .intel-chip { border-right-color: #162a24; }
-    .intel-chip:nth-child(n+3) { border-top-color: #162a24; }
-    .intel-val { color: #ecfdf5; }
-    .intel-label { color: #4d7a68; }
+    /* ─── IMAGEN CARD — más alta ──────────────────────────────── */
+    .card-img-wrap { height: 170px !important; }
 
-    /* Filtros */
-    .filters-section {
-      background: rgba(22,163,74,.06);
-      border-left-color: rgba(22,163,74,.4);
-      border-bottom-color: #162a24;
-    }
-    .filter-label { color: #6bab8f; }
-    .chip {
-      background: rgba(255,255,255,.04);
-      border-color: #1d3b32;
-      color: #c7e8d8;
-      box-shadow: none;
-    }
-    .chip[data-tipo=Todos] {
-      background: rgba(22,163,74,.1);
-      border-color: rgba(22,163,74,.32);
-      color: #6ee7b7;
-    }
-    .chip[data-tipo=Todos].active {
-      background: #16a34a; border-color: #16a34a; color: #fff;
-    }
-    .chip.active {
-      background: rgba(255,255,255,.09);
-      border-color: #2a5248;
-      color: #ecfdf5;
-      box-shadow: none;
-    }
-    .chip:hover:not(.active) {
-      background: rgba(255,255,255,.07);
-      border-color: #2a5248;
-      color: #ecfdf5;
-      transform: none;
-    }
+    /* ─── SIDEBAR DARK — forzar con !important ─────────────────── */
+    .sidebar { background: #0c1a17 !important; border-right: 1px solid #162a24 !important; }
+    .sidebar-top { background: #0c1a17 !important; border-bottom-color: #1d3b32 !important; }
+    .sidebar-scroll { background: #0c1a17 !important; }
+    .sidebar .stat-chip { background: rgba(22,163,74,.06) !important; border-color: #1d3b32 !important; }
+    .sidebar .stat-chip strong { color: #ecfdf5 !important; }
+    .sidebar .stat-chip span { color: #4d7a68 !important; }
+    .sidebar .sidebar-heading { color: #ecfdf5 !important; }
+    .sidebar .sidebar-sub { color: #4d7a68 !important; }
+    .sidebar .market-intel { border-top-color: #1d3b32 !important; border-bottom-color: #1d3b32 !important; }
+    .sidebar .intel-chip { border-right-color: #1d3b32 !important; background: #0c1a17 !important; }
+    .sidebar .intel-chip:nth-child(n+3) { border-top-color: #1d3b32 !important; }
+    .sidebar .intel-val { color: #ecfdf5 !important; }
+    .sidebar .intel-label { color: #4d7a68 !important; }
+    .sidebar .filters-section { background: rgba(22,163,74,.05) !important; border-bottom-color: #1d3b32 !important; }
+    .sidebar .filter-label { color: #6bab8f !important; }
+    .sidebar .chip { background: rgba(255,255,255,.04) !important; border-color: #1d3b32 !important; color: #c7e8d8 !important; box-shadow: none !important; }
+    .sidebar .chip[data-tipo="Todos"] { background: rgba(22,163,74,.1) !important; border-color: rgba(22,163,74,.3) !important; color: #6ee7b7 !important; }
+    .sidebar .chip[data-tipo="Todos"].active, .sidebar .chip.active[data-tipo="Todos"] { background: #16a34a !important; border-color: #16a34a !important; color: #fff !important; }
+    .sidebar .chip.active { background: rgba(255,255,255,.09) !important; border-color: #2a5248 !important; color: #ecfdf5 !important; }
+    .sidebar .chip:hover:not(.active) { background: rgba(255,255,255,.07) !important; border-color: #2a5248 !important; color: #ecfdf5 !important; transform: none !important; }
+    .sidebar .precio-section { background: #0c1a17 !important; border-bottom-color: #1d3b32 !important; }
+    .sidebar .precio-val { color: #ecfdf5 !important; }
+    .sidebar .fb-section { background: #0c1a17 !important; border-top-color: #1d3b32 !important; }
+    .sidebar .fb-section-title { color: #4d7a68 !important; }
+    .sidebar .fb-btn { background: rgba(22,163,74,.07) !important; border-color: #1d3b32 !important; color: #86efac !important; }
+    .sidebar .fb-btn:hover { background: #16a34a !important; color: #fff !important; border-color: #16a34a !important; }
+    .sidebar .action-section { background: #0c1a17 !important; border-top-color: #1d3b32 !important; }
+    .sidebar .action-btn--calc { background: rgba(22,163,74,.09) !important; color: #86efac !important; border-color: rgba(22,163,74,.22) !important; }
+    .sidebar .action-btn--val { background: rgba(249,115,22,.07) !important; color: #fb923c !important; border-color: rgba(249,115,22,.18) !important; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #1d3b32 !important; }
 
-    /* Precio slider */
-    .precio-section { border-bottom-color: #162a24; }
-    .precio-val { color: #ecfdf5; }
-    .sidebar .filter-label { color: #6bab8f; }
-
-    /* Portales */
-    .fb-section { border-top-color: #162a24; }
-    .fb-section-title { color: #4d7a68; }
-    .fb-btn {
-      background: rgba(22,163,74,.07);
-      border-color: #1d3b32;
-      color: #86efac;
-    }
-    .fb-btn:hover { background: #16a34a !important; color: #fff !important; border-color: #16a34a !important; }
-
-    /* Botones de acción */
-    .action-section { border-top-color: #162a24; }
-    .action-btn--calc {
-      background: rgba(22,163,74,.09);
-      color: #86efac;
-      border-color: rgba(22,163,74,.22);
-    }
-    .action-btn--val {
-      background: rgba(249,115,22,.07);
-      color: #fb923c;
-      border-color: rgba(249,115,22,.18);
-    }
-
-    /* Scrollbar oscuro */
-    .sidebar-scroll::-webkit-scrollbar-thumb { background: #1d3b32; }
+    /* ─── CARD — colores alineados al dark sidebar ────────────── */
+    .card-calle { color: #64748b !important; }
+    .spec-item { color: #64748b !important; }
+    .fuente-badge { font-size: 9px !important; }
+    .m2-tag { font-size: 11px !important; color: #94a3b8 !important; }
   </style>
 </head>
 <body>
@@ -1272,11 +1261,11 @@
     </div>
   </div>
   <div class="header-right header-tools">
-    <div class="data-badge" id="update-badge">🔄 Cargando...</div>
-    <div class="zona-pill">📍 Fracc. Terralta · CP 45594</div>
-    <button class="zona-btn active" id="btn-zona-terralta" onclick="toggleZona('terralta')">🗺 Ver zona</button>
+    <div class="data-badge" id="update-badge">Actualizando...</div>
+    <div class="zona-pill">Terralta · Jalisco</div>
+    <button class="zona-btn active" id="btn-zona-terralta" onclick="toggleZona('terralta')">Ver zona</button>
   </div>
-  <button class="btn-presentar" id="btn-presentar" onclick="togglePresentacion()">🖥 Presentar</button>
+  <button class="btn-presentar" id="btn-presentar" onclick="togglePresentacion()">Presentar</button>
 </header>
 
 <!-- Botón salir modo presentación (flotante) -->
@@ -1332,33 +1321,33 @@
 
     <!-- Tipo filter -->
     <div class="filters-section" id="filtros-section">
-      <div class="filter-label">Filtrar por tipo</div>
+      <div class="filter-label">Tipo de propiedad</div>
       <div class="tipo-chips">
         <button class="chip active" data-tipo="Todos">Todos</button>
-        <button class="chip" data-tipo="Venta">💰 Venta</button>
-        <button class="chip" data-tipo="Renta">🏠 Renta</button>
-        <button class="chip" data-tipo="Remate">🔴 Remate</button>
-        <button class="chip" data-tipo="Facebook">🔵 Facebook</button>
-        <button class="chip" data-tipo="Nuevo">🏗 Nuevo</button>
+        <button class="chip" data-tipo="Venta">Venta</button>
+        <button class="chip" data-tipo="Renta">Renta</button>
+        <button class="chip" data-tipo="Remate">Remate</button>
+        <button class="chip" data-tipo="Facebook">Facebook</button>
+        <button class="chip" data-tipo="Nuevo">Nuevo</button>
       </div>
     </div>
 
     <!-- Portales externos — buscar más propiedades -->
     <div class="fb-section">
-      <div class="fb-section-title">🔍 Buscar en portales</div>
-      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/venta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener" style="color:#f97316;background:#fff7ed;border-color:#fed7aa;">
-        🛒 ML Venta
+      <div class="fb-section-title">Portales externos</div>
+      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/venta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener">
+        MercadoLibre — Venta
       </a>
-      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/renta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener" style="color:#f97316;background:#fff7ed;border-color:#fed7aa;">
-        🛒 ML Renta
+      <a class="fb-btn" href="https://inmuebles.mercadolibre.com.mx/casas/renta/san-pedro-tlaquepaque/terralta/" target="_blank" rel="noopener">
+        MercadoLibre — Renta
       </a>
-      <a class="fb-btn" href="https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html" target="_blank" rel="noopener" style="color:#16a34a;background:#f0fdf4;border-color:#bbf7d0;">
-        🏡 Inmuebles24
+      <a class="fb-btn" href="https://www.inmuebles24.com/inmuebles-en-fraccionamiento-terralta.html" target="_blank" rel="noopener">
+        Inmuebles24
       </a>
       <a class="fb-btn" href="https://www.facebook.com/marketplace/guadalajara/propertyforsale/?query=terralta&exact=false" target="_blank" rel="noopener" title="Requiere sesión activa en Facebook">
-        🔵 Marketplace*
+        Facebook Marketplace
       </a>
-      <div style="grid-column:1/-1;font-size:9.5px;color:#9ca3af;margin-top:2px;">* Facebook requiere sesión activa</div>
+      <div style="font-size:9px;color:#4d7a68;margin-top:2px;">* Requiere sesión FB activa</div>
     </div>
 
     <!-- Price slider -->
@@ -1374,7 +1363,7 @@
 
     <!-- Tarjeta motivacional — siempre visible abajo -->
     <div class="motiv-card" id="motivCard">
-      <div class="motiv-tag">✨ Mentalidad ganadora · Hoy</div>
+      <div class="motiv-tag">Mentalidad ganadora · Hoy</div>
       <div class="motiv-quote" id="motivQuote">…</div>
       <div class="motiv-author" id="motivAuthor"></div>
       <div class="motiv-meta">
@@ -1392,16 +1381,16 @@
     <!-- Acciones rápidas -->
     <div class="action-section">
       <button class="action-btn action-btn--pub" onclick="openMarketplace()">
-        📢 Publicar propiedad
+        Publicar propiedad
       </button>
       <button class="action-btn action-btn--calc" onclick="openCalc()">
-        🧮 Calculadora inmobiliaria
+        Calculadora inmobiliaria
       </button>
       <button class="action-btn action-btn--val" onclick="openValuacion()">
-        🏠 Vender / Rentar mi propiedad
+        Vender o rentar mi propiedad
       </button>
       <button class="action-btn action-btn--tools" onclick="openHerramientas()">
-        ⚙️ Configurar WaFlowProX
+        Herramientas WA
       </button>
     </div>
 
@@ -1427,7 +1416,7 @@
     <div class="results-bar">
       <span>Mostrando <strong id="result-count">0</strong> propiedades</span>
       <div style="display:flex;align-items:center;gap:7px;">
-        <button onclick="map.fitBounds(_teraltaBounds,{padding:[20,20]})" style="background:#16a34a;color:#fff;border:none;border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📍 Ver Terralta</button>
+        <button onclick="map.fitBounds(_teraltaBounds,{padding:[20,20]})" style="background:#16a34a;color:#fff;border:none;border-radius:100px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">Ver Terralta</button>
         <span class="fuente-tag" id="data-fecha-tag">Mayo 2026</span>
       </div>
     </div>
