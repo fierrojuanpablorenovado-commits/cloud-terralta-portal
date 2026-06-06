@@ -339,6 +339,83 @@ def find_postings(obj, depth=0) -> list | None:
     return None
 
 
+def find_phone_in_obj(obj, depth=0) -> str | None:
+    """Busca recursivamente un teléfono mexicano (10 dígitos) en cualquier estructura JSON."""
+    if depth > 12:
+        return None
+    if isinstance(obj, str):
+        m = re.search(r'\b([2-9]\d{9})\b', obj)
+        return m.group(1) if m else None
+    if isinstance(obj, list):
+        for item in obj:
+            r = find_phone_in_obj(item, depth + 1)
+            if r:
+                return r
+    if isinstance(obj, dict):
+        # Primero claves que probablemente contienen teléfonos
+        for k in ('phones', 'phone', 'phoneNumber', 'telefono', 'contactPhone',
+                  'advertiserPhone', 'publisherPhone', 'sellerPhone'):
+            if k in obj:
+                r = find_phone_in_obj(obj[k], depth + 1)
+                if r:
+                    return r
+        # Luego el resto del dict
+        for v in obj.values():
+            r = find_phone_in_obj(v, depth + 1)
+            if r:
+                return r
+    return None
+
+
+def get_i24_phone(listing_id: str, url: str) -> str | None:
+    """
+    Visita la página de detalle de un listing de Inmuebles24 y extrae el teléfono
+    del vendedor desde __NEXT_DATA__ o patrones en el HTML.
+    Retorna el número de 10 dígitos o None.
+    """
+    detail_url = url if url and url.startswith("http") else (
+        f"https://www.inmuebles24.com/propiedades-{listing_id}.html" if listing_id else None
+    )
+    if not detail_url:
+        return None
+
+    jitter(0.8, 1.8)
+
+    # 1er intento: Playwright (bypasea Cloudflare)
+    html = _fetch_with_playwright(detail_url)
+    if html and "just a moment" in html.lower():
+        html = None
+
+    # 2do intento: HTTP directo
+    if not html:
+        status, html = http_get(detail_url)
+        if status != 200 or not html:
+            return None
+        if "just a moment" in html.lower():
+            return None
+
+    # Buscar en __NEXT_DATA__
+    nd = get_next_data(html)
+    if nd:
+        phone = find_phone_in_obj(nd)
+        if phone:
+            return phone
+
+    # Fallback: regex directos en HTML crudo
+    for pattern in [
+        r'"phone"\s*:\s*"([2-9]\d{9})"',
+        r'"phones"\s*:\s*\[\s*"([2-9]\d{9})"',
+        r'"phoneNumber"\s*:\s*"([2-9]\d{9})"',
+        r'tel:([2-9]\d{9})',
+        r'href="tel:(?:\+?52)?([2-9]\d{9})"',
+    ]:
+        m = re.search(pattern, html)
+        if m:
+            return m.group(1)
+
+    return None
+
+
 def parse_i24(p: dict) -> dict | None:
     precio = None
     for op in p.get("priceOperationTypes", []):
@@ -487,6 +564,25 @@ def scrape_inmuebles24() -> list[dict]:
                 listings = [l for l in listings if l]
                 if listings:
                     print(f"  ✓ {len(listings)} propiedades Inmuebles24")
+                    # Enriquecer con teléfonos desde páginas de detalle
+                    MAX_PHONE_FETCH = 15  # límite para no saturar ni tardar demasiado
+                    print(f"  📞 Extrayendo teléfonos (hasta {MAX_PHONE_FETCH} listings)...")
+                    found = 0
+                    for listing in listings[:MAX_PHONE_FETCH]:
+                        try:
+                            phone = get_i24_phone(
+                                listing.get('listing_id', ''),
+                                listing.get('url', '')
+                            )
+                            if phone:
+                                listing['telefono'] = phone
+                                found += 1
+                                print(f"    ✓ {listing.get('calle','')[:30]}: {phone}")
+                            else:
+                                print(f"    – {listing.get('calle','')[:30]}: sin teléfono")
+                        except Exception as e:
+                            print(f"    ✗ Error: {e}")
+                    print(f"  📞 {found}/{min(len(listings), MAX_PHONE_FETCH)} teléfonos obtenidos")
                     return listings
         jitter(1, 2)
 
