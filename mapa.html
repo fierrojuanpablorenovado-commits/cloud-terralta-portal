@@ -5,7 +5,7 @@
   <script>
     /* Auto cache-buster — incrementar V en cada deploy para forzar recarga instantánea */
     (function(){
-      var V='15';
+      var V='16';
       var p=new URLSearchParams(location.search);
       if(p.get('v')!==V){p.set('v',V);location.replace(location.pathname+'?'+p.toString());}
     })();
@@ -1342,9 +1342,12 @@
       transition: background .15s; white-space: nowrap;
     }
     .btn-cliente:hover { background: #dbeafe; border-color: #93c5fd; opacity: 1; }
-    /* Flex layout: btn-ver fila 1 completa; WA buttons fila 2 */
+    /* Flex layout: btn-ver fila 1 completa (si existe); WA buttons fila 2 o única fila */
     .btn-ver   { flex: 1 1 100%; }
     .btn-wa-sm { flex: 1; }
+    /* Cuando no hay btn-ver, WA buttons se estiran solos */
+    .card-btns:not(:has(.btn-ver)) .btn-wa-sm { min-height: 32px !important; }
+    .card-btns:not(:has(.btn-ver)) .btn-cliente { min-height: 32px; }
     /* ── EXPORTAR OVERLAY ────────────────────────────────── */
     #exportOverlay {
       position: fixed; inset: 0; background: rgba(0,0,0,.55);
@@ -3097,9 +3100,18 @@ function renderCards() {
             </div>
             <div class="card-btns">
               ${(()=>{
-                const DIRECT_URL = p.url && !['foreclosures/for-sale','handleUrlNotRecognize'].some(s=>p.url.includes(s));
-                const btnLabel = DIRECT_URL ? 'Ver en ' + (p.fuente||'portal') + ' ↗' : (p.fuente||'Portal') + ' ↗';
-                return `<a href="${getListingUrl(p)}" target="_blank" rel="noopener" class="btn-ver">${btnLabel}</a>`;
+                // URL "directa" = tiene path de listing específico, no es una búsqueda genérica
+                const GENERIC_PATTERNS = [
+                  '/casas/venta/', '/casas/renta/', '/terralta/', 'terralta.html',
+                  'query=', 'marketplace/guadalajara', 'propertyforsale', 'propertyrentals',
+                  'jalisco/tlaquepaque', 'san-pedro-tlaquepaque/terralta',
+                ];
+                const BAD_PATTERNS = ['foreclosures/for-sale','handleUrlNotRecognize'];
+                const isDirectUrl = p.url
+                  && !BAD_PATTERNS.some(s => p.url.includes(s))
+                  && !GENERIC_PATTERNS.some(s => p.url.includes(s));
+                if (!isDirectUrl) return ''; // Sin URL directa → solo mostrar botones WA
+                return `<a href="${p.url}" target="_blank" rel="noopener" class="btn-ver">Ver en ${p.fuente||'portal'} ↗</a>`;
               })()}
               ${(()=>{
                 const fuente = p.fuente || 'portal';
@@ -3113,7 +3125,7 @@ function renderCards() {
                 const precioTxt2 = esRenta ? '$'+p.precio.toLocaleString('es-MX')+'/mes' : fmtPrecioFull(p.precio);
                 const specsTxt2 = [p.rec != null ? p.rec+' rec' : '', p.ban != null ? p.ban+' baños' : '', p.m2c ? p.m2c+'m²' : ''].filter(Boolean).join(' · ');
                 const clienteMsg = encodeURIComponent('Vi una propiedad en Terralta que puede interesarte:\n\n📍 ' + p.calle + '\n💰 ' + precioTxt2 + (specsTxt2 ? '\n' + specsTxt2 : '') + '\n\n¿La agendamos para verla?');
-                return '<a href="https://wa.me/?text=' + clienteMsg + '" target="_blank" rel="noopener" class="btn-cliente"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg> Cliente</a>';
+                return '<a href="https://wa.me/?text=' + clienteMsg + '" target="_blank" rel="noopener" class="btn-cliente">→ Enviar a cliente</a>';
               })()}
             </div>
 
