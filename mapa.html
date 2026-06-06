@@ -360,9 +360,9 @@
 
     /* Portales externos — buscar más propiedades */
     .fb-section {
-      padding: 10px 14px 12px;
+      padding: 10px 12px 14px;
       border-top: 1px solid #e5e7eb;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
+      display: flex; flex-direction: column; gap: 4px;
     }
     .fb-section-title {
       grid-column: 1 / -1;
@@ -371,15 +371,14 @@
       margin-bottom: 4px; display: flex; align-items: center; gap: 5px;
     }
     .fb-btn {
-      padding: 8px 6px; border-radius: 8px;
+      padding: 8px 10px; border-radius: 8px;
       font-size: 11px; font-weight: 600; cursor: pointer;
-      font-family: inherit; text-align: center;
-      display: flex; align-items: center; justify-content: center; gap: 3px;
-      line-height: 1.2;
+      font-family: inherit; text-align: left;
       display: flex; align-items: center; gap: 7px;
-      text-decoration: none; color: #1877f2;
+      line-height: 1.2;
+      text-decoration: none; color: #1d4ed8;
       background: #e7f0fd; border: 1.5px solid #b8d0f7;
-      transition: all .15s; text-decoration: none; color: #1d4ed8;
+      transition: all .15s;
     }
     .fb-btn:hover { background: #1877f2; color: #fff !important; border-color: #1877f2; }
 
@@ -1174,6 +1173,91 @@
       font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
     }
     body.modo-presentacion .presentacion-exit { display: flex; align-items: center; gap: 5px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       SIDEBAR PREMIUM DARK — jerarquía visual gama alta
+    ════════════════════════════════════════════════════════════ */
+    .sidebar { background: #0c1a17; border-right: 1px solid #162a24; }
+    .sidebar-top { border-bottom-color: #162a24; }
+    .sidebar-heading { color: #e2f0eb; }
+    .sidebar-sub { color: #4d7a68; }
+
+    /* Stats chips */
+    .stats-row .stat-chip { background: rgba(22,163,74,.05); border-color: #1a3329; }
+    .stats-row .stat-chip strong { color: #ecfdf5; }
+    .stats-row .stat-chip span { color: #4d7a68; }
+
+    /* Market Intel */
+    .market-intel { border-top-color: #162a24; border-bottom-color: #162a24; }
+    .intel-chip { border-right-color: #162a24; }
+    .intel-chip:nth-child(n+3) { border-top-color: #162a24; }
+    .intel-val { color: #ecfdf5; }
+    .intel-label { color: #4d7a68; }
+
+    /* Filtros */
+    .filters-section {
+      background: rgba(22,163,74,.06);
+      border-left-color: rgba(22,163,74,.4);
+      border-bottom-color: #162a24;
+    }
+    .filter-label { color: #6bab8f; }
+    .chip {
+      background: rgba(255,255,255,.04);
+      border-color: #1d3b32;
+      color: #c7e8d8;
+      box-shadow: none;
+    }
+    .chip[data-tipo=Todos] {
+      background: rgba(22,163,74,.1);
+      border-color: rgba(22,163,74,.32);
+      color: #6ee7b7;
+    }
+    .chip[data-tipo=Todos].active {
+      background: #16a34a; border-color: #16a34a; color: #fff;
+    }
+    .chip.active {
+      background: rgba(255,255,255,.09);
+      border-color: #2a5248;
+      color: #ecfdf5;
+      box-shadow: none;
+    }
+    .chip:hover:not(.active) {
+      background: rgba(255,255,255,.07);
+      border-color: #2a5248;
+      color: #ecfdf5;
+      transform: none;
+    }
+
+    /* Precio slider */
+    .precio-section { border-bottom-color: #162a24; }
+    .precio-val { color: #ecfdf5; }
+    .sidebar .filter-label { color: #6bab8f; }
+
+    /* Portales */
+    .fb-section { border-top-color: #162a24; }
+    .fb-section-title { color: #4d7a68; }
+    .fb-btn {
+      background: rgba(22,163,74,.07);
+      border-color: #1d3b32;
+      color: #86efac;
+    }
+    .fb-btn:hover { background: #16a34a !important; color: #fff !important; border-color: #16a34a !important; }
+
+    /* Botones de acción */
+    .action-section { border-top-color: #162a24; }
+    .action-btn--calc {
+      background: rgba(22,163,74,.09);
+      color: #86efac;
+      border-color: rgba(22,163,74,.22);
+    }
+    .action-btn--val {
+      background: rgba(249,115,22,.07);
+      color: #fb923c;
+      border-color: rgba(249,115,22,.18);
+    }
+
+    /* Scrollbar oscuro */
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #1d3b32; }
   </style>
 </head>
 <body>
